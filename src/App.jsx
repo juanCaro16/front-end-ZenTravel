@@ -8,6 +8,7 @@ import { Servicios } from "./Pages/Servicios/Servicios";
 import { Contacto } from "./Pages/Contacto/Contacto";
 import { ButtonHelp } from "./Components/ButtonHelp/ButtonHelp";
 import { Soporte } from "./Pages/Soporte/Soporte";
+import { Register } from "./Pages/Register/Register";
 
 
 
@@ -24,6 +25,11 @@ export const App = () => {
 
         {/* Ruta para la página de inicio de sesión */}
         <Route path="/login" element={<Login />} />
+
+        {/* Ruta para la página de registro */}
+        <Route path="/register" element={<Register />} />
+
+        {/* Ruta para la página de inicio */}
 
         {/* Ruta para la página de nosotros */}
         <Route path="/nosotros" element={<Nosotros />} />

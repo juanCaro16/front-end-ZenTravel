@@ -27,7 +27,9 @@ export const Header = ({ route }) => {
       >
         Iniciar Sesión
       </button>
-      <button className="bg-[#F0FA39] text-black rounded-3xl px-4 py-2 hover:bg-[#D4E02E]">
+      <button
+      onClick={() => navigate("/register")} 
+      className="bg-[#F0FA39] text-black rounded-3xl px-4 py-2 hover:bg-[#D4E02E]">
         Registrarse
       </button>
     </div>  

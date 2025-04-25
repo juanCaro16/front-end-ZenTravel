@@ -8,7 +8,7 @@ export const ButtonHelp = () => {
       {/* Botón de ayuda con tooltip */}
       <button
         onClick={() => navigate("/soporte")}
-        className="bg-white rounded-3xl w-10 h-10 fixed ml-[45%] mt-[38%] hover:bg-gray-200 group"
+        className="bg-white rounded-3xl w-10 h-10 fixed cursor-pointer ml-[45%] mt-[38%] hover:bg-gray-200 group"
       >
         ?
         {/* Tooltip */}
