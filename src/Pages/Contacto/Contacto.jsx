@@ -2,7 +2,7 @@ import React from 'react';
 
 export const Contacto = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen text-white px-4">
+    <div className="flex flex-col items-center justify-center h-screen text-black px-4">
       {/* Título y descripción */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">Contacto</h1>
@@ -19,19 +19,19 @@ export const Contacto = () => {
           <h2 className="text-xl font-semibold mb-4">Utiliza las siguientes vías de contacto, o rellena el formulario.</h2>
           <p className="mb-2">
             <span className="font-bold">Vía E-mail:</span>{' '}
-            <a href="mailto:hola@unsitiogenial.es" className="text-[#F0FA39] hover:underline">
+            <a href="mailto:hola@unsitiogenial.es" className="text-neutral-900 hover:underline">
               hola@unsitiogenial.es
             </a>
           </p>
           <p className="mb-2">
             <span className="font-bold">En nuestras redes sociales:</span>{' '}
-            <a href="https://twitter.com/unsitiogenial" target="_blank" rel="noopener noreferrer" className="text-[#F0FA39] hover:underline">
+            <a href="https://twitter.com/unsitiogenial" target="_blank" rel="noopener noreferrer" className="text-neutral-900 hover:underline">
               @unsitiogenial
             </a>
           </p>
           <p className="mb-2">
             <span className="font-bold">Por teléfono:</span>{' '}
-            <a href="tel:911234567" className="text-[#F0FA39] hover:underline">
+            <a href="tel:911234567" className="text-neutral-900 font-bold hover:underline">
               91-1234-567
             </a>
           </p>

@@ -10,5 +10,7 @@ body,#root{
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(to bottom, #78c5f5, #004aad);
+  background-image: url(./assets/Images/bg-image3.jpg);
+  background-size: cover;
+  background-position: center;
 }

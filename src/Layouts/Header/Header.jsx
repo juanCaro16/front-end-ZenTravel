@@ -14,11 +14,11 @@ export const Header = ({ route }) => {
       <h1 className="text-[#3C525D]">ZenTravel</h1>
 
       <ul className="flex flex-row gap-10 ml-35 mr-10 text-[#3C525D] font-semibold">
-        <ItemNavLink myStyles="hover:text-[#F0FA39] text-[#3C525D] font-semibold" content="Inicio" route="/" />
-        <ItemNavLink myStyles="hover:text-[#F0FA39] text-[#3C525D] font-semibold" content="Nosotros" route="/nosotros" />
-        <ItemNavLink myStyles="hover:text-[#F0FA39] text-[#3C525D] font-semibold" content="Contacto" route="/contacto" />
-        <ItemNavLink myStyles="hover:text-[#F0FA39] text-[#3C525D] font-semibold" content="Servicios" route="/servicios" />
-        <ItemNavLink myStyles="hover:text-[#F0FA39] text-[#3C525D] font-semibold" content="SophIA" route="/sophIA" />
+        <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Inicio" route="/" />
+        <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Nosotros" route="/nosotros" />
+        <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Contacto" route="/contacto" />
+        <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Servicios" route="/servicios" />
+        <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="SophIA" route="/sophIA" />
       </ul>
 
       <button
