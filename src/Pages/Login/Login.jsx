@@ -62,6 +62,12 @@ export const Login = () => {
             Regístrate
           </a>
         </p>
+        <p className="text-center text-sm text-gray-600 mt-4">
+          ¿Olvidaste La Contraseña?{' '}
+          <a href="/reset-password" className="text-black hover:underline hover:text-sky-600">
+            Recuperar Contraseña
+          </a>
+        </p>
       </div>
     </div>
   );
