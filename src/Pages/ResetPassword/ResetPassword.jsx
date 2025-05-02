@@ -1,58 +1,45 @@
+// src/pages/RequestReset.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 export const ResetPassword = () => {
   const [email, setEmail] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const navigate = useNavigate();
+  const [msg, setMsg] = useState('');
+  const [error, setError] = useState('');
 
-  const handleResetRequest = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMsg('');
-    setSuccessMsg('');
+    setError('');
+    setMsg('');
     try {
-      const res = await axios.post('http://localhost:20101/Auth/reset-password', {
-        email,
-      });
-
-      console.log('Enlace enviado:', res.data);
-      setSuccessMsg('Se ha enviado un enlace de recuperación a tu correo.');
+      const res = await axios.post('http://localhost:20101/Password/validar-password', { email });
+      setMsg(res.data.message);
     } catch (err) {
-      console.error('Error al enviar enlace:', err.response?.data || err.message);
-      setErrorMsg('No se pudo enviar el enlace. Verifica el correo e intenta nuevamente.');
+      console.error('❌ Error:', err);
+      setError('No se pudo enviar el enlace. Verifica el correo e intenta nuevamente.');
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-sm">
-        <h2 className="text-2xl font-bold text-center mb-6">Recuperar Contraseña</h2>
-        <form onSubmit={handleResetRequest} className="flex flex-col gap-4">
-          <p className="text-sm text-gray-600 text-center mb-2">
-            Ingresa tu correo electrónico para recibir un enlace de recuperación.
-          </p>
+    <div className="flex items-center justify-center h-screen bg-cover bg-center" style={{ backgroundImage: `url('/fondo.jpg')` }}>
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md text-center">
+        <h2 className="text-2xl font-bold mb-4">Recuperar Contraseña</h2>
+        <p className="mb-6 text-gray-600">Ingresa tu correo electrónico para recibir un enlace de recuperación.</p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             type="email"
             placeholder="Correo electrónico"
-            className="w-full p-3 rounded-lg outline-none text-black bg-gray-100"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full p-3 rounded-lg outline-none bg-gray-100 text-black"
           />
-          <button
-            type="submit"
-            className="bg-[#F0FA39] text-black font-bold py-3 px-6 rounded-full hover:bg-[#D4E02E] transition-colors"
-          >
+          <button type="submit" className="bg-[#F0FA39] text-black font-bold py-3 rounded-full hover:bg-[#e2f528]">
             Enviar Enlace
           </button>
         </form>
-        {errorMsg && <p className="text-red-500 text-sm text-center mt-4">{errorMsg}</p>}
-        {successMsg && <p className="text-green-500 text-sm text-center mt-4">{successMsg}</p>}
-        <p className="text-center text-sm text-gray-600 mt-4">
-          ¿Ya recuerdas tu contraseña?{' '}
-          <a href="/login" className="text-[#F0FA39] hover:underline">Inicia sesión</a>
-        </p>
+        {msg && <p className="text-green-500 mt-4">{msg}</p>}
+        {error && <p className="text-red-500 mt-4">{error}</p>}
       </div>
     </div>
   );

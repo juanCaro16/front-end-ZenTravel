@@ -10,6 +10,7 @@ import { ButtonHelp } from "./Components/ButtonHelp/ButtonHelp";
 import { Soporte } from "./Pages/Soporte/Soporte";
 import { Register } from "./Pages/Register/Register";
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword";
+import { NewPassword } from "./Pages/NewPassword/NewPassword";
 
 
 
@@ -29,6 +30,9 @@ export const App = () => {
 
         {/* Ruta para la página de restablecimiento de contraseña */}
         <Route path="/reset-password" element={<ResetPassword />} />
+
+        {/* Ruta para la página de nueva contraseña */}
+        <Route path="/reset-password/:token" element={<NewPassword />} />
 
         {/* Ruta para la página de registro */}
         <Route path="/register" element={<Register />} />
