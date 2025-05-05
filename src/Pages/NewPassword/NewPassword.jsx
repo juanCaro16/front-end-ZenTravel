@@ -13,7 +13,7 @@ export const NewPassword = () => {
 
     try {
       const response = await axios.post(
-        `http://localhost:20101/Password/reset-password?token=${token}`,
+        `http://localhost:10101/Password/reset-password?token=${token}`,
         { newPassword }
       );
       setMessage("Contraseña actualizada correctamente.");

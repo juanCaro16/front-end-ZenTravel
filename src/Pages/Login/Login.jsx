@@ -12,7 +12,7 @@ export const Login = () => {
     e.preventDefault();
     setErrorMsg(''); // Limpiar mensaje anterior
     try {
-      const res = await axios.post('http://localhost:20101/Auth/login', {
+      const res = await axios.post('http://localhost:10101/Auth/login', {
         email,
         password
       });
