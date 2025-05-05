@@ -2,7 +2,7 @@ import { NavLink, Route, useNavigate } from "react-router-dom";
 import img from "../../Images/logofull_sin_fondo-Photoroom.png";
 import { Login } from "../../Pages/Login/Login";
 import { ItemNavLink } from "../../Components/ItemNavLink/ItemNavLink";
-
+import { ProfileButton } from "../../Components/ProfileButton/ProfileButton";
 
 
 export const Header = ({ route }) => {
@@ -19,6 +19,7 @@ export const Header = ({ route }) => {
         <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Contacto" route="/contacto" />
         <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="Servicios" route="/servicios" />
         <ItemNavLink myStyles="text-sky-500 hover:underline font-semibold" content="SophIA" route="/sophIA" />
+       <ProfileButton/>
       </ul>
 
       <button

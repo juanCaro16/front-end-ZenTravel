@@ -11,6 +11,8 @@ import { Soporte } from "./Pages/Soporte/Soporte";
 import { Register } from "./Pages/Register/Register";
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword";
 import { NewPassword } from "./Pages/NewPassword/NewPassword";
+import { ProfileButton } from "./Components/ProfileButton/ProfileButton";
+import { Profile } from "./Pages/Profile/Profile";
 
 
 
@@ -37,6 +39,9 @@ export const App = () => {
         {/* Ruta para la página de registro */}
         <Route path="/register" element={<Register />} />
 
+        {/*ruta para la página de perfil */}
+        <Route path="/profile" element={<Profile />} />
+
         {/* Ruta para la página de inicio */}
 
         {/* Ruta para la página de nosotros */}
@@ -56,6 +61,8 @@ export const App = () => {
 
         {/* Ruta para la página de error 404 */}
         <Route path="*" element={<h1>404 Not Found</h1>} />
+
+        
       </Routes>
     </>
   );
