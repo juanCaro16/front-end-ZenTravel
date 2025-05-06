@@ -136,7 +136,7 @@ export const Register = () => {
 
           <button
             type="submit"
-            className="bg-[#F0FA39] text-black font-bold py-3 px-6 rounded-full hover:bg-[#D4E02E] transition-colors"
+            className="bg-[#28A745] text-black font-bold py-3 px-6 rounded-full hover:bg-[#218838] transition-colors"
           >
             Registrarse
           </button>
@@ -148,7 +148,7 @@ export const Register = () => {
 
         <p className="text-center text-sm text-gray-600 mt-4">
           ¿Ya tienes una cuenta?{' '}
-          <a href="/login" className="text-[#F0FA39] hover:underline hover:text-black">
+          <a href="/login" className="text-[#28A745] hover:underline hover:text-black">
             Inicia sesión
           </a>
         </p>

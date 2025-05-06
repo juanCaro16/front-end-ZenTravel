@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-export const Login = () => {
+export const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -18,6 +18,7 @@ export const Login = () => {
       });
 
       console.log('Login exitoso:', res.data);
+      onLoginSuccess(); // Notifica el éxito del inicio de sesión
       navigate('/');
     } catch (err) {
       console.error('Error de login:', err.response?.data || err.message);
@@ -46,7 +47,7 @@ export const Login = () => {
           />
           <button
             type="submit"
-            className="bg-[#F0FA39] text-black font-bold py-3 px-6 rounded-full hover:bg-[#D4E02E] transition-colors"
+            className="bg-[#28A745] text-black font-bold py-3 px-6 rounded-full hover:bg-[#218838] transition-colors"
           >
             Iniciar Sesión
           </button>
@@ -56,18 +57,6 @@ export const Login = () => {
             {errorMsg}
           </p>
         )}
-        <p className="text-center text-sm text-gray-600 mt-4">
-          ¿No tienes una cuenta?{' '}
-          <a href="/register" className="text-black hover:underline hover:text-sky-600">
-            Regístrate
-          </a>
-        </p>
-        <p className="text-center text-sm text-gray-600 mt-4">
-          ¿Olvidaste La Contraseña?{' '}
-          <a href="/reset-password" className="text-black hover:underline hover:text-sky-600">
-            Recuperar Contraseña
-          </a>
-        </p>
       </div>
     </div>
   );

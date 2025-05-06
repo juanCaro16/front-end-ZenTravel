@@ -81,7 +81,7 @@ export const Soporte = () => {
               ></textarea>
               <button
                 type="submit"
-                className="bg-[#F0FA39] text-black font-bold py-3 px-6 rounded-full hover:bg-[#D4E02E] transition-colors"
+                className="bg-[#28A745] text-black font-bold py-3 px-6 rounded-full hover:bg-[#218838] transition-colors"
               >
                 ENVIAR
               </button>

@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import { Header } from "./Layouts/Header/Header";
+import { AppHeader } from "./Layouts/AppHeader/AppHeader";
 import { Main } from "./Layouts/Main/Main";
 import { Login } from "./Pages/Login/Login";
 import { SophIA } from "./Pages/SophIA/SophIA";
@@ -13,22 +13,50 @@ import { ResetPassword } from "./Pages/ResetPassword/ResetPassword";
 import { NewPassword } from "./Pages/NewPassword/NewPassword";
 import { ProfileButton } from "./Components/ProfileButton/ProfileButton";
 import { Profile } from "./Pages/Profile/Profile";
+import { useState } from "react";
 
 
 
 
 
 export const App = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   return (
     <>
-      <Header />
+      <AppHeader>
+        
+        {/* Renderiza dinámicamente los botones o el ProfileButton */}
+        {!isAuthenticated ? (
+          <>
+            <button
+              onClick={() => window.location.href = "/login"}
+              className="bg-[#28A745] text-black rounded-3xl px-4 py-2 hover:bg-[#218838]"
+            >
+              Iniciar Sesión
+            </button>
+            <button
+              onClick={() => window.location.href = "/register"}
+              className="bg-[#28A745] text-black rounded-3xl px-4 py-2 hover:bg-[#218838]"
+            >
+              Registrarse
+            </button>
+          </>
+        ) : (
+          <ProfileButton />
+        )}
+      </AppHeader>
+
+
       <ButtonHelp />
       <Routes>
         {/* Ruta para la página principal */}
         <Route path="/" element={<Main />} />
 
         {/* Ruta para la página de inicio de sesión */}
-        <Route path="/login" element={<Login />} />
+        <Route
+          path="/login"
+          element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
+        />
 
         {/* Ruta para la página de restablecimiento de contraseña */}
         <Route path="/reset-password" element={<ResetPassword />} />
