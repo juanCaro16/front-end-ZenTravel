@@ -10,15 +10,21 @@ export const Login = ({ onLoginSuccess }) => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setErrorMsg(''); // Limpiar mensaje anterior
+    setErrorMsg('');
     try {
       const res = await axios.post('http://localhost:10101/Auth/login', {
         email,
         password
       });
-
+  
       console.log('Login exitoso:', res.data);
-      onLoginSuccess(); // Notifica el éxito del inicio de sesión
+      
+  
+      // 🔐 Guardar el token en localStorage
+      localStorage.setItem('accessToken', res.data.accessToken);
+      localStorage.setItem('refreshToken', res.data.refreshToken); // opcional
+  
+      onLoginSuccess(); // Notifica el éxito
       navigate('/');
     } catch (err) {
       console.error('Error de login:', err.response?.data || err.message);

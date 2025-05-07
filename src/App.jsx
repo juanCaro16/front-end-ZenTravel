@@ -14,18 +14,28 @@ import { NewPassword } from "./Pages/NewPassword/NewPassword";
 import { ProfileButton } from "./Components/ProfileButton/ProfileButton";
 import { Profile } from "./Pages/Profile/Profile";
 import { useState } from "react";
-
-
+import { useEffect } from "react";
+import { Navigate } from "react-router-dom";
 
 
 
 export const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("accessToken")
+  );
+
+  useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      setIsAuthenticated(false);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    setIsAuthenticated(false); // Actualiza el estado global
+  };
   return (
     <>
-      <AppHeader>
-        
-        {/* Renderiza dinámicamente los botones o el ProfileButton */}
+       <AppHeader>
         {!isAuthenticated ? (
           <>
             <button
@@ -52,10 +62,16 @@ export const App = () => {
         {/* Ruta para la página principal */}
         <Route path="/" element={<Main />} />
 
-        {/* Ruta para la página de inicio de sesión */}
         <Route
           path="/login"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
+        />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? <Profile onLogout={handleLogout} /> : <Navigate to="/login" replace />
+          }
         />
 
         {/* Ruta para la página de restablecimiento de contraseña */}
@@ -64,19 +80,14 @@ export const App = () => {
         {/* Ruta para la página de nueva contraseña */}
         <Route path="/reset-password/:token" element={<NewPassword />} />
 
-        {/* Ruta para la página de registro */}
-        <Route path="/register" element={<Register />} />
-
-        {/*ruta para la página de perfil */}
-        <Route path="/profile" element={<Profile />} />
 
         {/* Ruta para la página de inicio */}
 
         {/* Ruta para la página de nosotros */}
         <Route path="/nosotros" element={<Nosotros />} />
-       
+
         {/* Ruta para la página de sophIA */}
-        <Route path="/sophIA" element={<SophIA />}/>
+        <Route path="/sophIA" element={<SophIA />} />
 
         {/* Ruta para la página de servicios */}
         <Route path="/servicios" element={<Servicios />} />
@@ -90,7 +101,7 @@ export const App = () => {
         {/* Ruta para la página de error 404 */}
         <Route path="*" element={<h1>404 Not Found</h1>} />
 
-        
+
       </Routes>
     </>
   );
