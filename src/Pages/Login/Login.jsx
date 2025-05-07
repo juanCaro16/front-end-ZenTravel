@@ -57,6 +57,9 @@ export const Login = ({ onLoginSuccess }) => {
             {errorMsg}
           </p>
         )}
+
+        <p className='text-center text-[14px] mt-5'>¿Ya Tienes Una Cuenta? <a className="text-[#28A745] hover:underline hover:text-black" href="/login">Iniciar Sesion</a></p>
+        <p className='text-center text-[14px] mt-5'>¿Olvidaste Tu Contraseña? <a className="text-[#28A745] hover:underline hover:text-black" href="/reset-password">Recuperar Contraseña</a></p>
       </div>
     </div>
   );
