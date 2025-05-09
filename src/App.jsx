@@ -16,93 +16,55 @@ import { Profile } from "./Pages/Profile/Profile";
 import { useState } from "react";
 import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
-
+import { useLocation } from "react-router-dom";
+import { Paquetes } from "./Pages/Paquetes/Paquetes";
 
 
 export const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
     !!localStorage.getItem("accessToken")
   );
+  const location = useLocation(); // Obtén la ubicación actual
 
   useEffect(() => {
+    // Verifica el token cada vez que cambie la ruta
     if (!localStorage.getItem("accessToken")) {
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [location]); // Ejecuta el efecto al cambiar la ruta
 
   const handleLogout = () => {
-    setIsAuthenticated(false); // Actualiza el estado global
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    setIsAuthenticated(false); // Actualiza el estado global correctamente
   };
+
   return (
     <>
-       <AppHeader>
-        {!isAuthenticated ? (
-          <>
-            <button
-              onClick={() => window.location.href = "/login"}
-              className="bg-[#28A745] text-black rounded-3xl px-4 py-2 hover:bg-[#218838]"
-            >
-              Iniciar Sesión
-            </button>
-            <button
-              onClick={() => window.location.href = "/register"}
-              className="bg-[#28A745] text-black rounded-3xl px-4 py-2 hover:bg-[#218838]"
-            >
-              Registrarse
-            </button>
-          </>
-        ) : (
-          <ProfileButton />
-        )}
-      </AppHeader>
+ 
 
+      <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />
 
       <ButtonHelp />
-      <Routes>
-        {/* Ruta para la página principal */}
-        <Route path="/" element={<Main />} />
 
+      <Routes>
+        <Route path="/" element={<Main />} />
         <Route
           path="/login"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
-        />
+          />
         <Route path="/register" element={<Register />} />
-        <Route
-          path="/profile"
-          element={
-            isAuthenticated ? <Profile onLogout={handleLogout} /> : <Navigate to="/login" replace />
-          }
-        />
-
-        {/* Ruta para la página de restablecimiento de contraseña */}
         <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* Ruta para la página de nueva contraseña */}
         <Route path="/reset-password/:token" element={<NewPassword />} />
-
-
-        {/* Ruta para la página de inicio */}
-
-        {/* Ruta para la página de nosotros */}
         <Route path="/nosotros" element={<Nosotros />} />
-
-        {/* Ruta para la página de sophIA */}
         <Route path="/sophIA" element={<SophIA />} />
-
-        {/* Ruta para la página de servicios */}
         <Route path="/servicios" element={<Servicios />} />
-
-        {/* Ruta para la página de contacto */}
+        <Route path="/paquetes" element={<Paquetes />} />
         <Route path="/contacto" element={<Contacto />} />
-
-        {/* Ruta para la página de soporte */}
         <Route path="/soporte" element={<Soporte />} />
-
-        {/* Ruta para la página de error 404 */}
         <Route path="*" element={<h1>404 Not Found</h1>} />
-
-
       </Routes>
+         
     </>
   );
 };

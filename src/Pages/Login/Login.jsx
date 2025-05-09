@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { Eye, EyeOff } from 'lucide-react'; // Asegúrate de tener instalada esta librería
 
 export const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
@@ -16,15 +19,18 @@ export const Login = ({ onLoginSuccess }) => {
         email,
         password
       });
-  
-      console.log('Login exitoso:', res.data);
-      
-  
-      // 🔐 Guardar el token en localStorage
+
       localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken); // opcional
-  
-      onLoginSuccess(); // Notifica el éxito
+      localStorage.setItem('refreshToken', res.data.refreshToken);
+
+      onLoginSuccess();
+
+      await Swal.fire({
+        title: '¡Inicio de sesión exitoso!',
+        icon: 'success',
+        confirmButtonColor: '#28A745'
+      });
+
       navigate('/');
     } catch (err) {
       console.error('Error de login:', err.response?.data || err.message);
@@ -44,13 +50,25 @@ export const Login = ({ onLoginSuccess }) => {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            className="w-full p-3 rounded-lg outline-none text-black bg-gray-100"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Contraseña"
+              className="w-full p-3 rounded-lg outline-none text-black bg-gray-100 pr-10"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-black"
+              aria-label="Mostrar contraseña"
+            >
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} /> }
+            </button>
+          </div>
+
           <button
             type="submit"
             className="bg-[#28A745] text-black font-bold py-3 px-6 rounded-full hover:bg-[#218838] transition-colors"
@@ -58,14 +76,29 @@ export const Login = ({ onLoginSuccess }) => {
             Iniciar Sesión
           </button>
         </form>
+
         {errorMsg && (
-          <p className="text-red-500 text-sm text-center mt-4">
-            {errorMsg}
-          </p>
+          <p className="text-red-500 text-sm text-center mt-4">{errorMsg}</p>
         )}
 
-        <p className='text-center text-[14px] mt-5'>¿Ya Tienes Una Cuenta? <a className="text-[#28A745] hover:underline hover:text-black" href="/login">Iniciar Sesion</a></p>
-        <p className='text-center text-[14px] mt-5'>¿Olvidaste Tu Contraseña? <a className="text-[#28A745] hover:underline hover:text-black" href="/reset-password">Recuperar Contraseña</a></p>
+        <p className="text-center text-[14px] mt-5">
+          ¿No Tienes Una Cuenta?{' '}
+          <a
+            className="text-[#28A745] hover:underline hover:text-black"
+            href="/register"
+          >
+            Registrarse
+          </a>
+        </p>
+        <p className="text-center text-[14px] mt-2">
+          ¿Olvidaste Tu Contraseña?{' '}
+          <a
+            className="text-[#28A745] hover:underline hover:text-black"
+            href="/reset-password"
+          >
+            Recuperar Contraseña
+          </a>
+        </p>
       </div>
     </div>
   );
