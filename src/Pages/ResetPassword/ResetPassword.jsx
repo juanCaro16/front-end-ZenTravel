@@ -34,7 +34,7 @@ export const ResetPassword = () => {
             required
             className="w-full p-3 rounded-lg outline-none bg-gray-100 text-black"
           />
-          <button type="submit" className="bg-[#F0FA39] text-black font-bold py-3 rounded-full hover:bg-[#e2f528]">
+          <button type="submit" className="bg-[#28A745] text-black font-bold py-3 rounded-full hover:bg-[#218838]">
             Enviar Enlace
           </button>
         </form>

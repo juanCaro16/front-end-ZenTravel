@@ -39,7 +39,7 @@ export const NewPassword = () => {
         />
         <button
           type="submit"
-          className="w-full bg-[#F0FA39] hover:bg-[#e2f528] text-black py-2 px-4 rounded-xl"
+          className="w-full bg-[#28A745] hover:bg-[#218838] text-black py-2 px-4 rounded-xl"
         >
           Cambiar Contraseña
         </button>

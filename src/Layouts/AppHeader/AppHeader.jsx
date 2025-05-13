@@ -25,6 +25,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           <ItemNavLink  content="Paquetes" route="/hoteles" />
           <ItemNavLink  content="Hotel + Vuelo" route="/paquetes" />
           <ItemNavLink  content="Ofertas" route="/ofertas" />
+          <ItemNavLink  content="IA" route="/SophIA" />
         </nav>
       </div>
 
@@ -66,6 +67,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
             </svg>
           </button>
           {/* Menú lateral flotante para móvil */}
+          
           {menuOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded shadow-md z-50">
               <ItemNavLink content="Vuelos" route="/" myStyles="block px-4 py-2 hover:bg-gray-100" />
@@ -73,6 +75,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               <ItemNavLink content="Hotel + Vuelo" route="/paquetes" myStyles="block px-4 py-2 hover:bg-gray-100" />
               <ItemNavLink content="Disney" route="/disney" myStyles="block px-4 py-2 hover:bg-gray-100" />
               <ItemNavLink content="Ofertas" route="/ofertas" myStyles="block px-4 py-2 hover:bg-gray-100" />
+              <ItemNavLink content="IA" route="/sophIA" myStyles="block px-4 py-2 hover:bg-gray-100" />
               {!isAuthenticated && (
                 <>
                   <ItemNavLink content="Iniciar Sesión" route="/login" myStyles="block px-4 py-2 hover:bg-gray-100" />
@@ -81,7 +84,6 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               )}
               {isAuthenticated && (
                 <>
-                  <ItemNavLink content="Editar Perfil" route="/profile" myStyles="block px-4 py-2 hover:bg-gray-100" />
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
