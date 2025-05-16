@@ -20,8 +20,13 @@ export const Login = ({ onLoginSuccess }) => {
         password
       });
 
-      localStorage.setItem('accessToken', res.data.accessToken);
-      localStorage.setItem('refreshToken', res.data.refreshToken);
+      console.log('Login response:', res.data);
+
+      const access = res.data.AccessToken; // ← Usa A mayúscula
+      const refresh = res.data.refreshToken; // ← Aunque está vacío, no genera error
+
+      localStorage.setItem('accessToken', access);
+      localStorage.setItem('refreshToken', JSON.stringify(refresh)); // por si es un objeto
 
       onLoginSuccess();
 
@@ -65,7 +70,7 @@ export const Login = ({ onLoginSuccess }) => {
               className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 hover:text-black"
               aria-label="Mostrar contraseña"
             >
-              {showPassword ? <Eye size={20} /> : <EyeOff size={20} /> }
+              {showPassword ? <Eye size={20} /> : <EyeOff size={20} />}
             </button>
           </div>
 

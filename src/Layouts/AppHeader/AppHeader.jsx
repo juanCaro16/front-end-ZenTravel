@@ -28,7 +28,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           <ItemNavLink  content="IA" route="/SophIA" />
         </nav>
       </div>
-
+      
       {/* Controles adicionales */}
       <div className="flex items-center gap-5">
         <div className="hidden md:flex items-center gap-3 text-sm text-gray-700">

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 export const Register = () => {
   const [nombre, setNombre] = useState('');
@@ -51,6 +52,11 @@ export const Register = () => {
       });
 
       console.log('Registro exitoso:', res.data);
+      await Swal.fire({
+              title: '¡Registro exitoso!',
+              icon: 'success',
+              confirmButtonColor: '#28A745'
+            });
       navigate('/login');
     } catch (err) {
       if (

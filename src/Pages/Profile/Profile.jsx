@@ -87,7 +87,7 @@ export const Profile = ({ onLogout }) => {
           <p className="text-gray-500 text-sm">{userInfo.email}</p>
         </div>
       </div>
-  
+
       <div>
         <h3 className="text-md font-semibold mb-1 text-neutral-800">Información general</h3>
         <ul className="text-sm text-gray-700 space-y-2">
@@ -123,7 +123,7 @@ export const Profile = ({ onLogout }) => {
           <li><span className="font-semibold">Presupuesto:</span> ${userInfo.presupuesto}</li>
         </ul>
       </div>
-  
+
       {/* Botones */}
       <div className="flex gap-3 justify-end">
         {editable ? (

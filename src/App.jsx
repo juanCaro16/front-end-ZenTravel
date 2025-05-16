@@ -18,6 +18,9 @@ import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
+import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
+
+
 
 
 export const App = () => {
@@ -44,7 +47,7 @@ export const App = () => {
  
 
       <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-
+      
       <ButtonHelp />
 
       <Routes>
@@ -60,6 +63,7 @@ export const App = () => {
         <Route path="/sophIA" element={<SophIA />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/paquetes" element={<Paquetes />} />
+        <Route path="/crearPaquete" element={<CrearPaquetes />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/soporte" element={<Soporte />} />
         <Route path="*" element={<h1>404 Not Found</h1>} />
