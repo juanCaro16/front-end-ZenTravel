@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import api from '../../Services/AxiosInstance/AxiosInstance';
+
 
 export const Profile = ({ onLogout }) => {
   const [userInfo, setUserInfo] = useState(null);
@@ -17,6 +19,7 @@ export const Profile = ({ onLogout }) => {
 
     await Swal.fire({
       title: '¡Cerraste sesión!',
+      text: 'Esperamos verte pronto.',
       icon: 'success',
       confirmButtonColor: '#28A745'
     });
@@ -26,19 +29,16 @@ export const Profile = ({ onLogout }) => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get('http://localhost:10101/Auth/infoUserDTO', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUserInfo(response.data);
-        setFormData(response.data);
-      } catch (error) {
-        console.error("❌ Error al cargar perfil:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  try {
+    const response = await api.get('/Auth/infoUserDTO');
+    setUserInfo(response.data);
+    setFormData(response.data);
+  } catch (error) {
+    console.error("❌ Error al cargar perfil:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
     fetchUserInfo();
   }, []);
