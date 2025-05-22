@@ -22,11 +22,11 @@ export const Login = ({ onLoginSuccess }) => {
 
       console.log('Login response:', res.data);
 
-      const access = res.data.AccessToken; // ← Usa A mayúscula
+      const access = res.data.accessToken; // ← Usa A mayúscula
       const refresh = res.data.refreshToken; // ← Aunque está vacío, no genera error
 
-      localStorage.setItem('accessToken', access);
-      localStorage.setItem('refreshToken', JSON.stringify(refresh)); // por si es un objeto
+      localStorage.setItem('accessToken', access); // por si es un objeto
+      localStorage.setItem('refreshToken', refresh); // por si es un objeto
 
       onLoginSuccess();
 

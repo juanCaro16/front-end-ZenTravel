@@ -6,10 +6,9 @@ export const CrearPaquetes = () => {
         nombrePaquete: '',
         descripcion: '',
         imagenUrl: '',
-        duracionDias: 0,
+        duracionDias: '',
         fechaInicioDisponible: '',
-        fechaFinDisponible: '', // <- Faltaba este campo en tu formData
-        descuento: 0,
+        descuento: '',
         nombreHotel: '',
         nombreTransporte: '',
         nombreDestino: ''
@@ -32,6 +31,8 @@ export const CrearPaquetes = () => {
             setMensaje('');
             setError('');
 
+            const { accessToken } = await refreshToken();
+
             const token = localStorage.getItem('accessToken');
 
             if (!token) {
@@ -40,7 +41,7 @@ export const CrearPaquetes = () => {
             }
 
             const response = await axios.post(
-                'http://localhost:10101/packages/paquetes',
+                'http://localhost:10101/packages/create',
                 formData,
                 {
                     headers: {
