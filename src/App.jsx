@@ -19,6 +19,7 @@ import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
+import  TokenRefresher from "./Services/TokenRefresher/TokenRefresher";
 
 
 
@@ -47,14 +48,9 @@ export const App = () => {
  
 
       <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-      <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
-                  >
-                    Cerrar sesión
-                  </button>
+      
       <ButtonHelp />
-
+      <TokenRefresher />
       <Routes>
         <Route path="/" element={<Main />} />
         <Route
