@@ -4,7 +4,7 @@ export const ButtonHelp = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative">
+    <div className="relative z-1">
       {/* Botón de ayuda con tooltip */}
       <button
         onClick={() => navigate("/soporte")}
