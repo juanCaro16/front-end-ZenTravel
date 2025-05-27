@@ -16,7 +16,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
   };
 
   return (
-    <header className="w-full bg-white shadow-md py-3 px-6 flex items-center justify-between">
+    <header className="w-full bg-white shadow-sm py-3 hover:text-primary px-6 flex items-center justify-between">
       {/* Logo y navegación principal */}
       <div className="flex items-center gap-6">
         <img className="w-14 h-auto" src={img} alt="ZenTravel Logo" />
@@ -25,7 +25,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           <ItemNavLink  content="Paquetes" route="/hoteles" />
           <ItemNavLink  content="Hotel + Vuelo" route="/paquetes" />
           <ItemNavLink  content="Ofertas" route="/ofertas" />
-          <ItemNavLink  content="IA" route="/SophIA" />
+          <ItemNavLink  content="Habla Con Nuestro Asistente" route="/SophIA" />
         </nav>
       </div>
       
@@ -75,7 +75,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               <ItemNavLink content="Hotel + Vuelo" route="/paquetes" myStyles="block px-4 py-2 hover:bg-gray-100" />
               <ItemNavLink content="Disney" route="/disney" myStyles="block px-4 py-2 hover:bg-gray-100" />
               <ItemNavLink content="Ofertas" route="/ofertas" myStyles="block px-4 py-2 hover:bg-gray-100" />
-              <ItemNavLink content="IA" route="/sophIA" myStyles="block px-4 py-2 hover:bg-gray-100" />
+              <ItemNavLink content="Habla Con Nuestro Bot" route="/sophIA" myStyles="block px-4 py-2 hover:bg-gray-100" />
               {!isAuthenticated && (
                 <>
                   <ItemNavLink content="Iniciar Sesión" route="/login" myStyles="block px-4 py-2 hover:bg-gray-100" />
