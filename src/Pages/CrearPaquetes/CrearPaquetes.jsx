@@ -21,7 +21,7 @@ export const CrearPaquetes = () => {
 
   const handleChange = (e) => {
     const { name, value, type } = e.target;
-    setFormData({
+    setFormData({   
       ...formData,
       [name]: type === 'number' ? Number(value) : value
     });
@@ -36,7 +36,8 @@ export const CrearPaquetes = () => {
       if (!token) {
         setError('Token no encontrado. Por favor inicia sesión.');
         return;
-      }
+      } 
+      console.log("Datos del formulario:", formData);
 
       const response = await api.post('/packages/create', formData);
 
