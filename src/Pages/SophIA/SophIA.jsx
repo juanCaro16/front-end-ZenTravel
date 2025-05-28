@@ -21,9 +21,11 @@ export const SophIA = () => {
       setRespuestaIA(fullText);
 
       let i = 0;
+      let visible = '';
       const interval = setInterval(() => {
         if (i < fullText.length) {
-          setRespuestaVisible((prev) => prev + fullText.charAt(i));
+          visible += fullText.charAt(i);
+          setRespuestaVisible(visible);
           i++;
         } else {
           clearInterval(interval);
@@ -65,7 +67,7 @@ export const SophIA = () => {
     <div className="bg-gray-100 border border-gray-300 rounded-xl p-4 max-h-60 overflow-y-auto whitespace-pre-line text-gray-700">
       {error && <p className="text-red-500">{error}</p>}
       {respuestaVisible && (
-        <p><strong className="text-blue-800">SophIA:</strong> {respuestaVisible}</p>
+        <p><strong className="text-blue-800">SophIA: </strong> {respuestaVisible}</p>
       )}
     </div>
   </div>
