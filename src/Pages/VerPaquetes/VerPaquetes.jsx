@@ -38,7 +38,11 @@ export const VerPaquetes = () => {
           <img
             src={paquete.imagenUrl}
             alt={paquete.nombrePaquete}
+<<<<<<< HEAD
             className="w-full h-40 object-cover rounded-xl"
+=======
+            className="w-screen h-40 object-cover rounded-xl"
+>>>>>>> origin/develop
           />
           <h2 className="text-xl font-semibold mt-2">{paquete.nombrePaquete}</h2>
           <p className="text-gray-600">{paquete.descripcion}</p>

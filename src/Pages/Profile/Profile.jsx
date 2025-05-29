@@ -30,7 +30,7 @@ export const Profile = ({ onLogout }) => {
   useEffect(() => {
     const fetchUserInfo = async () => {
   try {
-    const response = await api.get('/Auth/infoUserDTO');
+    const response = await api.get('https://proyecto-zentravel.onrender.com/Auth/infoUserDTO');
     setUserInfo(response.data);
     setFormData(response.data);
   } catch (error) {
@@ -50,7 +50,7 @@ export const Profile = ({ onLogout }) => {
   const handleSave = async () => {
     try {
       const token = localStorage.getItem('accessToken');
-      await axios.patch('http://localhost:10101/Auth/profile', formData, {
+      await axios.patch('https://proyecto-zentravel.onrender.com/Auth/profile', formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

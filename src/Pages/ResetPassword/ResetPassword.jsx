@@ -12,7 +12,7 @@ export const ResetPassword = () => {
     setError('');
     setMsg('');
     try {
-      const res = await axios.post('http://localhost:10101/Password/validar-password', { email });
+      const res = await axios.post('https://proyecto-zentravel.onrender.com/Password/validar-password', { email });
       setMsg(res.data.message);
     } catch (err) {
       console.error('❌ Error:', err);
