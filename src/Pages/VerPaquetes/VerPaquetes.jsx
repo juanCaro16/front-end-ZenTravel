@@ -2,60 +2,54 @@ import React, { useEffect, useState } from 'react';
 import api from '../../Services/AxiosInstance/AxiosInstance';
 import Swal from 'sweetalert2';
 
-const VerPaquetes = () => {
+export const VerPaquetes = () => {
   const [paquetes, setPaquetes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const obtenerPaquetes = async () => {
+    try {
+      const response = await api.get('/packages/paketes');
+      console.log(response.data); // depura el error
+      setPaquetes(response.data.paquetes);
+    } catch (error) {
+      console.error('Error al obtener paquetes:', error);
+      Swal.fire('Error', 'No se pudieron cargar los paquetes.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchPaquetes = async () => {
-      try {
-        const user = JSON.parse(localStorage.getItem("user"));
-        const id = user?._id;
-
-        if (!id) {
-          Swal.fire("Error", "No se encontró el ID del usuario", "error");
-          return;
-        }
-
-        const response = await api.get('/paketes/${id}');
-        console.log("📦 Paquetes recibidos:", response.data);
-
-        setPaquetes(response.data.paquetes || []);
-      } catch (error) {
-        console.error("Error al obtener los paquetes:", error);
-        Swal.fire("Error", "No se pudieron obtener los paquetes", "error");
-      }
-    };
-
-    fetchPaquetes();
+    obtenerPaquetes();
   }, []);
 
+  if (loading) {
+    return <p className="text-center mt-8">Cargando paquetes...</p>;
+  }
+
+  if (paquetes.length === 0) {
+    return <p className="text-center mt-8">No hay paquetes disponibles.</p>;
+  }
+
   return (
-    <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {paquetes.length === 0 ? (
-        <p className="col-span-full text-center text-gray-600">No hay paquetes disponibles</p>
-      ) : (
-        paquetes.map((paquete, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-md p-4">
-            <img
-              src={paquete.imagenUrl || "/default.jpg"}
-              alt={paquete.nombrePaquete}
-              className="w-full h-48 object-cover rounded-md mb-4"
-            />
-            <h2 className="text-xl font-bold mb-2">{paquete.nombrePaquete}</h2>
-            <p className="text-sm text-gray-600 mb-2">{paquete.descripcion}</p>
-            <ul className="text-sm text-gray-800">
-              <li><strong>Destino:</strong> {paquete.nombreDestino}</li>
-              <li><strong>Hotel:</strong> {paquete.nombreHotel}</li>
-              <li><strong>Transporte:</strong> {paquete.nombreTransporte}</li>
-              <li><strong>Duración:</strong> {paquete.duracionDias} días</li>
-              <li><strong>Fecha disponible:</strong> {paquete.fechaInicioDisponible}</li>
-              <li><strong>Descuento:</strong> {paquete.descuento}%</li>
-            </ul>
-          </div>
-        ))
-      )}
+    <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      {paquetes.map((paquete) => (
+        <div key={paquete.id} className="bg-white rounded-2xl shadow p-4">
+          <img
+            src={paquete.imagenUrl}
+            alt={paquete.nombrePaquete}
+            className="w-screen h-40 object-cover rounded-xl"
+          />
+          <h2 className="text-xl font-semibold mt-2">{paquete.nombrePaquete}</h2>
+          <p className="text-gray-600">{paquete.descripcion}</p>
+          <p><strong>Duración:</strong> {paquete.duracionDias} días</p>
+          <p><strong>Inicio:</strong> {paquete.fechaInicioDisponible}</p>
+          <p><strong>Hotel:</strong> {paquete.nombreHotel}</p>
+          <p><strong>Transporte:</strong> {paquete.nombreTransporte}</p>
+          <p><strong>Destino:</strong> {paquete.nombreDestino}</p>
+          <p><strong>Descuento:</strong> {paquete.descuento}%</p>
+        </div>
+      ))}
     </div>
   );
 };
-
-export default VerPaquetes;
