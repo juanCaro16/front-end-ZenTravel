@@ -19,6 +19,7 @@ import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
+import { VerPaquetes } from './Pages/VerPaquetes/VerPaquetes';
 import  TokenRefresher from "./Services/TokenRefresher/TokenRefresher";
 
 
@@ -56,7 +57,8 @@ export const App = () => {
         <Route
           path="/login"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
-          />
+        />
+        <Route path="/paquetes" element={<VerPaquetes />} />
         <Route path="/register" element={<Register />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/reset-password/:token" element={<NewPassword />} />
