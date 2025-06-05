@@ -1,7 +1,7 @@
-// TokenRefresher.jsx
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
+import api from "../../Services/AxiosInstance/AxiosInstance"
 import axios from 'axios';
 
 
@@ -23,7 +23,7 @@ const TokenRefresher = () => {
         const previousToken = token;
         
         try {
-            const response = await axios.post('http://localhost:10101/Auth/refresToken', {
+            const response = await api.post('Auth/refresToken', {
                 refreshToken,
             });
             

@@ -2,7 +2,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 
 const api = axios.create({
-  baseURL: 'http://localhost:10101',
+  baseURL: 'https://proyecto-zentravel.onrender.com',
 });
 
 api.interceptors.request.use(
