@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef } from "react"
 import { User, ChevronDown } from "lucide-react"
 import { Profile } from "../../Pages/Profile/Profile"
