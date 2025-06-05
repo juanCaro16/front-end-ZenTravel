@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect,useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import {
@@ -58,7 +58,7 @@ export const CrearPaquetes = () => {
   ]
 
   const transporteOpciones = [
-    { value: "avion", label: "Avión", icon: "✈️" },
+    { value: "Avianca", label: "Avión", icon: "✈️" },
     { value: "bus", label: "Bus", icon: "🚌" },
     { value: "carro", label: "Carro privado", icon: "🚗" },
     { value: "tren", label: "Tren", icon: "🚂" },
@@ -68,7 +68,7 @@ export const CrearPaquetes = () => {
   const incluyeOpciones = [
     "Alojamiento",
     "Desayuno",
-    "Almuerzo",
+    "Almuerzo",  
     "Cena",
     "Transporte local",
     "Guía turístico",
@@ -157,15 +157,15 @@ export const CrearPaquetes = () => {
         categoria: formData.categoria,
         incluye: formData.incluye,
         noIncluye: formData.noIncluye,
-        precioTotal: precioTotalFinal,
-        precio: Number(formData.precio), // Precio base por día
+        // precioTotal: precioTotalFinal,
+        // precio: Number(formData.precio), // Precio base por día
       }
 
       console.log("📦 Enviando a endpoint: POST /packages/paquetes") // ✅ URL corregida
       console.log("📦 Datos a enviar:", backendData)
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
-      const response = await api.post("/packages/paquetes", backendData)
+      const response = await api.post("/packages/paquetes/create", backendData)
 
       setMensaje("Paquete creado con éxito")
       console.log("✅ Respuesta del servidor:", response.data)
@@ -224,6 +224,8 @@ export const CrearPaquetes = () => {
         return false
     }
   }
+
+  
 
   const renderStep = () => {
     switch (currentStep) {

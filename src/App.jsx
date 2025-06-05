@@ -20,6 +20,7 @@ import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
 import  TokenRefresher from "./Services/TokenRefresher/TokenRefresher";
+import { VerPaquetes } from "./Pages/VerPaquetes/VerPaquetes";
 
 
 
@@ -64,6 +65,7 @@ export const App = () => {
         <Route path="/sophIA" element={<SophIA />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/paquetes" element={<Paquetes />} />
+        <Route path="/verPaquetes" element={<VerPaquetes />} />
         <Route path="/crearPaquete" element={<CrearPaquetes />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/soporte" element={<Soporte />} />
