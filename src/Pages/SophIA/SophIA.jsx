@@ -80,7 +80,7 @@ export const SophIA = () => {
   ]
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen w-full py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

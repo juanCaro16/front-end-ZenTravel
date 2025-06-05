@@ -1,8 +1,6 @@
-"use client"
-
 import { useNavigate } from "react-router-dom"
 import { ArrowRight, MapPin, Star, Users, Shield } from "lucide-react"
-
+import bg from "../../assets/Images/bg-image3.jpg"
 export const Main = () => {
   const navigate = useNavigate()
 
@@ -38,7 +36,7 @@ export const Main = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
           style={{
-            backgroundImage: `url('/src/assets/Images/bg-image3.jpg')`,
+            backgroundImage: `url('../../assets/Images/bg-image3.jpg)`,
           }}
         ></div>
 
