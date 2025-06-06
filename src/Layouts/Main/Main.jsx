@@ -36,7 +36,7 @@ export const Main = () => {
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
           style={{
-            backgroundImage: `url('../../assets/Images/bg-image3.jpg)`,
+            backgroundImage: `url(${bg})`,
           }}
         ></div>
 
