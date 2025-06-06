@@ -8,7 +8,7 @@ export const VerPaquetes = () => {
 
   const obtenerPaquetes = async () => {
   try {
-    const response = await api.get('/packages/paquetes');
+    const response = await api.get('/packages');
     console.log("📦 Respuesta completa:", response);
     console.log("Contenido:", response.data);
 
