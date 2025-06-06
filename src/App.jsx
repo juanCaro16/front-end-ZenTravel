@@ -11,16 +11,14 @@ import { Soporte } from "./Pages/Soporte/Soporte";
 import { Register } from "./Pages/Register/Register";
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword";
 import { NewPassword } from "./Pages/NewPassword/NewPassword";
-import { ProfileButton } from "./Components/ProfileButton/ProfileButton";
-import { Profile } from "./Pages/Profile/Profile";
 import { useState } from "react";
 import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
 import  TokenRefresher from "./Services/TokenRefresher/TokenRefresher";
 import { VerPaquetes } from "./Pages/VerPaquetes/VerPaquetes";
+import { Admin } from "./Pages/Administracion/Admin";
 
 
 
@@ -41,6 +39,7 @@ export const App = () => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("Rol");
     setIsAuthenticated(false); // Actualiza el estado global correctamente
   };
 
@@ -54,6 +53,7 @@ export const App = () => {
       <TokenRefresher />
       <Routes>
         <Route path="/" element={<Main />} />
+        <Route path="/Admin" element={<Admin/>}/>
         <Route
           path="/login"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}

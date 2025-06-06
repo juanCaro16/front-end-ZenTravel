@@ -25,9 +25,11 @@ export const Login = ({ onLoginSuccess }) => {
 
       const access = res.data.accessToken
       const refresh = res.data.refreshToken
+      const Rol = res.data.Rol
 
       localStorage.setItem("accessToken", access)
       localStorage.setItem("refreshToken", refresh)
+      localStorage.setItem("Rol",Rol)
 
       onLoginSuccess()
 

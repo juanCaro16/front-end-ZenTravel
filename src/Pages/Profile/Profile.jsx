@@ -16,6 +16,7 @@ export const Profile = ({ onLogout }) => {
     try {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
+      localStorage.removeItem("Rol")
       onLogout?.()
 
       await Swal.fire({

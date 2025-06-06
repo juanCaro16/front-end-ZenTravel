@@ -12,6 +12,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
+    localStorage.removeItem("Rol")
     onLogout()
     navigate("/login")
   }
