@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import api from "../../Services/AxiosInstance/AxiosInstance"
-import axios from 'axios';
 
 
 const TokenRefresher = () => {
@@ -23,7 +22,7 @@ const TokenRefresher = () => {
         const previousToken = token;
         
         try {
-            const response = await api.post('Auth/refresToken', {
+            const response = await api.post('Auth/RefreshToken', {
                 refreshToken,
             });
             
@@ -60,8 +59,9 @@ const isTokenExpiringSoon = (token) => {
     const now = Date.now();
     const buffer = 60 * 1000; // 1 minuto
     return expTime - now < buffer;
-  } catch (e) {
-    return true; // Si hay error, asumimos que expira
+  } catch (error) {
+    console.log("refreshToken ya expiro",error);
+    return true; 
   }
 };
 

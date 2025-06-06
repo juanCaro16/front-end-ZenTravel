@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from 'sweetalert2';
 import api from "../../Services/AxiosInstance/AxiosInstance";
@@ -7,7 +6,6 @@ import api from "../../Services/AxiosInstance/AxiosInstance";
 export const Paquetes = () => {
   const navigate = useNavigate();
   const [paquetes, setPaquetes] = useState([]);
-  const userId = localStorage.getItem("userId"); // Asegúrate de guardar el ID del usuario al iniciar sesión
 
   useEffect(() => {
   });
@@ -42,7 +40,7 @@ export const Paquetes = () => {
 
   const obtenerPaquetes = async () => {
     try {
-      const response = await api.get('/packages/paquetes');
+      const response = await api.get('/packages');
       console.log("📦 Respuesta completa:", response);
       console.log("Contenido:", response.data);
 

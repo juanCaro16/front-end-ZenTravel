@@ -1,8 +1,7 @@
 import axios from 'axios';
-import Swal from 'sweetalert2';
 
 const api = axios.create({
-  baseURL: 'https://proyecto-zentravel.onrender.com',
+  baseURL: 'https://proyecto-zentravel.onrender.com/',
 });
 
 api.interceptors.request.use(
@@ -16,71 +15,35 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-let isRefreshing = false;
-let failedQueue = [];
-
-const processQueue = (error, token = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
 api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
+  response => response,
+  async error => {
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return api(originalRequest);
-          })
-          .catch((err) => Promise.reject(err));
-      }
-
       originalRequest._retry = true;
-      isRefreshing = true;
 
       try {
         const refreshToken = localStorage.getItem('refreshToken');
-        const { data } = await axios.post('http://localhost:10101/Auth/refresToken', {
-          refreshToken,
-        });
+        if (!refreshToken) {
+          console.warn("⚠️ No hay refreshToken disponible");
+          return Promise.reject(error);
+        }
 
-        localStorage.setItem('accessToken', data.accessToken);
+        const response = await api.post('Auth/RefreshToken', { refreshToken });
 
-        // 🔑 Asegurar que la solicitud original tenga el token nuevo:
-        api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`; // <-- esta línea es crucial
+        const newToken = response.data.accessToken;
+        localStorage.setItem('accessToken', newToken);
 
-        processQueue(null, data.accessToken);
-        return api(originalRequest);
-      } catch (err) {
-        processQueue(err, null);
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        // Actualiza encabezados
+        api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+        originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
 
-        Swal.fire({
-          title: 'Sesión expirada',
-          text: 'Tu sesión ha caducado. Por favor inicia sesión nuevamente.',
-          icon: 'warning',
-          confirmButtonText: 'Aceptar',
-        }).then(() => {
-          window.location.href = '/login';
-        });
-
-        return Promise.reject(err);
-      } finally {
-        isRefreshing = false;
+        console.log("🔁 Token refrescado automáticamente");
+        return api(originalRequest); // reintenta la solicitud original
+      } catch (refreshError) {
+        console.error("❌ Error al refrescar token:", refreshError);
+        return Promise.reject(refreshError);
       }
     }
 

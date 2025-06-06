@@ -38,7 +38,7 @@ export const Profile = ({ onLogout }) => {
     const fetchUserInfo = async () => {
       try {
         setLoading(true)
-        const response = await api.get("https://proyecto-zentravel.onrender.com/Auth/infoUserDTO")
+        const response = await api.get("Auth/infoUserDTO")
         setUserInfo(response.data)
         setFormData(response.data)
       } catch (error) {
