@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { useEffect, useState } from "react";
 import Swal from 'sweetalert2';
 import api from "../../Services/AxiosInstance/AxiosInstance";
@@ -7,20 +6,8 @@ import api from "../../Services/AxiosInstance/AxiosInstance";
 export const Paquetes = () => {
   const navigate = useNavigate();
   const [paquetes, setPaquetes] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [editandoId, setEditandoId] = useState(null);
 
-  const obtenerPaquetes = async () => {
-    try {
-      const response = await api.get('/packages/paquetes');
-      setPaquetes(response.data.paquetes || []);
-    } catch (error) {
-      console.error('❌ Error al obtener paquetes:', error);
-      Swal.fire('Error', 'No se pudieron cargar los paquetes.', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     obtenerPaquetes();
@@ -69,6 +56,27 @@ export const Paquetes = () => {
       alert("Error al procesar el pago");
     }
   };
+
+  const [loading, setLoading] = useState(true);
+
+  const obtenerPaquetes = async () => {
+    try {
+      const response = await api.get('/packages');
+      console.log("📦 Respuesta completa:", response);
+      console.log("Contenido:", response.data);
+
+      setPaquetes(response.data.paquetes || []);
+    } catch (error) {
+      console.error('❌ Error al obtener paquetes:', error);
+      Swal.fire('Error', 'No se pudieron cargar los paquetes.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    obtenerPaquetes();
+  }, []);
 
   if (loading) return <p className="text-center mt-8">Cargando paquetes...</p>;
   if (paquetes.length === 0) return <p className="text-center mt-8">No hay paquetes disponibles.</p>;
