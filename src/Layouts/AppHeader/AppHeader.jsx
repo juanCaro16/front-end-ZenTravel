@@ -45,7 +45,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
               <ItemNavLink
                 content="Hotel + Vuelo"
-                route="/hoteles"
+                route="/inventario"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
               />
               <ItemNavLink

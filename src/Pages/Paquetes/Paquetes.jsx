@@ -59,8 +59,15 @@ export const Paquetes = () => {
 
   if (loading) return <p className="text-center mt-8">Cargando paquetes...</p>;
 
-  if (paquetes.length === 0) return <p className="text-center mt-8">No hay paquetes disponibles.</p>;
-
+  if (paquetes.length === 0) {
+  <p className="text-center mt-8">No hay paquetes disponibles.</p> ;
+        <button
+        onClick={() => navigate("/crearPaquete")}
+        className="w-max p-3 rounded-full bg-white text-black"
+      >
+        Agregar Paquete
+      </button>
+  }
 
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
@@ -92,7 +99,7 @@ export const Paquetes = () => {
               <li><strong>Duración:</strong> {paquete.duracionDias} días</li>
               <li><strong>Inicio:</strong> {paquete.fechaInicio || 'No especificado'}</li>
               <li><strong>Hotel:</strong> {paquete.numero_habitacion || 'No definido'}</li>
-              <li><strong>Transporte:</strong> {paquete.nombre_transporte || 'No definido'}</li>
+              <li><strong>origen:</strong> {paquete.nombre_transporte || 'No definido'}</li>
               <li><strong>Destino:</strong> {paquete.nombre_destino || 'No definido'}</li>
               <li><strong>Categoría:</strong> {paquete.categoria || 'Sin categoría'}</li>
               <li><strong>Descuento:</strong> {(Number(paquete.descuento) || 0).toFixed(2)}%</li>
