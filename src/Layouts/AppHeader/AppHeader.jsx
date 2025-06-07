@@ -9,6 +9,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
 
+
   const handleLogout = () => {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
@@ -53,6 +54,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
               />
             </nav>
+
           </div>
 
           {/* Controles adicionales */}
@@ -122,6 +124,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
+
         </div>
       </div>
 
@@ -183,6 +186,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           </div>
         </div>
       )}
+
     </header>
   )
 }

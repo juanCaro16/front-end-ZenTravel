@@ -28,6 +28,9 @@ export const App = () => {
   );
   const location = useLocation(); // Obtén la ubicación actual
 
+  const hideHeaderPaths = [ "/", "/register"]
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname)
+
   useEffect(() => {
     // Verifica el token cada vez que cambie la ruta
     if (!localStorage.getItem("accessToken")) {
@@ -44,9 +47,8 @@ export const App = () => {
 
   return (
     <>
- 
 
-      <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      {!shouldHideHeader && <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
       
       <ButtonHelp />
       <TokenRefresher />
