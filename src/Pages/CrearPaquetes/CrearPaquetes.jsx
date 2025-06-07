@@ -130,7 +130,7 @@ export const CrearPaquetes = () => {
         formToSend.append("imagen", formData.imagen); // clave 'imagen' debe coincidir con la que espera multer
       }
       console.log("📦 Enviando a endpoint: POST /packages/paquetes") // ✅ URL corregida
-      console.log("📦 Datos a enviar:", formToSend)
+      console.log("📦 Datos a enviar:", formData)
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
     const response = await api.post("packages/Create/Package", {
