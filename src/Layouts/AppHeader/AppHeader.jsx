@@ -14,7 +14,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("Rol")
     onLogout()
-    navigate("/login")
+    navigate("/")
   }
 
   return (
@@ -24,7 +24,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
         <div className="w-full flex items-center h-16 ">
           {/* Logo y navegación principal */}
           <div className="flex items-center w-[50%] gap-5">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/")}>
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/index")}>
               <img className="w-12 h-12 object-contain" src={img || "/placeholder.svg"} alt="ZenTravel Logo" />
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 ZenTravel
@@ -34,7 +34,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
             <nav className="hidden lg:flex items-center space-x-1">
               <ItemNavLink
                 content="Inicio"
-                route="/"
+                route="/index"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
               />
               <ItemNavLink
@@ -100,7 +100,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
             ) : (
               <div className="hidden md:flex items-center ">
                 <button
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/")}
                   className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
                 >
                   Iniciar Sesión
@@ -131,7 +131,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           <div className="px-4 py-6 space-y-4">
             <ItemNavLink
               content="Inicio"
-              route="/"
+              route="/index"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
@@ -159,7 +159,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               {!isAuthenticated ? (
                 <div className="space-y-3">
                   <button
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/")}
                     className="w-screen px-4 py-3 text-left rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
                   >
                     Iniciar Sesión
