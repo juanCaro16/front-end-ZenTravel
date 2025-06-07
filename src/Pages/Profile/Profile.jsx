@@ -16,6 +16,7 @@ export const Profile = ({ onLogout }) => {
     try {
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
+      localStorage.removeItem("Rol")
       onLogout?.()
 
       await Swal.fire({
@@ -27,7 +28,7 @@ export const Profile = ({ onLogout }) => {
         timer: 1500,
       })
 
-      navigate("/login")
+      navigate("/")
     } catch (error) {
       console.error("Error al cerrar sesión:", error)
     }
@@ -37,7 +38,7 @@ export const Profile = ({ onLogout }) => {
     const fetchUserInfo = async () => {
       try {
         setLoading(true)
-        const response = await api.get("https://proyecto-zentravel.onrender.com/Auth/infoUserDTO")
+        const response = await api.get("Auth/infoUserDTO")
         setUserInfo(response.data)
         setFormData(response.data)
       } catch (error) {

@@ -1,4 +1,4 @@
-import { useEffect,useState } from "react"
+import {useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import {
@@ -26,15 +26,12 @@ export const CrearPaquetes = () => {
   const [formData, setFormData] = useState({
     nombrePaquete: "",
     descripcion: "",
-    imagenUrl: "",
     duracionDias: "",
     fechaInicioDisponible: "",
     descuento: "",
     nombreHotel: "",
     nombreTransporte: "",
     nombreDestino: "",
-    precio: "",
-    precioCalculado: "",
     categoria: "",
     incluye: [],
     noIncluye: [],
@@ -43,8 +40,21 @@ export const CrearPaquetes = () => {
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [calculandoPrecio, setCalculandoPrecio] = useState(false)
-  const [precioCalculado, setPrecioCalculado] = useState(null)
+  const [imagen ,setImagen] = useState(null);
+
+  const handleFileChange = (e) => {
+    setImagen(e.target.files[0]);
+  };
+
+ console.log(imagen);
+ 
+  const transporteOpciones = [
+    { value: "Avianca", label: "Avión", icon: "✈️" },
+    { value: "bus", label: "Bus", icon: "🚌" },
+    { value: "carro", label: "Carro privado", icon: "🚗" },
+    { value: "tren", label: "Tren", icon: "🚂" },
+    { value: "barco", label: "Barco", icon: "⛵" },
+  ]
 
   const categorias = [
     { value: "aventura", label: "Aventura", icon: "🏔️" },
@@ -53,14 +63,6 @@ export const CrearPaquetes = () => {
     { value: "naturaleza", label: "Naturaleza", icon: "🌿" },
     { value: "urbano", label: "Urbano", icon: "🏙️" },
     { value: "gastronomico", label: "Gastronómico", icon: "🍽️" },
-  ]
-
-  const transporteOpciones = [
-    { value: "Avianca", label: "Avión", icon: "✈️" },
-    { value: "bus", label: "Bus", icon: "🚌" },
-    { value: "carro", label: "Carro privado", icon: "🚗" },
-    { value: "tren", label: "Tren", icon: "🚂" },
-    { value: "barco", label: "Barco", icon: "⛵" },
   ]
 
   const incluyeOpciones = [
@@ -97,38 +99,6 @@ export const CrearPaquetes = () => {
     }))
   }
 
-  // Cambiar la URL del endpoint para calcular precio
-  const calcularPrecio = async () => {
-    if (!formData.precio || !formData.duracionDias) {
-      alert("Necesitas ingresar el precio base y la duración para calcular el precio total")
-      return
-    }
-
-    setCalculandoPrecio(true)
-    try {
-      // ✅ Cambiar la URL del endpoint a la ruta correcta
-      const response = await api.post("/packages/paquetes/calcular", {
-        precio: formData.precio,
-        duracionDias: formData.duracionDias,
-        descuento: formData.descuento || 0,
-      })
-
-      const precioTotal = response.data.data.precioTotal
-      setPrecioCalculado(precioTotal)
-      setFormData((prev) => ({
-        ...prev,
-        precioCalculado: precioTotal.toString(),
-      }))
-
-      console.log("✅ Precio calculado:", response.data)
-    } catch (error) {
-      console.error("❌ Error al calcular precio:", error)
-      alert("Error al calcular el precio")
-    } finally {
-      setCalculandoPrecio(false)
-    }
-  }
-
   // Cambiar la URL del endpoint para crear paquete
   const handleSubmit = async () => {
     try {
@@ -136,34 +106,38 @@ export const CrearPaquetes = () => {
       setError("")
       setIsLoading(true)
 
-      // Calcular precio total si no se ha calculado
-      const precioTotalFinal =
-        precioCalculado ||
-        Number(formData.precio) * Number(formData.duracionDias) * (1 - (Number(formData.descuento) || 0) / 100)
+      const formToSend = new FormData()
 
-      // Preparar datos para enviar
-      const backendData = {
-        nombrePaquete: formData.nombrePaquete,
-        descripcion: formData.descripcion,
-        imagenUrl: formData.imagenUrl || null,
-        duracionDias: Number(formData.duracionDias),
-        fechaInicioDisponible: formData.fechaInicioDisponible,
-        descuento: Number(formData.descuento) || 0,
-        nombreHotel: formData.nombreHotel,
-        nombreTransporte: formData.nombreTransporte,
-        nombreDestino: formData.nombreDestino,
-        categoria: formData.categoria,
-        incluye: formData.incluye,
-        noIncluye: formData.noIncluye,
-        // precioTotal: precioTotalFinal,
-        // precio: Number(formData.precio), // Precio base por día
+        if (!formData.imagen || !(formData.imagen instanceof File)) {
+    console.error("⚠️ La imagen no es válida o no fue seleccionada.");
+    return;
+  }
+
+      formToSend.append('nombrePaquete', formData.nombrePaquete)
+      formToSend.append('descripcion', formData.descripcion)
+      formToSend.append('duracionDias', formData.duracionDias.toString())
+      formToSend.append('fechainicioDisponible', formData.fechaInicioDisponible)
+      formToSend.append('descuento', formData.descuento.toString())
+      formToSend.append('nombreHotel', formData.nombreHotel)
+      formToSend.append('nombreTransporte', formData.nombreTransporte)
+      formToSend.append('nombreDestino', formData.nombreDestino)
+      formToSend.append('categoria', formData.categoria)
+      formToSend.append("incluye", JSON.stringify(formData.incluye));
+      formToSend.append("noIncluye", JSON.stringify(formData.noIncluye));
+      formToSend.append("cantidad", (formData.cantidad ?? "1").toString());
+
+      if (formData.imagen) {
+        formToSend.append("imagen", formData.imagen); // clave 'imagen' debe coincidir con la que espera multer
       }
-
       console.log("📦 Enviando a endpoint: POST /packages/paquetes") // ✅ URL corregida
-      console.log("📦 Datos a enviar:", backendData)
+      console.log("📦 Datos a enviar:", formData)
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
-      const response = await api.post("/packages/paquetes/create", backendData)
+    const response = await api.post("packages/Create/Package", {
+      method: "POST",
+      body:formToSend 
+    });
+
 
       setMensaje("Paquete creado con éxito")
       console.log("✅ Respuesta del servidor:", response.data)
@@ -217,13 +191,11 @@ export const CrearPaquetes = () => {
       case 3:
         return true // Este paso es opcional ahora
       case 4:
-        return formData.duracionDias && formData.fechaInicioDisponible && formData.precio
+        return formData.duracionDias && formData.fechaInicioDisponible 
       default:
         return false
     }
   }
-
-  
 
   const renderStep = () => {
     switch (currentStep) {
@@ -284,18 +256,14 @@ export const CrearPaquetes = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <ImageIcon className="w-4 h-4 inline mr-2" />
-                URL de imagen
-              </label>
-              <div className="flex space-x-3">
-                <input
-                  name="imagenUrl"
-                  value={formData.imagenUrl}
-                  onChange={handleChange}
-                  placeholder="https://ejemplo.com/imagen.jpg"
-                  className="flex-1 p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
-                />
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Subir imagen:</label>
+              <input
+                type="file"
+                accept="image/*"
+                name="imagen"
+                onChange={handleFileChange}
+                required
+              />
                 <button
                   type="button"
                   className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
@@ -303,7 +271,7 @@ export const CrearPaquetes = () => {
                   <Upload className="w-5 h-5" />
                 </button>
               </div>
-              {formData.imagenUrl && (
+              {formData.imagen && (
                 <div className="mt-3 p-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center space-x-2 text-sm text-gray-600">
                     <Eye className="w-4 h-4" />
@@ -312,7 +280,6 @@ export const CrearPaquetes = () => {
                 </div>
               )}
             </div>
-          </div>
         )
 
       case 2:
@@ -459,23 +426,6 @@ export const CrearPaquetes = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <DollarSign className="w-4 h-4 inline mr-2" />
-                  Precio base por día *
-                </label>
-                <input
-                  type="number"
-                  name="precio"
-                  value={formData.precio}
-                  onChange={handleChange}
-                  placeholder="150000"
-                  min="0"
-                  step="1000"
-                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
-                />
-                <p className="text-sm text-gray-500 mt-1">Precio en COP por día por persona</p>
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -509,87 +459,6 @@ export const CrearPaquetes = () => {
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-            </div>
-
-            {/* Sección de cálculo de precio */}
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Cálculo de Precio</h3>
-                <button
-                  type="button"
-                  onClick={calcularPrecio}
-                  disabled={calculandoPrecio || !formData.precio || !formData.duracionDias}
-                  className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors duration-200 flex items-center space-x-2"
-                >
-                  {calculandoPrecio ? (
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <DollarSign className="w-4 h-4" />
-                  )}
-                  <span>{calculandoPrecio ? "Calculando..." : "Calcular Precio"}</span>
-                </button>
-              </div>
-
-              {formData.precio && formData.duracionDias && (
-                <div className="space-y-2 text-sm text-gray-700">
-                  <div className="flex justify-between">
-                    <span>Precio base por día:</span>
-                    <span className="font-medium">${Number.parseInt(formData.precio).toLocaleString()} COP</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Duración:</span>
-                    <span className="font-medium">{formData.duracionDias} días</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span className="font-medium">
-                      $
-                      {(
-                        Number.parseInt(formData.precio || 0) * Number.parseInt(formData.duracionDias || 0)
-                      ).toLocaleString()}{" "}
-                      COP
-                    </span>
-                  </div>
-                  {formData.descuento && (
-                    <div className="flex justify-between text-emerald-600">
-                      <span>Descuento ({formData.descuento}%):</span>
-                      <span className="font-medium">
-                        -$
-                        {(
-                          (Number.parseInt(formData.precio || 0) *
-                            Number.parseInt(formData.duracionDias || 0) *
-                            Number.parseInt(formData.descuento || 0)) /
-                          100
-                        ).toLocaleString()}{" "}
-                        COP
-                      </span>
-                    </div>
-                  )}
-                  <div className="border-t border-gray-300 pt-2">
-                    <div className="flex justify-between text-lg font-bold text-gray-900">
-                      <span>Precio Total:</span>
-                      <span className="text-emerald-600">
-                        $
-                        {precioCalculado
-                          ? precioCalculado.toLocaleString()
-                          : (
-                              Number.parseInt(formData.precio || 0) *
-                              Number.parseInt(formData.duracionDias || 0) *
-                              (1 - Number.parseInt(formData.descuento || 0) / 100)
-                            ).toLocaleString()}{" "}
-                        COP
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!formData.precio || !formData.duracionDias ? (
-                <div className="text-center text-gray-500 py-4">
-                  <DollarSign className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                  <p>Ingresa el precio base y la duración para ver el cálculo</p>
-                </div>
-              ) : null}
             </div>
 
             {/* Información sobre el proceso */}
