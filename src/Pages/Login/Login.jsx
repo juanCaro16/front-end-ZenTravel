@@ -1,8 +1,8 @@
 import { useState } from "react"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react"
+import api from "../../Services/AxiosInstance/AxiosInstance"
 
 export const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("")
@@ -18,7 +18,7 @@ export const Login = ({ onLoginSuccess }) => {
     setIsLoading(true)
 
     try {
-      const res = await axios.post("https://proyecto-zentravel.onrender.com/Auth/login", {
+      const res = await api.post("Auth/login", {
         email,
         password,
       })
@@ -42,7 +42,7 @@ export const Login = ({ onLoginSuccess }) => {
         showConfirmButton: false,
       })
 
-      navigate("/")
+      navigate("/index")
     } catch (err) {
       console.error("Error de login:", err.response?.data || err.message)
       setErrorMsg("Correo o contraseña incorrectos")
