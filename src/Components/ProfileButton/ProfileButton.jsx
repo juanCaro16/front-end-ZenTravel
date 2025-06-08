@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, useRef } from "react"
 import { User, ChevronDown } from "lucide-react"
 import { Profile } from "../../Pages/Profile/Profile"
@@ -54,7 +52,7 @@ export const ProfileButton = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInScale {
           from {
             opacity: 0;

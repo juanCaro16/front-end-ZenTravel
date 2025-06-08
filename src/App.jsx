@@ -11,16 +11,12 @@ import { Soporte } from "./Pages/Soporte/Soporte";
 import { Register } from "./Pages/Register/Register";
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword";
 import { NewPassword } from "./Pages/NewPassword/NewPassword";
-import { ProfileButton } from "./Components/ProfileButton/ProfileButton";
-import { Profile } from "./Pages/Profile/Profile";
-import { useState } from "react";
-import { useEffect } from "react";
-import { Navigate } from "react-router-dom";
+import { useState,useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Paquetes } from "./Pages/Paquetes/Paquetes";
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes";
 import  TokenRefresher from "./Services/TokenRefresher/TokenRefresher";
-import { VerPaquetes } from "./Pages/VerPaquetes/VerPaquetes";
+import { Admin } from "./Pages/Administracion/Admin";
 
 
 
@@ -30,6 +26,9 @@ export const App = () => {
     !!localStorage.getItem("accessToken")
   );
   const location = useLocation(); // Obtén la ubicación actual
+
+  const hideHeaderPaths = [ "/", "/register"]
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname)
 
   useEffect(() => {
     // Verifica el token cada vez que cambie la ruta
@@ -41,21 +40,22 @@ export const App = () => {
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("Rol");
     setIsAuthenticated(false); // Actualiza el estado global correctamente
   };
 
   return (
     <>
- 
 
-      <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+      {!shouldHideHeader && <AppHeader isAuthenticated={isAuthenticated} onLogout={handleLogout} />}
       
       <ButtonHelp />
       <TokenRefresher />
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/index" element={<Main />} />
+        <Route path="/Admin" element={<Admin/>}/>
         <Route
-          path="/login"
+          path="/"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
           />
         <Route path="/register" element={<Register />} />
@@ -65,7 +65,7 @@ export const App = () => {
         <Route path="/sophIA" element={<SophIA />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/paquetes" element={<Paquetes />} />
-        <Route path="/verPaquetes" element={<VerPaquetes />} />
+        <Route path="/inventario" />
         <Route path="/crearPaquete" element={<CrearPaquetes />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/soporte" element={<Soporte />} />

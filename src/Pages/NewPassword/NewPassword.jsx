@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import axios from "axios"
 import { Lock, Eye, EyeOff, CheckCircle, AlertCircle, ArrowRight, Shield } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 
@@ -103,7 +102,7 @@ export const NewPassword = () => {
     setIsLoading(true)
 
     try {
-      const response = await api.post(`/Password/reset-password?token=${token}`, {
+      await api.post(`/Password/reset-password?token=${token}`, {
         newPassword: formData.newPassword,
       })
 
@@ -112,7 +111,7 @@ export const NewPassword = () => {
 
       // Redirigir al login después de 3 segundos
       setTimeout(() => {
-        navigate("/login")
+        navigate("/")
       }, 3000)
     } catch (err) {
       console.error("❌ Error:", err)
@@ -134,7 +133,7 @@ export const NewPassword = () => {
   }
 
   const handleBackToLogin = () => {
-    navigate("/login")
+    navigate("/")
   }
 
   const handleRequestNewToken = () => {
