@@ -65,6 +65,7 @@ export const App = () => {
         <Route path="/sophIA" element={<SophIA />} />
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/paquetes" element={<Paquetes />} />
+        <Route path="/inventario" />
         <Route path="/crearPaquete" element={<CrearPaquetes />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/soporte" element={<Soporte />} />

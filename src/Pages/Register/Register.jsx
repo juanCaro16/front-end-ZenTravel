@@ -1,5 +1,4 @@
 import { useState } from "react"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
 import {
@@ -15,6 +14,7 @@ import {
   UserPlus,
   Shield,
 } from "lucide-react"
+import api from "../../Services/AxiosInstance/AxiosInstance"
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -101,7 +101,7 @@ export const Register = () => {
     setErrors({})
 
     try {
-      const response = await axios.post("https://proyecto-zentravel.onrender.com/Auth/register", {
+      const response = await api.post("Auth/Register", {
         nombre: formData.nombre.trim(),
         email: formData.email.trim().toLowerCase(),
         telefono: formData.telefono.trim(),
@@ -118,7 +118,7 @@ export const Register = () => {
         confirmButtonText: "Continuar",
       })
 
-      navigate("/login")
+      navigate("/")
     } catch (err) {
       console.error("❌ Error en registro:", err)
 
@@ -401,7 +401,7 @@ export const Register = () => {
             </div>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
               className="w-full py-3 px-4 border-2 border-emerald-500 text-emerald-600 rounded-xl hover:bg-emerald-50 font-semibold transition-all duration-200 transform hover:scale-105"
             >
               Iniciar Sesión

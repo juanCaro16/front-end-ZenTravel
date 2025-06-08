@@ -23,7 +23,7 @@ export const Paquetes = () => {
   const handleGuardar = async (paquete) => {
     try {
       const id = paquete.id_paquete;
-      await api.put(`packages/paquetes/${id}`, paquete);
+      await api.put(`packages/IDPackage/${id}`, paquete);
       Swal.fire("Éxito", "Paquete actualizado exitosamente", "success");
       setEditandoId(null);
     } catch (error) {
@@ -79,7 +79,16 @@ export const Paquetes = () => {
   }, []);
 
   if (loading) return <p className="text-center mt-8">Cargando paquetes...</p>;
-  if (paquetes.length === 0) return <p className="text-center mt-8">No hay paquetes disponibles.</p>;
+
+  if (paquetes.length === 0) {
+  <p className="text-center mt-8">No hay paquetes disponibles.</p> ;
+        <button
+        onClick={() => navigate("/crearPaquete")}
+        className="w-max p-3 rounded-full bg-white text-black"
+      >
+        Agregar Paquete
+      </button>
+  }
 
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
