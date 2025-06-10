@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react"
-import axios from "axios"
 import { Send, Bot, User, Sparkles } from "lucide-react"
+import api from "../../Services/AxiosInstance/AxiosInstance"
 
 export const SophIA = () => {
   const [inputValue, setInputValue] = useState("")
@@ -38,9 +38,9 @@ export const SophIA = () => {
     setIsLoading(true)
 
     try {
-      const response = await axios.post("http://localhost:10101/Preguntar", {
-        Preguntar: inputValue,
-      })
+      const response = await api.post("ZenIA", {
+        ZenIA: inputValue,
+      });
 
       const botMessage = {
         type: "bot",

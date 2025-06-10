@@ -52,7 +52,7 @@ export const ProfileButton = () => {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeInScale {
           from {
             opacity: 0;

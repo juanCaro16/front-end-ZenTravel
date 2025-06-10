@@ -1,5 +1,4 @@
 import { useState } from "react"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { Mail, ArrowLeft, Send, CheckCircle, AlertCircle, Clock } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
@@ -53,7 +52,7 @@ export const ResetPassword = () => {
   }
 
   const handleBackToLogin = () => {
-    navigate("/login")
+    navigate("/")
   }
 
   const handleResendEmail = () => {

@@ -1,4 +1,4 @@
-import {useState } from "react"
+import { useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import {
@@ -35,54 +35,21 @@ export const CrearPaquetes = () => {
     categoria: "",
     incluye: [],
     noIncluye: [],
+    cantidad:""
   })
 
+  const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+
+const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+
+  const [imagen ,setImagen] = useState(null);
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [imagen ,setImagen] = useState(null);
 
   const handleFileChange = (e) => {
     setImagen(e.target.files[0]);
   };
-
- console.log(imagen);
- 
-  const transporteOpciones = [
-    { value: "Avianca", label: "Avión", icon: "✈️" },
-    { value: "bus", label: "Bus", icon: "🚌" },
-    { value: "carro", label: "Carro privado", icon: "🚗" },
-    { value: "tren", label: "Tren", icon: "🚂" },
-    { value: "barco", label: "Barco", icon: "⛵" },
-  ]
-
-  const categorias = [
-    { value: "aventura", label: "Aventura", icon: "🏔️" },
-    { value: "playa", label: "Playa", icon: "🏖️" },
-    { value: "cultural", label: "Cultural", icon: "🏛️" },
-    { value: "naturaleza", label: "Naturaleza", icon: "🌿" },
-    { value: "urbano", label: "Urbano", icon: "🏙️" },
-    { value: "gastronomico", label: "Gastronómico", icon: "🍽️" },
-  ]
-
-  const incluyeOpciones = [
-    "Alojamiento",
-    "Desayuno",
-    "Almuerzo",  
-    "Cena",
-    "Transporte local",
-    "Guía turístico",
-    "Entradas a sitios",
-    "Seguro de viaje",
-    "Actividades programadas",
-  ]
-
-  const steps = [
-    { number: 1, title: "Información Básica", icon: <Package className="w-5 h-5" /> },
-    { number: 2, title: "Detalles del Viaje", icon: <MapPin className="w-5 h-5" /> },
-    { number: 3, title: "Servicios Incluidos", icon: <Star className="w-5 h-5" /> },
-    { number: 4, title: "Precios y Fechas", icon: <DollarSign className="w-5 h-5" /> },
-  ]
 
   const handleChange = (e) => {
     const { name, value, type } = e.target
@@ -99,7 +66,6 @@ export const CrearPaquetes = () => {
     }))
   }
 
-  // Cambiar la URL del endpoint para crear paquete
   const handleSubmit = async () => {
     try {
       setMensaje("")
@@ -108,39 +74,37 @@ export const CrearPaquetes = () => {
 
       const formToSend = new FormData()
 
-        if (!formData.imagen || !(formData.imagen instanceof File)) {
-    console.error("⚠️ La imagen no es válida o no fue seleccionada.");
-    return;
-  }
+      if (!imagen || !(imagen instanceof File)) {
+        console.error("⚠️ La imagen no es válida o no fue seleccionada.");
+        return;
+      }
 
-      formToSend.append('nombrePaquete', formData.nombrePaquete)
-      formToSend.append('descripcion', formData.descripcion)
-      formToSend.append('duracionDias', formData.duracionDias.toString())
-      formToSend.append('fechainicioDisponible', formData.fechaInicioDisponible)
-      formToSend.append('descuento', formData.descuento.toString())
-      formToSend.append('nombreHotel', formData.nombreHotel)
-      formToSend.append('nombreTransporte', formData.nombreTransporte)
-      formToSend.append('nombreDestino', formData.nombreDestino)
-      formToSend.append('categoria', formData.categoria)
+      formToSend.append("imagen", imagen);
+      formToSend.append("nombrePaquete", formData.nombrePaquete);
+      formToSend.append("descripcion", formData.descripcion);
+      formToSend.append("duracionDias", formData.duracionDias.toString());
+      formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible); // ✅ corregido
+      formToSend.append("descuento", formData.descuento.toString());
+      formToSend.append("nombreHotel", formData.nombreHotel);
+      formToSend.append("nombreTransporte", formData.nombreTransporte);
+      formToSend.append("nombreDestino", formData.nombreDestino);
+      formToSend.append("categoria", formData.categoria);
       formToSend.append("incluye", JSON.stringify(formData.incluye));
       formToSend.append("noIncluye", JSON.stringify(formData.noIncluye));
       formToSend.append("cantidad", (formData.cantidad ?? "1").toString());
 
-      if (formData.imagen) {
-        formToSend.append("imagen", formData.imagen); // clave 'imagen' debe coincidir con la que espera multer
+      for (let pair of formToSend.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
       }
-      console.log("📦 Enviando a endpoint: POST /packages/paquetes") // ✅ URL corregida
-      console.log("📦 Datos a enviar:", formData)
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
-    const response = await api.post("packages/Create/Package", {
-      method: "POST",
-      body:formToSend 
+    const response = await api.post("packages/Create/Package", formToSend, {
+      headers: {
+        "Content-Type": "multipart/form-data", // obligatorio para enviar imágenes
+      },
     });
 
-
-      setMensaje("Paquete creado con éxito")
-      console.log("✅ Respuesta del servidor:", response.data)
+    console.log("✅ Éxito:", response.data);
 
       await Swal.fire({
         title: "¡Éxito!",
@@ -151,9 +115,9 @@ export const CrearPaquetes = () => {
 
       navigate("/paquetes")
     } catch (err) {
-      console.error("❌ Error completo:", err)
-      console.error("❌ Response data:", err.response?.data)
-      console.error("❌ Response status:", err.response?.status)
+      console.error("❌ Error completo:", error);
+      console.error("❌ Response data:", error.response?.data);
+      console.error("❌ Response status:", error.response?.status);
 
       let errMsg = "Hubo un error al crear el paquete"
 
@@ -173,6 +137,21 @@ export const CrearPaquetes = () => {
       setIsLoading(false)
     }
   }
+
+  const buscarTransportes = async () => {
+    if (!transporte.origen || !transporte.destino) {
+      alert("Debes ingresar origen y destino.");
+      return;
+    }
+
+    try {
+      const res = await api.get(`packages/Transport/${transporte.origen}/${transporte.destino}`);
+      setOpcionesTransporte(res.data);
+    } catch (error) {
+      console.error("❌ Error al buscar transportes:", error);
+      alert("Ocurrió un error al buscar transportes.");
+    }
+  };
 
   const nextStep = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1)
@@ -279,6 +258,7 @@ export const CrearPaquetes = () => {
                   </div>
                 </div>
               )}
+              
             </div>
         )
 
@@ -314,28 +294,47 @@ export const CrearPaquetes = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Plane className="w-4 h-4 inline mr-2" />
-                Transporte incluido *
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {transporteOpciones.map((transport) => (
-                  <button
-                    key={transport.value}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, nombreTransporte: transport.value })}
-                    className={`p-4 border-2 rounded-xl transition-all duration-200 ${
-                      formData.nombreTransporte === transport.value
-                        ? "border-emerald-500 bg-emerald-50 text-emerald-700"
-                        : "border-gray-300 hover:border-emerald-300 hover:bg-emerald-50"
-                    }`}
-                  >
-                    <div className="text-2xl mb-2">{transport.icon}</div>
-                    <div className="font-medium text-sm">{transport.label}</div>
-                  </button>
-                ))}
-              </div>
+            <div>
+              <label>Origen:</label>
+              <input
+                type="text"
+                value={transporte.origen}
+                onChange={(e) => setTransporte((prev) => ({ ...prev, origen: e.target.value }))}
+              />
+
+              <label>Destino:</label>
+              <input
+                type="text"
+                value={transporte.destino}
+                onChange={(e) => setTransporte((prev) => ({ ...prev, destino: e.target.value }))}
+              />
             </div>
+
+              {opcionesTransporte.length > 0 && (
+              <div>
+                <select
+                  name="nombreTransporte"
+                  value={formData.nombreTransporte}
+                  onChange={(e) =>
+                    setFormData({ ...formData, nombreTransporte: e.target.value })
+                  }
+                >
+                  <option value=""></option>
+                  {opcionesTransporte.map((item) => (
+                    <option key={item.id_transporte} value={item.id_transporte}>
+                      {/* Aquí puedes personalizar cómo se muestra el transporte */}
+                      {`${item.tipo} - ${item.origen} → ${item.destino} (${item.empresa})`}
+                    </option>
+                  ))}
+            </select>
+
+              </div>
+            )}
+
+              <button type="button" onClick={buscarTransportes}>
+                Buscar Transportes
+              </button>
+              </div>
           </div>
         )
 
@@ -426,9 +425,26 @@ export const CrearPaquetes = () => {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Clock className="w-4 h-4 inline mr-2" />
+                  pasajes (cantidad) *
+                </label>
+                <input
+                  type="number"
+                  name="cantidad"
+                  value={formData.cantidad}
+                  onChange={handleChange}
+                  placeholder="5"
+                  min="1"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                />
+              </div>
+
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <Percent className="w-4 h-4 inline mr-2" />
@@ -459,6 +475,7 @@ export const CrearPaquetes = () => {
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
+
             </div>
 
             {/* Información sobre el proceso */}
@@ -476,6 +493,34 @@ export const CrearPaquetes = () => {
         return null
     }
   }
+
+  const categorias = [
+    { value: "aventura", label: "Aventura", icon: "🏔️" },
+    { value: "playa", label: "Playa", icon: "🏖️" },
+    { value: "cultural", label: "Cultural", icon: "🏛️" },
+    { value: "naturaleza", label: "Naturaleza", icon: "🌿" },
+    { value: "urbano", label: "Urbano", icon: "🏙️" },
+    { value: "gastronomico", label: "Gastronómico", icon: "🍽️" },
+  ]
+
+  const incluyeOpciones = [
+    "Alojamiento",
+    "Desayuno",
+    "Almuerzo",  
+    "Cena",
+    "Transporte local",
+    "Guía turístico",
+    "Entradas a sitios",
+    "Seguro de viaje",
+    "Actividades programadas",
+  ]
+
+  const steps = [
+    { number: 1, title: "Información Básica", icon: <Package className="w-5 h-5" /> },
+    { number: 2, title: "Detalles del Viaje", icon: <MapPin className="w-5 h-5" /> },
+    { number: 3, title: "Servicios Incluidos", icon: <Star className="w-5 h-5" /> },
+    { number: 4, title: "Precios y Fechas", icon: <DollarSign className="w-5 h-5" /> },
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8 px-4">
@@ -585,12 +630,15 @@ export const CrearPaquetes = () => {
             <p className="text-green-600 font-medium">{mensaje}</p>
           </div>
         )}
+
         {error && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-600 font-medium">{error}</p>
           </div>
         )}
+
       </div>
     </div>
   )
+  
 }
