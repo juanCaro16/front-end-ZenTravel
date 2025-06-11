@@ -1,5 +1,3 @@
-"use client"
-
 import { Route, Routes } from "react-router-dom"
 import { AppHeader } from "./Layouts/AppHeader/AppHeader"
 import { Main } from "./Layouts/Main/Main"
