@@ -38,7 +38,7 @@ export const SophIA = () => {
     setIsLoading(true)
 
     try {
-      const response = await api.post("ZenIA", {
+      const response = await api.post("IA/ZenIA", {
         ZenIA: inputValue,
       });
 
