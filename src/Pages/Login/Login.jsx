@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import Swal from "sweetalert2"
@@ -27,11 +29,8 @@ export const Login = ({ onLoginSuccess }) => {
       const refresh = res.data.refreshToken
       const Rol = res.data.Rol
 
-      localStorage.setItem("accessToken", access)
-      localStorage.setItem("refreshToken", refresh)
-      localStorage.setItem("Rol",Rol)
-
-      onLoginSuccess()
+      // Usar la función onLoginSuccess que viene del hook useAuth
+      onLoginSuccess(access, refresh, Rol)
 
       await Swal.fire({
         title: "¡Bienvenido de vuelta!",
@@ -42,7 +41,15 @@ export const Login = ({ onLoginSuccess }) => {
         showConfirmButton: false,
       })
 
-      navigate("/")
+      // Redirigir según el rol
+      if (Rol === "Admin") {
+        navigate("/admin")
+      } else if (Rol === "Empleado") {
+        navigate("/employee")
+      } else {
+        navigate("/index")
+      }
+      
     } catch (err) {
       console.error("Error de login:", err.response?.data || err.message)
       setErrorMsg("Correo o contraseña incorrectos")

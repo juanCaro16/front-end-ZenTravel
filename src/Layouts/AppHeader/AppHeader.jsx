@@ -1,31 +1,30 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Menu, X, Phone, Globe, Luggage, HelpCircle } from "lucide-react"
+import { Menu, X, Phone, Globe, Luggage, HelpCircle, TestTube } from "lucide-react"
 import img from "../../Images/logofull_sin_fondo-Photoroom.png"
 import { ItemNavLink } from "../../Components/ItemNavLink/ItemNavLink"
 import { ProfileButton } from "../../Components/ProfileButton/ProfileButton"
+import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
 
 export const AppHeader = ({ isAuthenticated, onLogout }) => {
   const [menuOpen, setMenuOpen] = useState(false)
   const navigate = useNavigate()
-
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken")
     localStorage.removeItem("refreshToken")
     localStorage.removeItem("Rol")
     onLogout()
-    navigate("/login")
+    navigate("/")
   }
 
   return (
     <header className="w-screen bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
       <div className=" mx-auto sm:px-6 lg:px-8">
-        
         <div className="w-full flex items-center h-16 ">
           {/* Logo y navegación principal */}
           <div className="flex items-center w-[50%] gap-5">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/")}>
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/index")}>
               <img className="w-12 h-12 object-contain" src={img || "/placeholder.svg"} alt="ZenTravel Logo" />
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 ZenTravel
@@ -53,8 +52,45 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 route="/SophIA"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
               />
-            </nav>
 
+              {/* Enlace para probar permisos - solo visible cuando está autenticado */}
+              {isAuthenticated && (
+                <ItemNavLink
+                  content={
+                    <div className="flex items-center space-x-1">
+                      <TestTube className="w-4 h-4" />
+                      <span>Test Permisos</span>
+                    </div>
+                  }
+                  route="/test-permissions"
+                  myStyles="px-4 py-2 rounded-lg text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-all duration-200 font-medium border border-orange-200"
+                />
+              )}
+
+              <RoleBasedComponent allowedRoles={["Admin"]}>
+                <ItemNavLink
+                  content="Admin Panel"
+                  route="/admin"
+                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                />
+              </RoleBasedComponent>
+
+              <RoleBasedComponent allowedRoles={["Empleado"]}>
+                <ItemNavLink
+                  content="Panel Empleado"
+                  route="/employee"
+                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                />
+              </RoleBasedComponent>
+
+              <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
+                <ItemNavLink
+                  content="Crear Paquete"
+                  route="/crearPaquete"
+                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                />
+              </RoleBasedComponent>
+            </nav>
           </div>
 
           {/* Controles adicionales */}
@@ -97,12 +133,11 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
 
             {/* Autenticación */}
             {isAuthenticated ? (
-              
               <ProfileButton />
             ) : (
               <div className="hidden md:flex items-center ">
                 <button
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/")}
                   className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
                 >
                   Iniciar Sesión
@@ -124,7 +159,6 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-
         </div>
       </div>
 
@@ -158,11 +192,44 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
 
+            {/* Enlace de testing en móvil */}
+            {isAuthenticated && (
+              <ItemNavLink
+                content="🧪 Test Permisos"
+                route="/test-permissions"
+                myStyles="block px-4 py-3 rounded-lg text-orange-600 hover:bg-orange-50 hover:text-orange-700 transition-all duration-200 font-medium border border-orange-200"
+              />
+            )}
+
+            <RoleBasedComponent allowedRoles={["Admin"]}>
+              <ItemNavLink
+                content="Admin Panel"
+                route="/admin"
+                myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+              />
+            </RoleBasedComponent>
+
+            <RoleBasedComponent allowedRoles={["Empleado"]}>
+              <ItemNavLink
+                content="Panel Empleado"
+                route="/employee"
+                myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+              />
+            </RoleBasedComponent>
+
+            <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
+              <ItemNavLink
+                content="Crear Paquete"
+                route="/crearPaquete"
+                myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+              />
+            </RoleBasedComponent>
+
             <div className="pt-4 border-t border-gray-200">
               {!isAuthenticated ? (
                 <div className="space-y-3">
                   <button
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/")}
                     className="w-screen px-4 py-3 text-left rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
                   >
                     Iniciar Sesión
@@ -186,7 +253,6 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           </div>
         </div>
       )}
-
     </header>
   )
 }
