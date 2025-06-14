@@ -52,10 +52,10 @@ export const App = () => {
       <ButtonHelp />
       <TokenRefresher />
       <Routes>
-        <Route path="/index" element={<Main />} />
+        <Route path="/" element={<Main />} />
         <Route path="/Admin" element={<Admin/>}/>
         <Route
-          path="/"
+          path="/login"
           element={<Login onLoginSuccess={() => setIsAuthenticated(true)} />}
           />
         <Route path="/register" element={<Register />} />
