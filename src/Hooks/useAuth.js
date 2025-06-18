@@ -1,7 +1,8 @@
+// src/Hooks/useAuth.js
 import { useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
 
-const UseAuth = () => {
+const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userRole, setUserRole] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -16,7 +17,6 @@ const UseAuth = () => {
       const role = localStorage.getItem("Rol")
 
       if (token) {
-        // Verificar si el token no ha expirado
         const decoded = jwtDecode(token)
         const currentTime = Date.now() / 1000
 
@@ -24,7 +24,6 @@ const UseAuth = () => {
           setIsAuthenticated(true)
           setUserRole(role)
         } else {
-          // Token expirado
           logout()
         }
       } else {
@@ -55,13 +54,8 @@ const UseAuth = () => {
     setUserRole(null)
   }
 
-  const hasRole = (requiredRole) => {
-    return userRole === requiredRole
-  }
-
-  const hasAnyRole = (requiredRoles) => {
-    return requiredRoles.includes(userRole)
-  }
+  const hasRole = (requiredRole) => userRole === requiredRole
+  const hasAnyRole = (requiredRoles) => requiredRoles.includes(userRole)
 
   return {
     isAuthenticated,
@@ -74,4 +68,5 @@ const UseAuth = () => {
     checkAuthStatus,
   }
 }
-export default UseAuth;
+
+export default useAuth
