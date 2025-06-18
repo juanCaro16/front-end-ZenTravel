@@ -22,7 +22,9 @@ import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
-import { UseAuth } from "./Hooks/useAuth"
+import UseAuth from "./Hooks/useAuth";
+
+
 
 export const App = () => {
   const { isAuthenticated, userRole, login, logout } = UseAuth()
