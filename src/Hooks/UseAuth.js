@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { jwtDecode } from "jwt-decode"
 
-export const useAuth = () => {
+export const UseAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userRole, setUserRole] = useState(null)
   const [loading, setLoading] = useState(true)
