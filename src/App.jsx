@@ -15,6 +15,8 @@ import { useEffect } from "react"
 import { useLocation } from "react-router-dom"
 import { Paquetes } from "./Pages/Paquetes/Paquetes"
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes"
+import { Hoteles } from "./Pages/Hoteles/Hoteles"
+import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
 import TokenRefresher from "./Services/TokenRefresher/TokenRefresher"
 import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
@@ -96,6 +98,22 @@ export const App = () => {
           element={
             <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
               <CrearPaquetes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Hoteles"
+          element={
+            <ProtectedRoute>
+              <Hoteles />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crearHotel"
+          element={
+            <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
+              <CrearHoteles />
             </ProtectedRoute>
           }
         />
