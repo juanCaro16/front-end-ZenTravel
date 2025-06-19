@@ -22,7 +22,7 @@ import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
 import { useAuth } from "./Hooks/useAuth"
 
 export const App = () => {
-  const { isAuthenticated, userRole, login, logout } = useAuth()
+  const { isAuthenticated, login, logout } = useAuth()
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register"]
