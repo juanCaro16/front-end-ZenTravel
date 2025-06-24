@@ -14,15 +14,23 @@ import { NewPassword } from "./Pages/NewPassword/NewPassword"
 import { useEffect ,} from "react"
 import { Paquetes } from "./Pages/Paquetes/Paquetes"
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes"
+import { Hoteles } from "./Pages/Hoteles/Hoteles"
+import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
 import TokenRefresher from "./Services/TokenRefresher/TokenRefresher"
 import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
-import { useAuth } from "./Hooks/useAuth"
+import UseAuth from "./Hooks/useAuth";
+
+
 
 export const App = () => {
+<<<<<<< HEAD
   const { isAuthenticated, login, logout } = useAuth()
+=======
+  const { isAuthenticated, userRole, login, logout } = UseAuth()
+>>>>>>> origin
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register"]
@@ -94,6 +102,22 @@ export const App = () => {
           element={
             <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
               <CrearPaquetes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Hoteles"
+          element={
+            <ProtectedRoute>
+              <Hoteles />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/crearHotel"
+          element={
+            <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
+              <CrearHoteles />
             </ProtectedRoute>
           }
         />

@@ -1,6 +1,9 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Menu, X, Phone, Globe, Luggage, HelpCircle, TestTube } from "lucide-react"
+import { IoHome } from "react-icons/io5";
+import { FaSuitcaseRolling,FaHeadSideVirus } from "react-icons/fa6";
+import { FaBuilding } from "react-icons/fa";
 import img from "../../Images/logofull_sin_fondo-Photoroom.png"
 import { ItemNavLink } from "../../Components/ItemNavLink/ItemNavLink"
 import { ProfileButton } from "../../Components/ProfileButton/ProfileButton"
@@ -18,12 +21,14 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
     navigate("/")
   }
 
+  
+
   return (
     <header className="w-screen bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
       <div className=" mx-auto sm:px-6 lg:px-8">
         <div className="w-full flex items-center h-16 ">
           {/* Logo y navegación principal */}
-          <div className="flex items-center w-[50%] gap-5">
+          <div className="flex items-center w-[60%] gap-5">
             <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/index")}>
               <img className="w-12 h-12 object-contain" src={img || "/placeholder.svg"} alt="ZenTravel Logo" />
               <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
@@ -33,24 +38,55 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
 
             <nav className="hidden lg:flex items-center space-x-1">
               <ItemNavLink
-                content="Inicio"
                 route="/index"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                content={({ isActive }) =>
+                  isActive ? (
+                    <span className="flex items-center gap-1">
+                      <IoHome size={15} />
+                      inicio
+                    </span>
+                  ) : "inicio"
+                }
+          
               />
               <ItemNavLink
-                content="Paquetes"
                 route="/paquetes"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                content = {({ isActive }) =>
+                  isActive ? (
+                    <span className="flex items-center gap-1 ">
+                      <FaSuitcaseRolling size={15} />
+                      Paquetes
+                    </span>
+                  ) : "Paquetes"
+                }
+               
               />
               <ItemNavLink
-                content="Hotel + Vuelo"
-                route="/inventario"
+                route="/Hoteles"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                content={({ isActive }) =>
+                  isActive ? (
+                    <span className="flex items-center gap-1 ">
+                      <FaBuilding size={15} />
+                      Paquetes
+                    </span>
+                  ) : "Hoteles"
+                }
               />
               <ItemNavLink
-                content="Asistente IA"
+                
                 route="/SophIA"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                content={({ isActive }) =>
+                  isActive ? (
+                    <span className="flex items-center gap-1 ">
+                      <FaHeadSideVirus size={15} />
+                      Asistente IA
+                    </span>
+                  ) : "Asistente IA"
+                }
               />
 
               {/* Enlace para probar permisos - solo visible cuando está autenticado */}
@@ -83,13 +119,6 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 />
               </RoleBasedComponent>
 
-              <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
-                <ItemNavLink
-                  content="Crear Paquete"
-                  route="/crearPaquete"
-                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
-                />
-              </RoleBasedComponent>
             </nav>
           </div>
 
