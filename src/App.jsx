@@ -23,6 +23,8 @@ import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
 import UseAuth from "./Hooks/useAuth";
+import { SolicitarCambioRol } from "./Pages/SolicitarCambioRol/SolicitarCambioRol"
+
 
 
 
@@ -139,9 +141,18 @@ export const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/solicitar-cambio-rol"
+          element={
+            <ProtectedRoute>
+              <SolicitarCambioRol />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<h1>404 Not Found</h1>} />
       </Routes>
+      
     </>
   )
 }

@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import {
   Search,
@@ -12,7 +14,9 @@ import {
   Send,
   AlertCircle,
   Info,
+  ExternalLink,
 } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 export const Soporte = () => {
   const [searchQuery, setSearchQuery] = useState("")
@@ -25,6 +29,8 @@ export const Soporte = () => {
     message: "",
     priority: "normal",
   })
+
+  const navigate = useNavigate()
 
   const faqData = [
     {
@@ -318,6 +324,23 @@ export const Soporte = () => {
                   Enviar Mensaje
                 </button>
               </form>
+              <div className="mt-6 flex flex-col space-y-3">
+                <button
+                  onClick={() => navigate("/soporte")}
+                  className="w-full flex items-center justify-between text-sm text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-2 rounded transition-colors"
+                >
+                  <span>Soporte</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+
+                <button
+                  onClick={() => navigate("/solicitar-cambio-rol")}
+                  className="w-full flex items-center justify-between text-sm text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 px-2 py-2 rounded transition-colors"
+                >
+                  <span>Solicitar cambio de rol</span>
+                  <ExternalLink className="w-3 h-3" />
+                </button>
+              </div>
             </div>
 
             {/* Información adicional */}
