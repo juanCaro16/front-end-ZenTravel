@@ -26,11 +26,7 @@ import UseAuth from "./Hooks/useAuth";
 
 
 export const App = () => {
-<<<<<<< HEAD
-  const { isAuthenticated, login, logout } = useAuth()
-=======
-  const { isAuthenticated, userRole, login, logout } = UseAuth()
->>>>>>> origin
+  const { isAuthenticated, login, logout } = UseAuth()
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register"]
