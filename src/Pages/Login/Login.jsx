@@ -49,6 +49,7 @@ export const Login = ({ onLoginSuccess }) => {
       } else {
         navigate("/index")
       }
+      
     } catch (err) {
       console.error("Error de login:", err.response?.data || err.message)
       setErrorMsg("Correo o contraseña incorrectos")
