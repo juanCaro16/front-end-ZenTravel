@@ -4,15 +4,51 @@ import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
 
+// Componente de estrellas
+const StarRating = ({ value, onChange, editable = true }) => {
+  const [hovered, setHovered] = useState(null)
+
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          type="button"
+          key={star}
+          className="focus:outline-none"
+          onMouseEnter={() => editable && setHovered(star)}
+          onMouseLeave={() => editable && setHovered(null)}
+          onClick={() => editable && onChange(star)}
+          tabIndex={editable ? 0 : -1}
+          aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill={(hovered || value) >= star ? "#facc15" : "#e5e7eb"}
+            viewBox="0 0 20 20"
+            className="w-7 h-7 transition-colors duration-150"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  )
+}
+
 export const Hoteles = () => {
   const navigate = useNavigate()
   const [hoteles, setHoteles] = useState([])
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [calificados, setCalificados] = useState(() => {
+    // Cargar del localStorage los hoteles ya calificados
+    const saved = localStorage.getItem("hotelesCalificados")
+    return saved ? JSON.parse(saved) : []
+  })
 
   const obtenerHoteles = async () => {
     try {
-      const response = await api.get("/hotels")
+      const response = await api.get("/packages/Hotel")
       setHoteles(response.data.hoteles || [])
     } catch (error) {
       Swal.fire("Error", "No se pudieron cargar los hoteles.", "error")
@@ -24,6 +60,11 @@ export const Hoteles = () => {
   useEffect(() => {
     obtenerHoteles()
   }, [])
+
+  // Guardar en localStorage cuando cambie calificados
+  useEffect(() => {
+    localStorage.setItem("hotelesCalificados", JSON.stringify(calificados))
+  }, [calificados])
 
   const handleChange = (index, e) => {
     const { name, value } = e.target
@@ -43,6 +84,25 @@ export const Hoteles = () => {
     }
   }
 
+  // Solo permite calificar una vez por usuario (por navegador)
+  const handleStarChange = async (index, estrellas) => {
+    const hotel = hoteles[index]
+    if (calificados.includes(hotel.id_hotel)) {
+      Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info")
+      return
+    }
+    const nuevosHoteles = [...hoteles]
+    nuevosHoteles[index].estrellas = estrellas
+    setHoteles(nuevosHoteles)
+    try {
+      await api.put(`/hotels/${hotel.id_hotel}`, { ...hotel, estrellas })
+      setCalificados([...calificados, hotel.id_hotel])
+      Swal.fire("¡Gracias!", `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`, "success")
+    } catch (error) {
+      Swal.fire("Error", "No se pudo guardar la calificación", "error")
+    }
+  }
+
   if (loading) return <p className="text-center mt-8">Cargando hoteles...</p>
 
   return (
@@ -55,25 +115,35 @@ export const Hoteles = () => {
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {hoteles.map((hotel, index) => {
           const enEdicion = editandoId === hotel.id_hotel
+          const yaCalificado = calificados.includes(hotel.id_hotel)
           return (
             <div key={hotel.id_hotel || index} className="bg-white rounded-2xl shadow p-4">
-              {hotel.imagenUrl ? (
-                <img src={hotel.imagenUrl} alt={hotel.nombreHotel} className="w-full h-40 object-cover rounded-xl" />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-xl text-gray-500">
-                  Sin imagen
-                </div>
-              )}
+              {(() => {
+                let imagenUrl = null
+                if (hotel.imagenes) {
+                  try {
+                    const arr = typeof hotel.imagenes === "string" ? JSON.parse(hotel.imagenes) : hotel.imagenes
+                    if (Array.isArray(arr) && arr.length > 0) imagenUrl = arr[0]
+                  } catch (e) {}
+                }
+                return imagenUrl ? (
+                  <img src={imagenUrl} alt={hotel.nombre} className="w-full h-40 object-cover rounded-xl" />
+                ) : (
+                  <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-xl text-gray-500">
+                    Sin imagen
+                  </div>
+                )
+              })()}
 
               {enEdicion ? (
                 <input
-                  name="nombreHotel"
-                  value={hotel.nombreHotel}
+                  name="nombre"
+                  value={hotel.nombre}
                   onChange={(e) => handleChange(index, e)}
                   className="w-full mt-2 border p-1 rounded"
                 />
               ) : (
-                <h2 className="text-xl font-semibold mt-2">{hotel.nombreHotel}</h2>
+                <h2 className="text-xl font-semibold mt-2">{hotel.nombre}</h2>
               )}
 
               {enEdicion ? (
@@ -89,7 +159,17 @@ export const Hoteles = () => {
 
               <ul className="text-sm space-y-1 mt-2">
                 <li><strong>Ubicación:</strong> {hotel.ubicacion || "No especificada"}</li>
-                <li><strong>Estrellas:</strong> {hotel.estrellas || "No definido"}</li>
+                <li className="flex items-center gap-2">
+                  <strong>Estrellas:</strong>
+                  <StarRating
+                    value={Number(hotel.estrellas) || 0}
+                    onChange={(val) => handleStarChange(index, val)}
+                    editable={!enEdicion && !yaCalificado}
+                  />
+                  {yaCalificado && (
+                    <span className="ml-2 text-xs text-emerald-600 font-semibold">¡Ya calificaste!</span>
+                  )}
+                </li>
               </ul>
 
               <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
