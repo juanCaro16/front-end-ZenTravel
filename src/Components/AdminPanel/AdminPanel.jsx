@@ -161,6 +161,7 @@ export const AdminPanel = () => {
                     </tr>
                   ))}
                 </tbody>
+                
               </table>
             </div>
           </div>
