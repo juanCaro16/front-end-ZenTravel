@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useEffect, useState } from "react"
-=======
 import { useState, useEffect } from "react"
->>>>>>> fc5e099f7b78108cbed5be3483479f0ae4a360f3
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
@@ -12,28 +8,6 @@ import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBase
 const StarRating = ({ value, onChange, editable = true }) => {
   const [hovered, setHovered] = useState(null)
 
-<<<<<<< HEAD
-    const obtenerHoteles = async () => {
-      try {
-        const response = await api.get("/packages/hotel")
-        console.log("📦 Respuesta completa:", response)
-        console.log("Contenido:", response.data)
-  
-        setHoteles(response.data.paquetes || [])
-      } catch (error) {
-        console.error("❌ Error al obtener paquetes:", error)
-        Swal.fire("Error", "No se pudieron cargar los paquetes.", "error")
-      } 
-      // finally {
-      //   setLoading(false)
-      // }
-    }
-
-    useEffect(() => {
-      obtenerHoteles()
-    }, [])
-    
-=======
   return (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => (
@@ -130,7 +104,6 @@ export const Hoteles = () => {
   }
 
   if (loading) return <p className="text-center mt-8">Cargando hoteles...</p>
->>>>>>> fc5e099f7b78108cbed5be3483479f0ae4a360f3
 
 
   return (
@@ -140,14 +113,6 @@ export const Hoteles = () => {
           Agregar Hotel
         </button>
       </RoleBasedComponent>
-<<<<<<< HEAD
-
-      <div>
-        <h2>hoteles</h2>
-          obtenerHoteles()
-      </div>
-
-=======
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {hoteles.map((hotel, index) => {
           const enEdicion = editandoId === hotel.id_hotel
@@ -239,7 +204,6 @@ export const Hoteles = () => {
           )
         })}
       </div>
->>>>>>> fc5e099f7b78108cbed5be3483479f0ae4a360f3
     </div>
   )
 }
