@@ -70,7 +70,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                   isActive ? (
                     <span className="flex items-center gap-1 ">
                       <FaBuilding size={15} />
-                      Paquetes
+                      Hoteles
                     </span>
                   ) : "Hoteles"
                 }
