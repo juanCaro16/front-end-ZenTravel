@@ -9,6 +9,7 @@ export const CrearHoteles = () => {
     nombre: "",
     descripcion: "",
     ubicacion: "",
+    ciudad: "",
     estrellas: "",
     imagenes: [],
   })
@@ -35,6 +36,7 @@ export const CrearHoteles = () => {
       formToSend.append("nombre", formData.nombre)
       formToSend.append("descripcion", formData.descripcion)
       formToSend.append("ubicacion", formData.ubicacion)
+      formToSend.append("ciudad", formData.ciudad) // <-- aquí
       formToSend.append("estrellas", formData.estrellas)
       formData.imagenes.forEach((img) => {
         formToSend.append("imagenes", img)
@@ -59,7 +61,7 @@ export const CrearHoteles = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center  p-2">
+    <div className="min-h-screen flex items-center justify-center mt-10 p-2">
       <form
         onSubmit={handleSubmit}
         className="w-130 bg-white shadow-xl rounded-2xl px-6 py-10 space-y-5"
@@ -100,6 +102,18 @@ export const CrearHoteles = () => {
             value={formData.ubicacion}
             onChange={handleChange}
             placeholder="Ej. Medellín, Antioquia"
+            className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none transition"
+            required
+          />
+        </div>
+
+        <div>
+          <label className="block font-semibold text-gray-700 mb-1">Ciudad</label>
+          <input
+            name="ciudad"
+            value={formData.ciudad}
+            onChange={handleChange}
+            placeholder="Ej. Medellín"
             className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none transition"
             required
           />

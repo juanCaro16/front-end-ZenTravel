@@ -154,6 +154,30 @@ export const Hoteles = () => {
     }
   }
 
+  const handleEliminar = async (id_hotel) => {
+    const confirm = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará el hotel permanentemente.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar"
+    });
+
+    if (confirm.isConfirmed) {
+      try {
+        await api.delete(`/admin/deleteHotel/${id_hotel}`);
+        Swal.fire("Eliminado", "El hotel ha sido eliminado.", "success");
+        obtenerHoteles(); // Refresca la lista
+      } catch (error) {
+        console.error(error);
+        Swal.fire("Error", error?.response?.data?.error || "No se pudo eliminar el hotel", "error");
+      }
+    }
+  };
+
   if (loading) return <p className="text-center mt-8">Cargando hoteles...</p>
 
 
@@ -265,8 +289,8 @@ export const Hoteles = () => {
                         Editar
                       </button>
                       <button
+                        onClick={() => handleEliminar(hotel.id_hotel)}
                         className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200"
-                        // Aquí irá la lógica de eliminar en el futuro
                       >
                         Eliminar
                       </button>
