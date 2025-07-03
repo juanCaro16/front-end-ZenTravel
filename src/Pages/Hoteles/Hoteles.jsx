@@ -7,30 +7,74 @@ import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBase
 // Componente de estrellas
 const StarRating = ({ value, onChange, editable = true }) => {
   const [hovered, setHovered] = useState(null)
+  const displayValue = hovered || value
 
   return (
     <div className="flex items-center gap-1">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <button
-          type="button"
-          key={star}
-          className="focus:outline-none"
-          onMouseEnter={() => editable && setHovered(star)}
-          onMouseLeave={() => editable && setHovered(null)}
-          onClick={() => editable && onChange(star)}
-          tabIndex={editable ? 0 : -1}
-          aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill={(hovered || value) >= star ? "#facc15" : "#e5e7eb"}
-            viewBox="0 0 20 20"
-            className="w-7 h-7 transition-colors duration-150"
+      {[1, 2, 3, 4, 5].map((star) => {
+        let fill = "#e5e7eb"
+        let gradientId = `star-gradient-${star}`
+
+        if (displayValue >= star) {
+          fill = "#facc15" // llena
+        } else if (displayValue > star - 1) {
+          // Fracción realista para cada estrella
+          const percent = Math.round((displayValue - (star - 1)) * 100)
+          fill = `url(#${gradientId})`
+          return (
+            <button
+              type="button"
+              key={star}
+              className="focus:outline-none"
+              onMouseEnter={() => editable && setHovered(star)}
+              onMouseLeave={() => editable && setHovered(null)}
+              onClick={() => editable && onChange(star)}
+              tabIndex={editable ? 0 : -1}
+              aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                className="w-7 h-7 transition-colors duration-150"
+              >
+                <defs>
+                  <linearGradient id={gradientId}>
+                    <stop offset={`${percent}%`} stopColor="#facc15" />
+                    <stop offset={`${percent}%`} stopColor="#e5e7eb" />
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z"
+                  fill={fill}
+                />
+              </svg>
+            </button>
+          )
+        }
+        return (
+          <button
+            type="button"
+            key={star}
+            className="focus:outline-none"
+            onMouseEnter={() => editable && setHovered(star)}
+            onMouseLeave={() => editable && setHovered(null)}
+            onClick={() => editable && onChange(star)}
+            tabIndex={editable ? 0 : -1}
+            aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
           >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z" />
-          </svg>
-        </button>
-      ))}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              className="w-7 h-7 transition-colors duration-150"
+            >
+              <path
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z"
+                fill={fill}
+              />
+            </svg>
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -75,12 +119,19 @@ export const Hoteles = () => {
 
   const handleGuardar = async (hotel) => {
     try {
-      await api.put(`/hotels/${hotel.id_hotel}`, hotel)
+      const data = {
+        nombre: hotel.nombre,
+        descripcion: hotel.descripcion,
+        ubicacion: hotel.ubicacion
+      }
+      console.log("Enviando a backend:", hotel.id_hotel, data)
+      await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, data)
       Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
       setEditandoId(null)
       obtenerHoteles()
     } catch (error) {
-      Swal.fire("Error", "No se pudo actualizar el hotel", "error")
+      console.error(error)
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
     }
   }
 
@@ -159,7 +210,19 @@ export const Hoteles = () => {
               )}
 
               <ul className="text-sm space-y-1 mt-2">
-                <li><strong>Ubicación:</strong> {hotel.ubicacion || "No especificada"}</li>
+                <li>
+                  <strong>Ubicación:</strong>{" "}
+                  {enEdicion ? (
+                    <input
+                      name="ubicacion"
+                      value={hotel.ubicacion}
+                      onChange={(e) => handleChange(index, e)}
+                      className="border p-1 rounded w-2/3"
+                    />
+                  ) : (
+                    hotel.ubicacion || "No especificada"
+                  )}
+                </li>
                 <li className="flex items-center gap-2">
                   <strong>Estrellas:</strong>
                   <StarRating
@@ -167,6 +230,9 @@ export const Hoteles = () => {
                     onChange={(val) => handleStarChange(index, val)}
                     editable={!enEdicion && !yaCalificado}
                   />
+                  <span className="text-xs text-gray-500 font-semibold">
+                    {Number(hotel.estrellas).toFixed(1)}
+                  </span>
                   {yaCalificado && (
                     <span className="ml-2 text-xs text-emerald-600 font-semibold">¡Ya calificaste!</span>
                   )}
@@ -191,12 +257,20 @@ export const Hoteles = () => {
                       </button>
                     </>
                   ) : (
-                    <button
-                      onClick={() => setEditandoId(hotel.id_hotel)}
-                      className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
-                    >
-                      Editar
-                    </button>
+                    <>
+                      <button
+                        onClick={() => setEditandoId(hotel.id_hotel)}
+                        className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200"
+                        // Aquí irá la lógica de eliminar en el futuro
+                      >
+                        Eliminar
+                      </button>
+                    </>
                   )}
                 </div>
               </RoleBasedComponent>
