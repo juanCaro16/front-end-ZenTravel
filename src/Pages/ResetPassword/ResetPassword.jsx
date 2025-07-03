@@ -52,7 +52,7 @@ export const ResetPassword = () => {
   }
 
   const handleBackToLogin = () => {
-    navigate("/")
+    navigate("/login")
   }
 
   const handleResendEmail = () => {

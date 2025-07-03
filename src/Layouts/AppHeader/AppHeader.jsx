@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Menu, X, Phone, Globe, Luggage, HelpCircle, TestTube } from "lucide-react"
@@ -208,7 +206,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
-              content="Hotel + Vuelo"
+              content="Hotel"
               route="/hoteles"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />

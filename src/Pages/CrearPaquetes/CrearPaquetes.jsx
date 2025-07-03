@@ -40,7 +40,7 @@ export const CrearPaquetes = () => {
 
   const [opcionesTransporte, setOpcionesTransporte] = useState([]);
 
-const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
 
   const [imagen ,setImagen] = useState(null);
   const [mensaje, setMensaje] = useState("")
@@ -273,7 +273,10 @@ const [transporte, setTransporte] = useState({ origen: '', destino: '' });
               <input
                 name="nombreDestino"
                 value={formData.nombreDestino}
-                onChange={handleChange}
+                onChange={(e) => {
+                  handleChange(e); // actualiza el formData
+                  setTransporte(prev => ({ ...prev, destino: e.target.value })); // también actualiza transporte.destino
+                }}
                 placeholder="Ej: Cartagena de Indias"
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
               />
@@ -301,40 +304,41 @@ const [transporte, setTransporte] = useState({ origen: '', destino: '' });
                 value={transporte.origen}
                 onChange={(e) => setTransporte((prev) => ({ ...prev, origen: e.target.value }))}
               />
-
-              <label>Destino:</label>
-              <input
-                type="text"
-                value={transporte.destino}
-                onChange={(e) => setTransporte((prev) => ({ ...prev, destino: e.target.value }))}
-              />
             </div>
 
               {opcionesTransporte.length > 0 && (
-              <div>
+              <div className="w-full h-20">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Transporte disponible *
+                </label>
                 <select
                   name="nombreTransporte"
                   value={formData.nombreTransporte}
                   onChange={(e) =>
                     setFormData({ ...formData, nombreTransporte: e.target.value })
                   }
+                  className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
+                  size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
                 >
-                  <option value=""></option>
+                  <option value="">Selecciona un transporte</option>
                   {opcionesTransporte.map((item) => (
-                    <option key={item.id_transporte} value={item.id_transporte}>
-                      {/* Aquí puedes personalizar cómo se muestra el transporte */}
-                      {`${item.tipo} - ${item.origen} → ${item.destino} (${item.empresa})`}
+                    <option
+                      key={item.id_transporte}
+                      value={item.id_transporte}
+                      className="whitespace-normal break-words"
+                    >
+                      {`🚌 Transporte a ${item.destino} desde ${item.origen}, empresa: ${item.empresa}, tipo: ${item.tipo}, pasajes: ${item.capacidad}, salida: ${new Date(item.fecha_salida).toLocaleDateString()}`}
                     </option>
                   ))}
-            </select>
+                </select>
 
               </div>
-            )}
 
+            )}
+              </div>
               <button type="button" onClick={buscarTransportes}>
                 Buscar Transportes
               </button>
-              </div>
           </div>
         )
 
