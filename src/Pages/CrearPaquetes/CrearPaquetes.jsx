@@ -296,49 +296,53 @@ export const CrearPaquetes = () => {
               />
             </div>
 
+            {/* Origen y Buscar Transportes */}
             <div>
-            <div>
-              <label>Origen:</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Origen *
+              </label>
               <input
                 type="text"
                 value={transporte.origen}
                 onChange={(e) => setTransporte((prev) => ({ ...prev, origen: e.target.value }))}
+                placeholder="Ciudad de origen"
+                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white mb-4"
               />
-            </div>
-
-              {opcionesTransporte.length > 0 && (
-              <div className="w-full h-20">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Transporte disponible *
-                </label>
-                <select
-                  name="nombreTransporte"
-                  value={formData.nombreTransporte}
-                  onChange={(e) =>
-                    setFormData({ ...formData, nombreTransporte: e.target.value })
-                  }
-                  className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
-                  size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
-                >
-                  <option value="">Selecciona un transporte</option>
-                  {opcionesTransporte.map((item) => (
-                    <option
-                      key={item.id_transporte}
-                      value={item.id_transporte}
-                      className="whitespace-normal break-words"
-                    >
-                      {`🚌 Transporte a ${item.destino} desde ${item.origen}, empresa: ${item.empresa}, tipo: ${item.tipo}, pasajes: ${item.capacidad}, salida: ${new Date(item.fecha_salida).toLocaleDateString()}`}
-                    </option>
-                  ))}
-                </select>
-
-              </div>
-
-            )}
-              </div>
-              <button type="button" onClick={buscarTransportes}>
+              <button
+                type="button"
+                onClick={buscarTransportes}
+                className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
                 Buscar Transportes
               </button>
+              {opcionesTransporte.length > 0 && (
+                <div className="w-full h-20 mt-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Transporte disponible *
+                  </label>
+                  <select
+                    name="nombreTransporte"
+                    value={formData.nombreTransporte}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nombreTransporte: e.target.value })
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
+                    size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
+                  >
+                    <option value="">Selecciona un transporte</option>
+                    {opcionesTransporte.map((item) => (
+                      <option
+                        key={item.id_transporte}
+                        value={item.id_transporte}
+                        className="whitespace-normal break-words"
+                      >
+                        {`🚌 Transporte a ${item.destino} desde ${item.origen}, empresa: ${item.empresa}, tipo: ${item.tipo}, pasajes: ${item.capacidad}, salida: ${new Date(item.fecha_salida).toLocaleDateString()}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           </div>
         )
 

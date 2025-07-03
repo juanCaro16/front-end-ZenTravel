@@ -38,8 +38,11 @@ export const SophIA = () => {
     setIsLoading(true)
 
     try {
+      // Obtener el id del usuario justo antes de enviar la petición
+      const userId = localStorage.getItem("id_usuario")
       const response = await api.post("IA/ZenIA", {
         ZenIA: inputValue,
+        id_usuario: userId,
       });
 
       const botMessage = {
