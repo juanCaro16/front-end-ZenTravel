@@ -1,10 +1,10 @@
-"use client"
-
 import { useState } from "react"
 import { Package, Users, Calendar, MessageCircle, TrendingUp, CheckCircle } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 export const EmployeePanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
+  const navigate = useNavigate()
 
   const employeeTabs = [
     { id: "dashboard", label: "Mi Dashboard", icon: <TrendingUp className="w-5 h-5" /> },
@@ -78,7 +78,7 @@ export const EmployeePanel = () => {
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Gestión de Paquetes</h3>
-              <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+              <button onClick={() => navigate("/crearPaquete")} className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
                 Crear Paquete
               </button>
             </div>

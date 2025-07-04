@@ -1,5 +1,3 @@
-"use client"
-
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
@@ -92,7 +90,7 @@ export const Paquetes = () => {
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
       <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
-        <button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black">
+        <button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black transition-all duration-200 hover:scale-105">
           Agregar Paquete
         </button>
       </RoleBasedComponent>

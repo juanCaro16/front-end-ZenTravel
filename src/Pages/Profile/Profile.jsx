@@ -114,7 +114,7 @@ export const Profile = ({ onLogout }) => {
         </div>
         <p className="text-red-600 text-sm mb-3">Error al cargar datos</p>
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/login")}
           className="text-xs bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-colors"
         >
           Iniciar sesión

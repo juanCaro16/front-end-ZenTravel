@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes,useLocation } from "react-router-dom"
 import { AppHeader } from "./Layouts/AppHeader/AppHeader"
 import { Main } from "./Layouts/Main/Main"
 import { Login } from "./Pages/Login/Login"
@@ -11,8 +11,7 @@ import { Soporte } from "./Pages/Soporte/Soporte"
 import { Register } from "./Pages/Register/Register"
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword"
 import { NewPassword } from "./Pages/NewPassword/NewPassword"
-import { useEffect } from "react"
-import { useLocation } from "react-router-dom"
+import { useEffect ,} from "react"
 import { Paquetes } from "./Pages/Paquetes/Paquetes"
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes"
 import { Hoteles } from "./Pages/Hoteles/Hoteles"
@@ -23,11 +22,13 @@ import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
 import UseAuth from "./Hooks/useAuth";
+import { SolicitarCambioRol } from "./Pages/SolicitarCambioRol/SolicitarCambioRol"
+
 
 
 
 export const App = () => {
-  const { isAuthenticated, userRole, login, logout } = UseAuth()
+  const { isAuthenticated, login, logout } = UseAuth()
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register"]
@@ -51,6 +52,7 @@ export const App = () => {
       <ButtonHelp />
       <TokenRefresher />
       <Routes>
+
         <Route path="/index" element={<Main />} />
 
         {/* Ruta para probar permisos */}
@@ -110,10 +112,10 @@ export const App = () => {
           }
         />
         <Route
-          path="/crearHotel"
+          path="/crearHoteles"
           element={
             <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
-              <CrearHoteles />
+              <CrearHoteles/>
             </ProtectedRoute>
           }
         />
@@ -139,9 +141,18 @@ export const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/solicitar-cambio-rol"
+          element={
+            <ProtectedRoute>
+              <SolicitarCambioRol />
+            </ProtectedRoute>
+          }
+        />
 
         <Route path="*" element={<h1>404 Not Found</h1>} />
       </Routes>
+      
     </>
   )
 }

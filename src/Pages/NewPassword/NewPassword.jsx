@@ -111,7 +111,7 @@ export const NewPassword = () => {
 
       // Redirigir al login después de 3 segundos
       setTimeout(() => {
-        navigate("/")
+        navigate("/login")
       }, 3000)
     } catch (err) {
       console.error("❌ Error:", err)
@@ -133,7 +133,7 @@ export const NewPassword = () => {
   }
 
   const handleBackToLogin = () => {
-    navigate("/")
+    navigate("/login")
   }
 
   const handleRequestNewToken = () => {
