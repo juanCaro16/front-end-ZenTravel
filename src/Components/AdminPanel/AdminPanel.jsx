@@ -1,17 +1,82 @@
 import { useEffect, useState } from "react"
 import { Users, Package, BarChart3, Settings, Shield, FileText, Calendar, DollarSign } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
+import Swal from "sweetalert2";
 
+const NewUserModal = ({ open, onClose, onCreate }) => {
+  const [form, setForm] = useState({ nombre: "", email: "", telefono: "", rol: "Empleado" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await onCreate(form);
+    setLoading(false);
+    setForm({ nombre: "", email: "", telefono: "", rol: "Empleado" });
+  };
+
+  if (!open) return null;
+  return (
+      <div className="fixed inset-0 bg-emerald-100 bg-opacity-80 flex items-center justify-center z-50 transition-all">
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative animate-fade-in">
+        <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+        <h2 className="text-xl font-bold mb-4 text-emerald-700">Crear Nuevo Empleado</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input name="nombre" value={form.nombre} onChange={handleChange} required placeholder="Nombre" className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300" />
+          <input name="email" value={form.email} onChange={handleChange} required placeholder="Email" type="email" className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300" />
+          <input name="telefono" value={form.telefono} onChange={handleChange} required placeholder="Teléfono" className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300" />
+          <select name="rol" value={form.rol} onChange={handleChange} className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300">
+            <option value="Empleado">Empleado</option>
+            <option value="admin">admin</option>
+          </select>
+          <button type="submit" disabled={loading} className="w-full bg-emerald-500 text-white rounded p-2 hover:bg-emerald-600 transition">
+            {loading ? "Creando..." : "Crear Usuario"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [infoDashBoard, setInfoDashBoard] = useState(null)
   const [infoUser, setInfoUser] = useState(null)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [filterRol, setFilterRol] = useState("");
+  
 
   useEffect(() => {
     handleGetInfo()
     handleGetInfoUser()
   }, [])
+
+  // Cambia la consulta al backend según el filtro de rol
+  const handleFilterUserByRol = async (rol) => {
+    try {
+      let endpoint = "admin/Users/cliente";
+      if (rol === "admin") endpoint = "admin/Users/admin";
+      else if (rol === "Empleado") endpoint = "admin/Users/empleado";
+      // Si es "Todos" o vacío, usa cliente (o podrías crear un endpoint para todos)
+      const response = await api.get(endpoint);
+      setInfoUser(response.data);
+    } catch (error) {
+      setInfoUser({ user: [] });
+      Swal.fire("Error", "Error al filtrar usuarios por rol", "error");
+    }
+  };
+
+  // useEffect para filtrar usuarios por rol SOLO cuando cambia el filtro y el tab activo es "users"
+  useEffect(() => {
+    if (activeTab === "users") {
+      handleFilterUserByRol(filterRol || "cliente");
+    }
+    // eslint-disable-next-line
+  }, [filterRol, activeTab]);
 
   const adminTabs = [
     { id: "dashboard", label: "Dashboard", icon: <BarChart3 className="w-5 h-5" /> },
@@ -20,6 +85,29 @@ export const AdminPanel = () => {
     { id: "reports", label: "Reportes", icon: <FileText className="w-5 h-5" /> },
     { id: "settings", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
   ]
+
+  const handleNewUser  = async (data) => {
+    try {
+      const response = await api.post("admin/CreateUsers", data);
+      console.log("Nuevo usuario creado con éxito:", response.data);
+      setModalOpen(false);
+      handleGetInfoUser(); // refresca la lista
+      // Mostrar la contraseña generada si viene en la respuesta
+      if (response.data && response.data.password) {
+        Swal.fire({
+          title: "Usuario creado exitosamente",
+          html: `<b>Contraseña generada:</b> <span style='font-family:monospace'>${response.data.password}</span>`,
+          icon: "success",
+          confirmButtonColor: "#10b981"
+        });
+      } else {
+        Swal.fire("Usuario creado exitosamente", "", "success");
+      }
+    } catch (error) {
+      Swal.fire("Error", "Error al crear usuario", "error");
+      console.error(error);
+    }
+  }
 
   const handleGetInfo = async () => {
 
@@ -31,7 +119,7 @@ export const AdminPanel = () => {
 
     } catch (error) {
       console.error("Error al obtener la información del dashboard:", error)
-      alert("Error al obtener la información del dashboard")
+      Swal.fire("Error", "Error al obtener la información del dashboard", "error");
     }
   }
 
@@ -44,7 +132,7 @@ export const AdminPanel = () => {
       // Aquí podrías hacer algo con la información del usuario si es necesario
     } catch (error) {
       console.error("Error al obtener la información del usuario:", error)
-      alert("Error al obtener la información del usuario")
+      Swal.fire("Error", "Error al obtener la información del usuario", "error");
     }
 
   }
@@ -135,13 +223,23 @@ export const AdminPanel = () => {
         )
 
       case "users":
+        const usuariosFiltrados = (infoUser?.user || []);
         return (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+            <NewUserModal open={modalOpen} onClose={() => setModalOpen(false)} onCreate={handleNewUser} />
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Gestión de Usuarios</h3>
-              <button className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
+              <button onClick={() => setModalOpen(true)} className="px-4 py-2 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-colors">
                 Nuevo Usuario
               </button>
+            </div>
+            <div className="flex items-center mb-4 gap-2">
+              <label className="text-sm font-medium text-gray-700">Filtrar por rol:</label>
+              <select value={filterRol} onChange={e => setFilterRol(e.target.value)} className="border rounded p-1">
+                <option value="">Todos</option>
+                <option value="Empleado">Empleado</option>
+                <option value="admin">Admin</option>
+              </select>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -150,18 +248,25 @@ export const AdminPanel = () => {
                     <th className="text-left py-3 px-4 font-medium text-gray-700">ID</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-700">Usuario</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-700">Email</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Rol</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {(infoUser?.user || []).map((user, index) => (
-                    <tr key={user.id_usuario || index} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4">{user.id_usuario}</td>
-                      <td className="py-3 px-4">{user.nombre}</td>
-                      <td className="py-3 px-4">{user.email}</td>
+                  {usuariosFiltrados.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} className="text-center py-4 text-gray-400">No hay usuarios para este rol.</td>
                     </tr>
-                  ))}
+                  ) : (
+                    usuariosFiltrados.map((user, index) => (
+                      <tr key={user.id_usuario || index} className="border-b border-gray-100 hover:bg-gray-50">
+                        <td className="py-3 px-4">{user.id_usuario}</td>
+                        <td className="py-3 px-4">{user.nombre}</td>
+                        <td className="py-3 px-4">{user.email}</td>
+                        <td className="py-3 px-4">{user.rol || "Empleado"}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
-                
               </table>
             </div>
           </div>

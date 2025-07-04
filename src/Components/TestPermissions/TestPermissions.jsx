@@ -17,7 +17,7 @@ export const TestPermissions = () => {
     {
       path: "/admin",
       name: "Panel de Administración",
-      requiredRoles: ["Admin"],
+      requiredRoles: ["admin"],
       icon: <Shield className="w-5 h-5" />,
       color: "bg-red-500",
     },
@@ -31,7 +31,7 @@ export const TestPermissions = () => {
     {
       path: "/crearPaquete",
       name: "Crear Paquetes",
-      requiredRoles: ["Admin", "Empleado"],
+      requiredRoles: ["admin", "Empleado"],
       icon: <Package className="w-5 h-5" />,
       color: "bg-green-500",
     },
@@ -68,14 +68,14 @@ export const TestPermissions = () => {
             <div className="flex items-center space-x-3">
               <div
                 className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                  currentRole === "Admin"
+                  currentRole === "admin"
                     ? "bg-red-100 text-red-600"
                     : currentRole === "Empleado"
                       ? "bg-blue-100 text-blue-600"
                       : "bg-gray-100 text-gray-600"
                 }`}
               >
-                {currentRole === "Admin" ? (
+                {currentRole === "admin" ? (
                   <Shield className="w-6 h-6" />
                 ) : currentRole === "Empleado" ? (
                   <User className="w-6 h-6" />
@@ -101,7 +101,7 @@ export const TestPermissions = () => {
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Cambiar Rol (Solo para Testing)</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {["Cliente", "Empleado", "Admin"].map((role) => (
+            {["Cliente", "Empleado", "admin"].map((role) => (
               <button
                 key={role}
                 onClick={() => changeRole(role)}
@@ -112,7 +112,7 @@ export const TestPermissions = () => {
                 }`}
               >
                 <div className="text-center">
-                  <div className="text-2xl mb-2">{role === "Admin" ? "👑" : role === "Empleado" ? "👨‍💼" : "👤"}</div>
+                  <div className="text-2xl mb-2">{role === "admin" ? "👑" : role === "Empleado" ? "👨‍💼" : "👤"}</div>
                   <div className="font-medium">{role}</div>
                 </div>
               </button>

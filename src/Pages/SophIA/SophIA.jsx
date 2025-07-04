@@ -38,8 +38,11 @@ export const SophIA = () => {
     setIsLoading(true)
 
     try {
+      // Obtener el id del usuario justo antes de enviar la petición
+      const userId = localStorage.getItem("id_usuario")
       const response = await api.post("IA/ZenIA", {
         ZenIA: inputValue,
+        id_usuario: userId,
       });
 
       const botMessage = {
@@ -128,7 +131,11 @@ export const SophIA = () => {
                         : "bg-white border border-gray-200 text-gray-800"
                     }`}
                   >
-                    <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
+                    <p className="text-sm leading-relaxed whitespace-pre-line">
+                      {typeof message.content === "string"
+                        ? message.content
+                        : JSON.stringify(message.content)}
+                    </p>
                     <p className={`text-xs mt-2 ${message.type === "user" ? "text-blue-100" : "text-gray-500"}`}>
                       {formatTime(message.timestamp)}
                     </p>
