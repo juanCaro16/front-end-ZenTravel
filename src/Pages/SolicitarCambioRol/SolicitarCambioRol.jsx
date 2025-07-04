@@ -38,7 +38,7 @@ export const SolicitarCambioRol = () => {
       color: "from-blue-500 to-blue-600",
     },
     {
-      value: "Admin",
+      value: "admin",
       label: "Administrador",
       description: "Acceso completo al sistema",
       icon: <Shield className="w-5 h-5" />,
