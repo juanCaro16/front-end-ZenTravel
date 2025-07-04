@@ -31,7 +31,7 @@ const NewUserModal = ({ open, onClose, onCreate }) => {
           <input name="telefono" value={form.telefono} onChange={handleChange} required placeholder="Teléfono" className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300" />
           <select name="rol" value={form.rol} onChange={handleChange} className="w-full border rounded p-2 focus:ring-2 focus:ring-emerald-300">
             <option value="Empleado">Empleado</option>
-            <option value="Admin">Admin</option>
+            <option value="admin">admin</option>
           </select>
           <button type="submit" disabled={loading} className="w-full bg-emerald-500 text-white rounded p-2 hover:bg-emerald-600 transition">
             {loading ? "Creando..." : "Crear Usuario"}
@@ -59,7 +59,7 @@ export const AdminPanel = () => {
   const handleFilterUserByRol = async (rol) => {
     try {
       let endpoint = "admin/Users/cliente";
-      if (rol === "Admin") endpoint = "admin/Users/admin";
+      if (rol === "admin") endpoint = "admin/Users/admin";
       else if (rol === "Empleado") endpoint = "admin/Users/empleado";
       // Si es "Todos" o vacío, usa cliente (o podrías crear un endpoint para todos)
       const response = await api.get(endpoint);
@@ -238,7 +238,7 @@ export const AdminPanel = () => {
               <select value={filterRol} onChange={e => setFilterRol(e.target.value)} className="border rounded p-1">
                 <option value="">Todos</option>
                 <option value="Empleado">Empleado</option>
-                <option value="Admin">Admin</option>
+                <option value="admin">Admin</option>
               </select>
             </div>
             <div className="overflow-x-auto">

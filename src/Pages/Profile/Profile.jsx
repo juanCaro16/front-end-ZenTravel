@@ -41,6 +41,10 @@ export const Profile = ({ onLogout }) => {
         const response = await api.get("Auth/infoUserDTO")
         setUserInfo(response.data)
         setFormData(response.data)
+        // Guardar el id_usuario en localStorage
+        if (response.data?.id_usuario) {
+          localStorage.setItem("id_usuario", response.data.id_usuario)
+        }
       } catch (error) {
         console.error("❌ Error al cargar perfil:", error)
       } finally {
