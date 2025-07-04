@@ -4,53 +4,21 @@ import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
 
-// Componente de estrellas
-const StarRating = ({ value, onChange, editable = true }) => {
+// Componente de estrellas realista y único por hotel
+const StarRating = ({ value, onChange, editable = true, uniqueId = "" }) => {
   const [hovered, setHovered] = useState(null)
   const displayValue = hovered || value
 
   return (
     <div className="flex items-center gap-1">
       {[1, 2, 3, 4, 5].map((star) => {
-        let fill = "#e5e7eb"
-        let gradientId = `star-gradient-${star}`
-
+        let percent = 0
         if (displayValue >= star) {
-          fill = "#facc15" // llena
+          percent = 100
         } else if (displayValue > star - 1) {
-          // Fracción realista para cada estrella
-          const percent = Math.round((displayValue - (star - 1)) * 100)
-          fill = `url(#${gradientId})`
-          return (
-            <button
-              type="button"
-              key={star}
-              className="focus:outline-none"
-              onMouseEnter={() => editable && setHovered(star)}
-              onMouseLeave={() => editable && setHovered(null)}
-              onClick={() => editable && onChange(star)}
-              tabIndex={editable ? 0 : -1}
-              aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                className="w-7 h-7 transition-colors duration-150"
-              >
-                <defs>
-                  <linearGradient id={gradientId}>
-                    <stop offset={`${percent}%`} stopColor="#facc15" />
-                    <stop offset={`${percent}%`} stopColor="#e5e7eb" />
-                  </linearGradient>
-                </defs>
-                <path
-                  d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z"
-                  fill={fill}
-                />
-              </svg>
-            </button>
-          )
+          percent = ((displayValue - (star - 1)) * 100)
         }
+        const gradId = `star-gradient-${uniqueId}-${star}`
         return (
           <button
             type="button"
@@ -61,15 +29,22 @@ const StarRating = ({ value, onChange, editable = true }) => {
             onClick={() => editable && onChange(star)}
             tabIndex={editable ? 0 : -1}
             aria-label={`Calificar con ${star} estrella${star > 1 ? "s" : ""}`}
+            style={{ padding: 0, background: "none", border: "none" }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
               className="w-7 h-7 transition-colors duration-150"
             >
+              <defs>
+                <linearGradient id={gradId}>
+                  <stop offset={`${percent}%`} stopColor="#facc15" />
+                  <stop offset={`${percent}%`} stopColor="#e5e7eb" />
+                </linearGradient>
+              </defs>
               <path
                 d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 00.95.69h4.18c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.287 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.175 0l-3.385 2.46c-.784.57-1.838-.196-1.539-1.118l1.287-3.966a1 1 0 00-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.18a1 1 0 00.95-.69l1.286-3.967z"
-                fill={fill}
+                fill={`url(#${gradId})`}
               />
             </svg>
           </button>
@@ -85,7 +60,6 @@ export const Hoteles = () => {
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [calificados, setCalificados] = useState(() => {
-    // Cargar del localStorage los hoteles ya calificados
     const saved = localStorage.getItem("hotelesCalificados")
     return saved ? JSON.parse(saved) : []
   })
@@ -105,7 +79,6 @@ export const Hoteles = () => {
     obtenerHoteles()
   }, [])
 
-  // Guardar en localStorage cuando cambie calificados
   useEffect(() => {
     localStorage.setItem("hotelesCalificados", JSON.stringify(calificados))
   }, [calificados])
@@ -124,20 +97,21 @@ export const Hoteles = () => {
         descripcion: hotel.descripcion,
         ubicacion: hotel.ubicacion
       }
-      console.log("Enviando a backend:", hotel.id_hotel, data)
       await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, data)
       Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
       setEditandoId(null)
       obtenerHoteles()
     } catch (error) {
-      console.error(error)
       Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
     }
   }
 
-  // Solo permite calificar una vez por usuario (por navegador)
   const handleStarChange = async (index, estrellas) => {
-    const hotel = hoteles[index]
+    const hotel = hoteles[index];
+    if (!estrellas || !hotel?.id_hotel) {
+      Swal.fire("Error", "Faltan datos para calificar.", "error");
+      return;
+    }
     if (calificados.includes(hotel.id_hotel)) {
       Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info")
       return
@@ -146,11 +120,14 @@ export const Hoteles = () => {
     nuevosHoteles[index].estrellas = estrellas
     setHoteles(nuevosHoteles)
     try {
-      await api.put(`/hotels/${hotel.id_hotel}`, { ...hotel, estrellas })
+      await api.post('/Auth/Report/Calificar', {
+        estrellas,
+        id_hotel: hotel.id_hotel
+      })
       setCalificados([...calificados, hotel.id_hotel])
       Swal.fire("¡Gracias!", `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`, "success")
     } catch (error) {
-      Swal.fire("Error", "No se pudo guardar la calificación", "error")
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error")
     }
   }
 
@@ -172,14 +149,12 @@ export const Hoteles = () => {
         Swal.fire("Eliminado", "El hotel ha sido eliminado.", "success");
         obtenerHoteles(); // Refresca la lista
       } catch (error) {
-        console.error(error);
         Swal.fire("Error", error?.response?.data?.error || "No se pudo eliminar el hotel", "error");
       }
     }
   };
 
   if (loading) return <p className="text-center mt-8">Cargando hoteles...</p>
-
 
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
@@ -253,6 +228,7 @@ export const Hoteles = () => {
                     value={Number(hotel.estrellas) || 0}
                     onChange={(val) => handleStarChange(index, val)}
                     editable={!enEdicion && !yaCalificado}
+                    uniqueId={hotel.id_hotel || index}
                   />
                   <span className="text-xs text-gray-500 font-semibold">
                     {Number(hotel.estrellas).toFixed(1)}
@@ -289,8 +265,8 @@ export const Hoteles = () => {
                         Editar
                       </button>
                       <button
-                        onClick={() => handleEliminar(hotel.id_hotel)}
                         className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200"
+                        onClick={() => handleEliminar(hotel.id_hotel)}
                       >
                         Eliminar
                       </button>
