@@ -113,23 +113,39 @@ export const Hoteles = () => {
       return;
     }
     if (calificados.includes(hotel.id_hotel)) {
-      Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info")
-      return
+      Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info");
+      return;
     }
-    const nuevosHoteles = [...hoteles]
-    nuevosHoteles[index].estrellas = estrellas
-    setHoteles(nuevosHoteles)
+
     try {
-      await api.post('/Auth/Report/Calificar', {
+      const response = await api.post('/Auth/Report/Calificar', {
         estrellas,
         id_hotel: hotel.id_hotel
-      })
-      setCalificados([...calificados, hotel.id_hotel])
-      Swal.fire("¡Gracias!", `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`, "success")
+      });
+
+      const nuevoPromedio = parseFloat(response.data.promedio);
+      
+      if (!isNaN(nuevoPromedio)) {
+        const nuevosHoteles = [...hoteles];
+        nuevosHoteles[index] = {
+          ...nuevosHoteles[index],
+          estrellas: nuevoPromedio  // 🔁 Actualiza el promedio directamente
+        };
+        setHoteles(nuevosHoteles);
+      }
+
+      setCalificados([...calificados, hotel.id_hotel]);
+
+      Swal.fire(
+        "¡Gracias!",
+        `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`,
+        "success"
+      );
     } catch (error) {
-      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error")
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error");
     }
   }
+
 
   const handleEliminar = async (id_hotel) => {
     const confirm = await Swal.fire({
@@ -231,7 +247,7 @@ export const Hoteles = () => {
                     uniqueId={hotel.id_hotel || index}
                   />
                   <span className="text-xs text-gray-500 font-semibold">
-                    {Number(hotel.estrellas).toFixed(1)}
+                    {!isNaN(hotel.estrellas) ? Number(hotel.estrellas).toFixed(1) : "0.0"}
                   </span>
                   {yaCalificado && (
                     <span className="ml-2 text-xs text-emerald-600 font-semibold">¡Ya calificaste!</span>
