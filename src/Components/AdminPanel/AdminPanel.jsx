@@ -236,7 +236,7 @@ export const AdminPanel = () => {
             <div className="flex items-center mb-4 gap-2">
               <label className="text-sm font-medium text-gray-700">Filtrar por rol:</label>
               <select value={filterRol} onChange={e => setFilterRol(e.target.value)} className="border rounded p-1">
-                <option value="">Todos</option>
+                <option value="">Clientes</option>
                 <option value="Empleado">Empleado</option>
                 <option value="admin">Admin</option>
               </select>
