@@ -126,10 +126,12 @@ export const CrearHoteles = () => {
             type="number"
             min={1}
             max={5}
+            step={0.1} // <-- permite decimales como 2.3, 4.7, etc.
             value={formData.estrellas}
             onChange={handleChange}
             placeholder="1 a 5"
             className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none transition"
+            required
           />
         </div>
 

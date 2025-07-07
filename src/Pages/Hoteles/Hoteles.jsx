@@ -158,7 +158,7 @@ export const Hoteles = () => {
 
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
-      <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
+      <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
         <button onClick={() => navigate("/CrearHoteles")} className="w-max p-3 rounded-full bg-white text-black transition-all duration-200 hover:scale-105">
           Agregar Hotel
         </button>
@@ -239,7 +239,7 @@ export const Hoteles = () => {
                 </li>
               </ul>
 
-              <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
+              <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
                 <div className="mt-4 flex flex-col gap-2">
                   {enEdicion ? (
                     <>
@@ -281,5 +281,3 @@ export const Hoteles = () => {
     </div>
   )
 }
-
-
