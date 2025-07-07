@@ -56,14 +56,14 @@ export const App = () => {
         <Route path="/index" element={<Main />} />
 
         {/* Ruta para probar permisos */}
-        <Route
+        {/* <Route
           path="/test-permissions"
           element={
             <ProtectedRoute>
               <TestPermissions />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* Rutas de Admin */}
         <Route
@@ -134,7 +134,7 @@ export const App = () => {
 
         {/* Rutas protegidas */}
         <Route
-          path="/sophIA"
+          path="/ZenIA"
           element={
             <ProtectedRoute>
               <SophIA />

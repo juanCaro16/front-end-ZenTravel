@@ -107,7 +107,11 @@ export const Hoteles = () => {
   }
 
   const handleStarChange = async (index, estrellas) => {
-    const hotel = hoteles[index]
+    const hotel = hoteles[index];
+    if (!estrellas || !hotel?.id_hotel) {
+      Swal.fire("Error", "Faltan datos para calificar.", "error");
+      return;
+    }
     if (calificados.includes(hotel.id_hotel)) {
       Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info")
       return
@@ -116,11 +120,14 @@ export const Hoteles = () => {
     nuevosHoteles[index].estrellas = estrellas
     setHoteles(nuevosHoteles)
     try {
-      await api.put(`/hotels/${hotel.id_hotel}`, { ...hotel, estrellas })
+      await api.post('/Auth/Report/Calificar', {
+        estrellas,
+        id_hotel: hotel.id_hotel
+      })
       setCalificados([...calificados, hotel.id_hotel])
       Swal.fire("¡Gracias!", `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`, "success")
     } catch (error) {
-      Swal.fire("Error", "No se pudo guardar la calificación", "error")
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error")
     }
   }
 
@@ -221,7 +228,7 @@ export const Hoteles = () => {
                     value={Number(hotel.estrellas) || 0}
                     onChange={(val) => handleStarChange(index, val)}
                     editable={!enEdicion && !yaCalificado}
-                    uniqueId={hotel.id_hotel} // Pasar el ID único del hotel
+                    uniqueId={hotel.id_hotel || index}
                   />
                   <span className="text-xs text-gray-500 font-semibold">
                     {Number(hotel.estrellas).toFixed(1)}
@@ -274,5 +281,3 @@ export const Hoteles = () => {
     </div>
   )
 }
-
-

@@ -7,7 +7,7 @@ export const SophIA = () => {
   const [messages, setMessages] = useState([
     {
       type: "bot",
-      content: "¡Hola! Soy SophIA, tu asistente virtual de viajes. ¿En qué puedo ayudarte hoy? 🌎✈️",
+      content: "¡Hola! Soy ZenIA, tu asistente virtual de viajes. ¿En qué puedo ayudarte hoy? 🌎✈️",
       timestamp: new Date(),
     },
   ])
@@ -90,7 +90,7 @@ export const SophIA = () => {
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Conoce a
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"> SophIA</span>
+            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"> ZenIA</span>
             <Sparkles className="inline-block w-8 h-8 text-yellow-400 ml-2" />
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
