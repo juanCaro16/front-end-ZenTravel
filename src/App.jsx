@@ -56,20 +56,20 @@ export const App = () => {
         <Route path="/index" element={<Main />} />
 
         {/* Ruta para probar permisos */}
-        <Route
+        {/* <Route
           path="/test-permissions"
           element={
             <ProtectedRoute>
               <TestPermissions />
             </ProtectedRoute>
           }
-        />
+        /> */}
 
         {/* Rutas de Admin */}
         <Route
           path="/admin"
           element={
-            <ProtectedRoute requiredRoles={["Admin"]}>
+            <ProtectedRoute requiredRoles={["admin"]}>
               <AdminPanel />
             </ProtectedRoute>
           }
@@ -98,7 +98,7 @@ export const App = () => {
         <Route
           path="/crearPaquete"
           element={
-            <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
+            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
               <CrearPaquetes />
             </ProtectedRoute>
           }
@@ -114,7 +114,7 @@ export const App = () => {
         <Route
           path="/crearHoteles"
           element={
-            <ProtectedRoute requiredRoles={["Admin", "Empleado"]}>
+            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
               <CrearHoteles/>
             </ProtectedRoute>
           }
@@ -134,7 +134,7 @@ export const App = () => {
 
         {/* Rutas protegidas */}
         <Route
-          path="/sophIA"
+          path="/ZenIA"
           element={
             <ProtectedRoute>
               <SophIA />

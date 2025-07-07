@@ -401,7 +401,7 @@ export const Register = () => {
             </div>
 
             <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/")}
               className="w-full py-3 px-4 border-2 border-emerald-500 text-emerald-600 rounded-xl hover:bg-emerald-50 font-semibold transition-all duration-200 transform hover:scale-105"
             >
               Iniciar Sesión

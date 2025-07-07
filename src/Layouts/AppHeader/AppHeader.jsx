@@ -77,7 +77,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
               <ItemNavLink
                 
-                route="/SophIA"
+                route="/ZenIA"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
                 content={({ isActive }) =>
                   isActive ? (
@@ -90,20 +90,9 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
 
               {/* Enlace para probar permisos - solo visible cuando está autenticado */}
-              {isAuthenticated && (
-                <ItemNavLink
-                  content={
-                    <div className="flex items-center space-x-1">
-                      <TestTube className="w-4 h-4" />
-                      <span>Test Permisos</span>
-                    </div>
-                  }
-                  route="/test-permissions"
-                  myStyles="px-4 py-2 rounded-lg text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-all duration-200 font-medium border border-orange-200"
-                />
-              )}
+              
 
-              <RoleBasedComponent allowedRoles={["Admin"]}>
+              <RoleBasedComponent allowedRoles={["admin"]}>
                 <ItemNavLink
                   content="Admin Panel"
                   route="/admin"
@@ -212,7 +201,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
             />
             <ItemNavLink
               content="Asistente IA"
-              route="/SophIA"
+              route="/ZenIA"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
@@ -230,7 +219,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             )}
 
-            <RoleBasedComponent allowedRoles={["Admin"]}>
+            <RoleBasedComponent allowedRoles={["admin"]}>
               <ItemNavLink
                 content="Admin Panel"
                 route="/admin"
@@ -246,7 +235,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             </RoleBasedComponent>
 
-            <RoleBasedComponent allowedRoles={["Admin", "Empleado"]}>
+            <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
               <ItemNavLink
                 content="Crear Paquete"
                 route="/crearPaquete"
