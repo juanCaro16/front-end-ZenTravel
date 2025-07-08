@@ -72,8 +72,8 @@ export const SophIA = () => {
 
     try {
       // Obtener el id del usuario justo antes de enviar la petición
-      const userId = localStorage.getItem("id_usuario")
       const response = await api.post("IA/ZenIA", {
+
         ZenIA: inputValue,
         id_usuario: userId,
       })
@@ -112,6 +112,27 @@ export const SophIA = () => {
           ]
         })
       }
+
+        ZenIA: inputValue
+      });
+
+      console.log(inputValue);
+      
+
+      const contenidoRespuesta =
+          typeof response.data.datos === "string"
+            ? response.data.datos
+            : JSON.stringify(response.data.datos, null, 2);
+
+        const botMessage = {
+          type: "bot",
+          content: contenidoRespuesta,
+          timestamp: new Date(),
+        };
+
+
+      setMessages((prev) => [...prev, botMessage])
+
     } catch (err) {
       console.error("Error al consultar la IA:", err)
       const errorMessage = {

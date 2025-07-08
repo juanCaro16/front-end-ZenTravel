@@ -3,6 +3,7 @@ import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
+import { HabitacionCarrusel } from "../../Components/HabitacionCarrusel/HabitacionCarrusel";
 
 // Componente de estrellas realista y único por hotel
 const StarRating = ({ value, onChange, editable = true, uniqueId = "" }) => {
@@ -59,6 +60,7 @@ export const Hoteles = () => {
   const [hoteles, setHoteles] = useState([])
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [verHabitacionesId, setVerHabitacionesId] = useState(null);
   const [calificados, setCalificados] = useState(() => {
     const saved = localStorage.getItem("hotelesCalificados")
     return saved ? JSON.parse(saved) : []
@@ -113,23 +115,39 @@ export const Hoteles = () => {
       return;
     }
     if (calificados.includes(hotel.id_hotel)) {
-      Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info")
-      return
+      Swal.fire("Ya calificaste", "Solo puedes calificar una vez este hotel.", "info");
+      return;
     }
-    const nuevosHoteles = [...hoteles]
-    nuevosHoteles[index].estrellas = estrellas
-    setHoteles(nuevosHoteles)
+
     try {
-      await api.post('/Auth/Report/Calificar', {
+      const response = await api.post('/Auth/Report/Calificar', {
         estrellas,
         id_hotel: hotel.id_hotel
-      })
-      setCalificados([...calificados, hotel.id_hotel])
-      Swal.fire("¡Gracias!", `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`, "success")
+      });
+
+      const nuevoPromedio = parseFloat(response.data.promedio);
+      
+      if (!isNaN(nuevoPromedio)) {
+        const nuevosHoteles = [...hoteles];
+        nuevosHoteles[index] = {
+          ...nuevosHoteles[index],
+          estrellas: nuevoPromedio  // 🔁 Actualiza el promedio directamente
+        };
+        setHoteles(nuevosHoteles);
+      }
+
+      setCalificados([...calificados, hotel.id_hotel]);
+
+      Swal.fire(
+        "¡Gracias!",
+        `Calificaste este hotel con ${estrellas} estrella${estrellas > 1 ? "s" : ""}.`,
+        "success"
+      );
     } catch (error) {
-      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error")
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo guardar la calificación", "error");
     }
   }
+
 
   const handleEliminar = async (id_hotel) => {
     const confirm = await Swal.fire({
@@ -231,7 +249,7 @@ export const Hoteles = () => {
                     uniqueId={hotel.id_hotel || index}
                   />
                   <span className="text-xs text-gray-500 font-semibold">
-                    {Number(hotel.estrellas).toFixed(1)}
+                    {!isNaN(hotel.estrellas) ? Number(hotel.estrellas).toFixed(1) : "0.0"}
                   </span>
                   {yaCalificado && (
                     <span className="ml-2 text-xs text-emerald-600 font-semibold">¡Ya calificaste!</span>
@@ -270,10 +288,52 @@ export const Hoteles = () => {
                       >
                         Eliminar
                       </button>
+
+                      <button
+                        onClick={() => setVerHabitacionesId(hotel.id_hotel)}
+                        className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200"
+                      >
+                        Ver habitaciones
+                      </button>
                     </>
+                    
                   )}
                 </div>
               </RoleBasedComponent>
+
+              {/* 🖼️ Galería de habitaciones */}
+              {verHabitacionesId === hotel.id_hotel && (
+                <div className="mt-4 relative">
+                  {(() => {
+                    let imagenes = [];
+
+                    try {
+                      const imgs = typeof hotel.imageneshabitaciones === "string"
+                        ? JSON.parse(hotel.imageneshabitaciones)
+                        : hotel.imageneshabitaciones;
+
+                      imagenes = Array.isArray(imgs) ? imgs : [];
+                    } catch (e) {}
+
+                    return imagenes.length ? (
+                      <HabitacionCarousel imagenes={imagenes} />
+                    ) : (
+                      <p className="text-gray-500">No hay imágenes de habitaciones disponibles.</p>
+                    );
+                  })()}
+
+                  <button
+                    onClick={() => setVerHabitacionesId(null)}
+                    className="mt-3 px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
+                  >
+                    Cerrar galería
+                  </button> 
+                </div>
+              )}
+
+
+
+
             </div>
           )
         })}
