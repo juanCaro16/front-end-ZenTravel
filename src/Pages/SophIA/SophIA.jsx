@@ -52,7 +52,7 @@ export const SophIA = () => {
     if (savedPaquetes) {
       try {
         setPaquetesIA(JSON.parse(savedPaquetes))
-      } catch {}
+      } catch { }
     }
   }, [])
 
@@ -71,19 +71,16 @@ export const SophIA = () => {
     setIsLoading(true)
 
     try {
-      // Obtener el id del usuario justo antes de enviar la petición
+      const userId = localStorage.getItem("id_usuario")
       const response = await api.post("IA/ZenIA", {
-
         ZenIA: inputValue,
         id_usuario: userId,
       })
 
-      // Animación de respuesta letra por letra
       const respuesta = response.data.datos || response.data.respuesta || "No se obtuvo respuesta de la IA."
-      // Intentar extraer paquetes recomendados si la respuesta es JSON o contiene un bloque JSON
       let paquetesExtraidos = []
+
       try {
-        // Buscar bloque JSON en la respuesta
         const match = respuesta.match(/\[.*\]/s)
         if (match) {
           paquetesExtraidos = JSON.parse(match[0])
@@ -93,54 +90,55 @@ export const SophIA = () => {
       } catch {
         paquetesExtraidos = parsePaquetesFromTexto(respuesta)
       }
+
       setPaquetesIA(paquetesExtraidos)
-      // Agregar un mensaje placeholder del bot antes de animar
-      setMessages((prev) => [
-        ...prev,
-        { type: "bot", content: "", timestamp: new Date() }, // placeholder para la animación
-      ])
-      setIsLoading(false) // Detenemos el loader antes de animar
-      let currentText = ""
-      for (let i = 0; i < respuesta.length; i++) {
-        currentText += respuesta[i]
-        await new Promise((resolve) => setTimeout(resolve, 18)) // velocidad de animación
-        setMessages((prev) => {
-          // Solo actualiza el último mensaje del bot
-          return [
+
+      if (paquetesExtraidos.length > 0) {
+        // Mostrar solo una línea introductoria si hay paquetes
+        setMessages((prev) => [
+          ...prev,
+          {
+            type: "bot",
+            content: "✨ Aquí tienes algunos paquetes recomendados:",
+            timestamp: new Date(),
+          },
+        ])
+        setIsLoading(false)
+      } else {
+        // Mostrar respuesta completa animada si no hay paquetes
+        setMessages((prev) => [
+          ...prev,
+          { type: "bot", content: "", timestamp: new Date() }, // placeholder para animación
+        ])
+        setIsLoading(false)
+        let currentText = ""
+        for (let i = 0; i < respuesta.length; i++) {
+          currentText += respuesta[i]
+          await new Promise((resolve) => setTimeout(resolve, 18))
+          setMessages((prev) => [
             ...prev.slice(0, -1),
             { type: "bot", content: currentText, timestamp: new Date() },
-          ]
-        })
+          ])
+        }
       }
-
-        ZenIA: inputValue
-      });
-
-      console.log(inputValue);
-      
-
-      const contenidoRespuesta =
-          typeof response.data.datos === "string"
-            ? response.data.datos
-            : JSON.stringify(response.data.datos, null, 2);
-
-        const botMessage = {
-          type: "bot",
-          content: contenidoRespuesta,
-          timestamp: new Date(),
-        };
-
-
-      setMessages((prev) => [...prev, botMessage])
 
     } catch (err) {
       console.error("Error al consultar la IA:", err)
-      const errorMessage = {
-        type: "bot",
-        content: "Lo siento, hubo un error al procesar tu consulta. Por favor, intenta nuevamente.",
-        timestamp: new Date(),
+      setPaquetesIA([])
+      let errorMsg = "Lo siento, hubo un error al procesar tu consulta. Por favor, intenta nuevamente."
+      if (err?.response?.status === 403) {
+        errorMsg = "No tienes permisos para realizar esta acción. Por favor, inicia sesión nuevamente o verifica tus credenciales."
+      } else if (err?.response?.status === 401) {
+        errorMsg = "Tu sesión ha expirado. Por favor, inicia sesión nuevamente."
       }
-      setMessages((prev) => [...prev, errorMessage])
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: "bot",
+          content: errorMsg,
+          timestamp: new Date(),
+        },
+      ])
     } finally {
       setIsLoading(false)
       inputRef.current?.focus()
@@ -214,11 +212,10 @@ export const SophIA = () => {
                 >
                   {/* Avatar */}
                   <div
-                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                      message.type === "user"
-                        ? "bg-gradient-to-br from-blue-500 to-purple-500"
-                        : "bg-gradient-to-br from-emerald-500 to-teal-500"
-                    }`}
+                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${message.type === "user"
+                      ? "bg-gradient-to-br from-blue-500 to-purple-500"
+                      : "bg-gradient-to-br from-emerald-500 to-teal-500"
+                      }`}
                   >
                     {message.type === "user" ? (
                       <User className="w-4 h-4 text-white" />
@@ -229,11 +226,10 @@ export const SophIA = () => {
 
                   {/* Message Bubble */}
                   <div
-                    className={`rounded-2xl px-4 py-3 shadow-sm ${
-                      message.type === "user"
-                        ? "bg-gradient-to-br from-blue-500 to-purple-500 text-white"
-                        : "bg-white border border-gray-200 text-gray-800"
-                    }`}
+                    className={`rounded-2xl px-4 py-3 shadow-sm ${message.type === "user"
+                      ? "bg-gradient-to-br from-blue-500 to-purple-500 text-white"
+                      : "bg-white border border-gray-200 text-gray-800"
+                      }`}
                   >
                     <p className="text-sm leading-relaxed whitespace-pre-line">
                       {typeof message.content === "string"
