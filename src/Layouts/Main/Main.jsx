@@ -66,7 +66,7 @@ export const Main = () => {
               </button>
 
               <button
-                onClick={() => navigate("/SophIA")}
+                onClick={() => navigate("/ZenIA")}
                 className="px-8 py-4 border-2 border-white/30 hover:border-white/60 text-white hover:bg-white/10 rounded-full font-semibold text-lg backdrop-blur-sm transition-all duration-300"
               >
                 Habla con ZenIA
