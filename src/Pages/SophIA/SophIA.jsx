@@ -39,17 +39,21 @@ export const SophIA = () => {
 
     try {
       // Obtener el id del usuario justo antes de enviar la petición
-      const userId = localStorage.getItem("id_usuario")
       const response = await api.post("IA/ZenIA", {
-        ZenIA: inputValue,
-        id_usuario: userId,
+        ZenIA: inputValue
       });
 
-      const botMessage = {
-        type: "bot",
-        content: response.data.respuesta,
-        timestamp: new Date(),
-      }
+      const contenidoRespuesta =
+          typeof response.data.datos === "string"
+            ? response.data.datos
+            : JSON.stringify(response.data.datos, null, 2);
+
+        const botMessage = {
+          type: "bot",
+          content: contenidoRespuesta,
+          timestamp: new Date(),
+        };
+
 
       setMessages((prev) => [...prev, botMessage])
     } catch (err) {
