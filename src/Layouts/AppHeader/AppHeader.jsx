@@ -24,7 +24,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
   
 
   return (
-    <header className="w-screen bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
+    <header className="w-[100%] bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
       <div className=" mx-auto sm:px-6 lg:px-8">
         <div className="w-full flex items-center h-16 ">
           {/* Logo y navegación principal */}
