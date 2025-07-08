@@ -77,7 +77,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
               <ItemNavLink
                 
-                route="/SophIA"
+                route="/ZenIA"
                 myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
                 content={({ isActive }) =>
                   isActive ? (
@@ -90,18 +90,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
 
               {/* Enlace para probar permisos - solo visible cuando está autenticado */}
-              {isAuthenticated && (
-                <ItemNavLink
-                  content={
-                    <div className="flex items-center space-x-1">
-                      <TestTube className="w-4 h-4" />
-                      <span>Test Permisos</span>
-                    </div>
-                  }
-                  route="/test-permissions"
-                  myStyles="px-4 py-2 rounded-lg text-orange-600 hover:text-orange-700 hover:bg-orange-50 transition-all duration-200 font-medium border border-orange-200"
-                />
-              )}
+              
 
               <RoleBasedComponent allowedRoles={["admin"]}>
                 <ItemNavLink
@@ -154,10 +143,11 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
 
               <div className="w-px h-4 bg-gray-300"></div>
 
-              <div className="flex items-center space-x-2 cursor-pointer hover:text-emerald-600 transition-colors duration-200 mr-5">
-                <Luggage className="w-4 h-4" />
-                <span>Mis viajes</span>
-              </div>
+              <ItemNavLink
+              content="Mis viajes"
+              route="/mis-viajes"
+              myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+            />
             </div>
 
             {/* Autenticación */}
@@ -212,7 +202,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
             />
             <ItemNavLink
               content="Asistente IA"
-              route="/SophIA"
+              route="/ZenIA"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
