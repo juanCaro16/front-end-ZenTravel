@@ -1,17 +1,37 @@
 import { useState, useRef, useEffect } from "react"
 import { Send, Bot, User, Sparkles } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
+import { Paquetes } from "../Paquetes/Paquetes" // Importar el componente de cards
 
 export const SophIA = () => {
   const [inputValue, setInputValue] = useState("")
-  const [messages, setMessages] = useState([
-    {
-      type: "bot",
-      content: "¡Hola! Soy ZenIA, tu asistente virtual de viajes. ¿En qué puedo ayudarte hoy? 🌎✈️",
-      timestamp: new Date(),
-    },
-  ])
+  // Inicializar messages desde localStorage si existe
+  const [messages, setMessages] = useState(() => {
+    const saved = localStorage.getItem("sophia_messages");
+    if (saved) {
+      try {
+        // Restaurar fechas
+        return JSON.parse(saved).map(m => ({ ...m, timestamp: new Date(m.timestamp) }))
+      } catch {
+        return [
+          {
+            type: "bot",
+            content: "¡Hola! Soy ZenIA, tu asistente virtual de viajes. ¿En qué puedo ayudarte hoy? 🌎✈️",
+            timestamp: new Date(),
+          },
+        ]
+      }
+    }
+    return [
+      {
+        type: "bot",
+        content: "¡Hola! Soy ZenIA, tu asistente virtual de viajes. ¿En qué puedo ayudarte hoy? 🌎✈️",
+        timestamp: new Date(),
+      },
+    ]
+  })
   const [isLoading, setIsLoading] = useState(false)
+  const [paquetesIA, setPaquetesIA] = useState([])
   const messagesEndRef = useRef(null)
   const inputRef = useRef(null)
 
@@ -21,7 +41,20 @@ export const SophIA = () => {
 
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+    // Guardar mensajes y paquetesIA en localStorage cada vez que cambian
+    localStorage.setItem("sophia_messages", JSON.stringify(messages))
+    localStorage.setItem("sophia_paquetesIA", JSON.stringify(paquetesIA))
+  }, [messages, paquetesIA])
+
+  // Al cargar, restaurar paquetesIA si existe
+  useEffect(() => {
+    const savedPaquetes = localStorage.getItem("sophia_paquetesIA")
+    if (savedPaquetes) {
+      try {
+        setPaquetesIA(JSON.parse(savedPaquetes))
+      } catch {}
+    }
+  }, [])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -40,6 +73,46 @@ export const SophIA = () => {
     try {
       // Obtener el id del usuario justo antes de enviar la petición
       const response = await api.post("IA/ZenIA", {
+
+        ZenIA: inputValue,
+        id_usuario: userId,
+      })
+
+      // Animación de respuesta letra por letra
+      const respuesta = response.data.datos || response.data.respuesta || "No se obtuvo respuesta de la IA."
+      // Intentar extraer paquetes recomendados si la respuesta es JSON o contiene un bloque JSON
+      let paquetesExtraidos = []
+      try {
+        // Buscar bloque JSON en la respuesta
+        const match = respuesta.match(/\[.*\]/s)
+        if (match) {
+          paquetesExtraidos = JSON.parse(match[0])
+        } else {
+          paquetesExtraidos = parsePaquetesFromTexto(respuesta)
+        }
+      } catch {
+        paquetesExtraidos = parsePaquetesFromTexto(respuesta)
+      }
+      setPaquetesIA(paquetesExtraidos)
+      // Agregar un mensaje placeholder del bot antes de animar
+      setMessages((prev) => [
+        ...prev,
+        { type: "bot", content: "", timestamp: new Date() }, // placeholder para la animación
+      ])
+      setIsLoading(false) // Detenemos el loader antes de animar
+      let currentText = ""
+      for (let i = 0; i < respuesta.length; i++) {
+        currentText += respuesta[i]
+        await new Promise((resolve) => setTimeout(resolve, 18)) // velocidad de animación
+        setMessages((prev) => {
+          // Solo actualiza el último mensaje del bot
+          return [
+            ...prev.slice(0, -1),
+            { type: "bot", content: currentText, timestamp: new Date() },
+          ]
+        })
+      }
+
         ZenIA: inputValue
       });
 
@@ -59,6 +132,7 @@ export const SophIA = () => {
 
 
       setMessages((prev) => [...prev, botMessage])
+
     } catch (err) {
       console.error("Error al consultar la IA:", err)
       const errorMessage = {
@@ -86,6 +160,29 @@ export const SophIA = () => {
     "¿Cuál es la mejor época para viajar?",
     "¿Ofrecen tours de aventura?",
   ]
+
+  // Agrega la función parsePaquetesFromTexto si no existe
+  const parsePaquetesFromTexto = (texto) => {
+    // Busca bloques que empiecen con "Paquete:" y terminen antes del siguiente "Paquete:" o el final
+    const bloques = texto.split(/\n\s*\u{1F4E6}|\n\s*\* Paquete:/u).filter(b => b.trim().length > 0)
+    return bloques.map(bloque => {
+      const get = (regex) => {
+        const m = bloque.match(regex)
+        return m ? m[1].trim() : undefined
+      }
+      return {
+        nombrePaquete: get(/Paquete:\s*([^\n]+)/) || get(/paquete:\s*([^\n]+)/i),
+        destino: get(/Destino:\s*([^\n]+)/i),
+        hotel: get(/Hotel:\s*([^\n]+)/i),
+        duracion: get(/Duraci[oó]n:\s*([^\n]+)/i),
+        fechaSalida: get(/Fecha de salida:\s*([^\n]+)/i),
+        precio: get(/Precio:\s*([^\n]+)/i),
+        calificacion: get(/Calificaci[oó]n:\s*([^\n]+)/i),
+        estado: get(/Estado:\s*([^\n]+)/i),
+        descripcion: undefined
+      }
+    }).filter(p => p.nombrePaquete)
+  }
 
   return (
     <div className="min-h-screen w-full py-8 px-4">
@@ -171,6 +268,30 @@ export const SophIA = () => {
                       ></div>
                     </div>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Carrusel de paquetes IA si existen */}
+            {paquetesIA.length > 0 && (
+              <div className="mt-6">
+                <h3 className="text-lg font-bold mb-2 text-emerald-700">Paquetes recomendados por ZenIA:</h3>
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {paquetesIA.map((paquete, idx) => (
+                    <div key={idx} className="min-w-[300px] max-w-xs bg-white rounded-2xl shadow p-4 border border-emerald-100 flex-shrink-0">
+                      <h4 className="text-xl font-semibold mb-1">{paquete.nombrePaquete || paquete.paquete || "Paquete"}</h4>
+                      <p className="text-gray-600 text-sm mb-2">{paquete.descripcion || ""}</p>
+                      <ul className="text-sm space-y-1 mb-2">
+                        {paquete.destino && <li><strong>Destino:</strong> {paquete.destino}</li>}
+                        {paquete.hotel && <li><strong>Hotel:</strong> {paquete.hotel}</li>}
+                        {paquete.duracion && <li><strong>Duración:</strong> {paquete.duracion}</li>}
+                        {paquete.fechaSalida && <li><strong>Salida:</strong> {paquete.fechaSalida}</li>}
+                        {paquete.precio && <li><strong>Precio:</strong> {paquete.precio}</li>}
+                        {paquete.calificacion && <li><strong>Calificación:</strong> {paquete.calificacion}</li>}
+                        {paquete.estado && <li><strong>Estado:</strong> {paquete.estado}</li>}
+                      </ul>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}

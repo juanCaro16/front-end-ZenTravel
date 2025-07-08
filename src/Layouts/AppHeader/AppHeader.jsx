@@ -143,10 +143,11 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
 
               <div className="w-px h-4 bg-gray-300"></div>
 
-              <div className="flex items-center space-x-2 cursor-pointer hover:text-emerald-600 transition-colors duration-200 mr-5">
-                <Luggage className="w-4 h-4" />
-                <span>Mis viajes</span>
-              </div>
+              <ItemNavLink
+              content="Mis viajes"
+              route="/mis-viajes"
+              myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+            />
             </div>
 
             {/* Autenticación */}
