@@ -43,6 +43,9 @@ export const SophIA = () => {
         ZenIA: inputValue
       });
 
+      console.log(inputValue);
+      
+
       const contenidoRespuesta =
           typeof response.data.datos === "string"
             ? response.data.datos
