@@ -22,7 +22,7 @@ import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
-import useAuth  from "./hooks/useAuth"
+import useAuth  from "./Hooks/useAuth"
 import { Hoteles } from "./Pages/Hoteles/Hoteles"
 import { MisViajes } from "./Pages/MisViajes/MisViajes"
 
