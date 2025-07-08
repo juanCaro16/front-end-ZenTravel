@@ -49,9 +49,10 @@ export const CrearHoteles = () => {
         formToSend.append("imagenes", img)
       })
 
-      formData.imageneshabitaciones.forEach((img) => {
-        formToSend.append("imageneshabitaciones", img)
-      })
+      formData.imageneshabitaciones.forEach((img, i) => {
+        console.log("🛏️ Imagen habitación:", i, img.name); // 👈 Esto debería mostrarte que existen
+        formToSend.append("imageneshabitaciones", img);
+      });
 
       const response = await api.post("/admin/CreateHotel", formToSend, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -179,7 +180,7 @@ export const CrearHoteles = () => {
             className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
             multiple
           />
-          {formData.imageneshabitaciones.length > 0 && (
+          {formData.imageneshabitaciones.length > 0 && (  
             <div className="grid grid-cols-3 gap-3 mt-4">
               {formData.imageneshabitaciones.map((img, i) => (
                 <div key={i} className="rounded-xl overflow-hidden border border-gray-200 shadow">

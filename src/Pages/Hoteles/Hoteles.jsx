@@ -288,18 +288,19 @@ export const Hoteles = () => {
                       >
                         Eliminar
                       </button>
-
-                      <button
-                        onClick={() => setVerHabitacionesId(hotel.id_hotel)}
-                        className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200"
-                      >
-                        Ver habitaciones
-                      </button>
                     </>
                     
                   )}
                 </div>
               </RoleBasedComponent>
+              <div className="mt-2">
+                <button
+                  onClick={() => setVerHabitacionesId(hotel.id_hotel)}
+                  className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200 w-[100%]"
+                >
+                  Ver habitaciones
+                </button>
+              </div>
 
               {/* 🖼️ Galería de habitaciones */}
               {verHabitacionesId === hotel.id_hotel && (
@@ -316,7 +317,7 @@ export const Hoteles = () => {
                     } catch (e) {}
 
                     return imagenes.length ? (
-                      <HabitacionCarousel imagenes={imagenes} />
+                      <HabitacionCarrusel imagenes={imagenes} />
                     ) : (
                       <p className="text-gray-500">No hay imágenes de habitaciones disponibles.</p>
                     );
@@ -330,9 +331,6 @@ export const Hoteles = () => {
                   </button> 
                 </div>
               )}
-
-
-
 
             </div>
           )
