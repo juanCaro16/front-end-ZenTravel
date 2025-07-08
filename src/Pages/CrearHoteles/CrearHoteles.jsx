@@ -12,7 +12,9 @@ export const CrearHoteles = () => {
     ciudad: "",
     estrellas: "",
     imagenes: [],
+    imageneshabitaciones: [] // ✅ campo agregado
   })
+
   const [isLoading, setIsLoading] = useState(false)
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
@@ -26,6 +28,10 @@ export const CrearHoteles = () => {
     setFormData({ ...formData, imagenes: Array.from(e.target.files) })
   }
 
+  const handleHabitacionesChange = (e) => {
+    setFormData({ ...formData, imageneshabitaciones: Array.from(e.target.files) })
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -36,10 +42,15 @@ export const CrearHoteles = () => {
       formToSend.append("nombre", formData.nombre)
       formToSend.append("descripcion", formData.descripcion)
       formToSend.append("ubicacion", formData.ubicacion)
-      formToSend.append("ciudad", formData.ciudad) // <-- aquí
+      formToSend.append("ciudad", formData.ciudad)
       formToSend.append("estrellas", formData.estrellas)
+
       formData.imagenes.forEach((img) => {
         formToSend.append("imagenes", img)
+      })
+
+      formData.imageneshabitaciones.forEach((img) => {
+        formToSend.append("imageneshabitaciones", img)
       })
 
       const response = await api.post("/admin/CreateHotel", formToSend, {
@@ -126,7 +137,7 @@ export const CrearHoteles = () => {
             type="number"
             min={1}
             max={5}
-            step={0.1} // <-- permite decimales como 2.3, 4.7, etc.
+            step={0.1}
             value={formData.estrellas}
             onChange={handleChange}
             placeholder="1 a 5"
@@ -151,6 +162,30 @@ export const CrearHoteles = () => {
                   <img
                     src={URL.createObjectURL(img)}
                     alt={`preview-${i}`}
+                    className="w-full h-24 object-cover"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="block font-semibold text-gray-700 mb-1">Imágenes de Habitaciones</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleHabitacionesChange}
+            className="w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-purple-100 file:text-purple-700 hover:file:bg-purple-200"
+            multiple
+          />
+          {formData.imageneshabitaciones.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mt-4">
+              {formData.imageneshabitaciones.map((img, i) => (
+                <div key={i} className="rounded-xl overflow-hidden border border-gray-200 shadow">
+                  <img
+                    src={URL.createObjectURL(img)}
+                    alt={`habitacion-${i}`}
                     className="w-full h-24 object-cover"
                   />
                 </div>

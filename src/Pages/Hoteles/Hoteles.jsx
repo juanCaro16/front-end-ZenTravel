@@ -3,6 +3,7 @@ import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import { useNavigate } from "react-router-dom"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
+import { HabitacionCarrusel } from "../../Components/HabitacionCarrusel/HabitacionCarrusel";
 
 // Componente de estrellas realista y único por hotel
 const StarRating = ({ value, onChange, editable = true, uniqueId = "" }) => {
@@ -59,6 +60,7 @@ export const Hoteles = () => {
   const [hoteles, setHoteles] = useState([])
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [verHabitacionesId, setVerHabitacionesId] = useState(null);
   const [calificados, setCalificados] = useState(() => {
     const saved = localStorage.getItem("hotelesCalificados")
     return saved ? JSON.parse(saved) : []
@@ -286,10 +288,52 @@ export const Hoteles = () => {
                       >
                         Eliminar
                       </button>
+
+                      <button
+                        onClick={() => setVerHabitacionesId(hotel.id_hotel)}
+                        className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200"
+                      >
+                        Ver habitaciones
+                      </button>
                     </>
+                    
                   )}
                 </div>
               </RoleBasedComponent>
+
+              {/* 🖼️ Galería de habitaciones */}
+              {verHabitacionesId === hotel.id_hotel && (
+                <div className="mt-4 relative">
+                  {(() => {
+                    let imagenes = [];
+
+                    try {
+                      const imgs = typeof hotel.imageneshabitaciones === "string"
+                        ? JSON.parse(hotel.imageneshabitaciones)
+                        : hotel.imageneshabitaciones;
+
+                      imagenes = Array.isArray(imgs) ? imgs : [];
+                    } catch (e) {}
+
+                    return imagenes.length ? (
+                      <HabitacionCarousel imagenes={imagenes} />
+                    ) : (
+                      <p className="text-gray-500">No hay imágenes de habitaciones disponibles.</p>
+                    );
+                  })()}
+
+                  <button
+                    onClick={() => setVerHabitacionesId(null)}
+                    className="mt-3 px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
+                  >
+                    Cerrar galería
+                  </button> 
+                </div>
+              )}
+
+
+
+
             </div>
           )
         })}
