@@ -29,7 +29,7 @@ export const CrearPaquetes = () => {
     duracionDias: "",
     fechaInicioDisponible: "",
     descuento: "",
-    nombreHotel: "",
+    Habitacion: "",
     nombreTransporte: "",
     nombreDestino: "",
     categoria: "",
@@ -85,7 +85,7 @@ export const CrearPaquetes = () => {
       formToSend.append("duracionDias", formData.duracionDias.toString());
       formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible); // ✅ corregido
       formToSend.append("descuento", formData.descuento.toString());
-      formToSend.append("nombreHotel", formData.nombreHotel);
+      formToSend.append("Habitacion", formData.Habitacion);
       formToSend.append("nombreTransporte", formData.nombreTransporte);
       formToSend.append("nombreDestino", formData.nombreDestino);
       formToSend.append("categoria", formData.categoria);
@@ -166,7 +166,7 @@ export const CrearPaquetes = () => {
       case 1:
         return formData.nombrePaquete && formData.descripcion
       case 2:
-        return formData.nombreDestino && formData.nombreHotel && formData.nombreTransporte
+        return formData.nombreDestino && formData.Habitacion && formData.nombreTransporte
       case 3:
         return true // Este paso es opcional ahora
       case 4:
@@ -288,8 +288,8 @@ export const CrearPaquetes = () => {
                 Hotel incluido *
               </label>
               <input
-                name="nombreHotel"
-                value={formData.nombreHotel}
+                name="Habitacion"
+                value={formData.Habitacion}
                 onChange={handleChange}
                 placeholder="Ej: Hotel Boutique Casa San Agustín"
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"

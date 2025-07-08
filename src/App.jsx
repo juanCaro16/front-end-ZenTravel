@@ -1,4 +1,6 @@
-import { Route, Routes,useLocation } from "react-router-dom"
+"use client"
+
+import { Route, Routes } from "react-router-dom"
 import { AppHeader } from "./Layouts/AppHeader/AppHeader"
 import { Main } from "./Layouts/Main/Main"
 import { Login } from "./Pages/Login/Login"
@@ -11,24 +13,21 @@ import { Soporte } from "./Pages/Soporte/Soporte"
 import { Register } from "./Pages/Register/Register"
 import { ResetPassword } from "./Pages/ResetPassword/ResetPassword"
 import { NewPassword } from "./Pages/NewPassword/NewPassword"
-import { useEffect ,} from "react"
+import { useEffect } from "react"
+import { useLocation } from "react-router-dom"
 import { Paquetes } from "./Pages/Paquetes/Paquetes"
 import { CrearPaquetes } from "./Pages/CrearPaquetes/CrearPaquetes"
-import { Hoteles } from "./Pages/Hoteles/Hoteles"
-import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
 import TokenRefresher from "./Services/TokenRefresher/TokenRefresher"
 import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
-import UseAuth from "./Hooks/useAuth";
-import { SolicitarCambioRol } from "./Pages/SolicitarCambioRol/SolicitarCambioRol"
-
-
-
+import useAuth  from "./hooks/useAuth"
+import { Hoteles } from "./Pages/Hoteles/Hoteles"
+import { MisViajes } from "./Pages/MisViajes/MisViajes"
 
 export const App = () => {
-  const { isAuthenticated, login, logout } = UseAuth()
+  const { isAuthenticated, userRole, login, logout } = useAuth()
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register"]
@@ -52,18 +51,17 @@ export const App = () => {
       <ButtonHelp />
       <TokenRefresher />
       <Routes>
-
         <Route path="/index" element={<Main />} />
 
         {/* Ruta para probar permisos */}
-        {/* <Route
+        <Route
           path="/test-permissions"
           element={
             <ProtectedRoute>
               <TestPermissions />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Rutas de Admin */}
         <Route
@@ -96,26 +94,28 @@ export const App = () => {
         />
 
         <Route
-          path="/crearPaquete"
-          element={
-            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
-              <CrearPaquetes />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/Hoteles"
+          path="/hoteles"
           element={
             <ProtectedRoute>
               <Hoteles />
             </ProtectedRoute>
           }
         />
+
         <Route
-          path="/crearHoteles"
+          path="/mis-viajes"
+          element={
+            <ProtectedRoute>
+              <MisViajes />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/crearPaquete"
           element={
             <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
-              <CrearHoteles/>
+              <CrearPaquetes />
             </ProtectedRoute>
           }
         />
@@ -141,18 +141,9 @@ export const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/solicitar-cambio-rol"
-          element={
-            <ProtectedRoute>
-              <SolicitarCambioRol />
-            </ProtectedRoute>
-          }
-        />
 
         <Route path="*" element={<h1>404 Not Found</h1>} />
       </Routes>
-      
     </>
   )
 }

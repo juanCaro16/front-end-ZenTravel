@@ -1,13 +1,20 @@
+"use client"
+
 import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import Swal from "sweetalert2"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
+import { Heart } from "lucide-react"
 
 export const Paquetes = () => {
   const navigate = useNavigate()
   const [paquetes, setPaquetes] = useState([])
   const [editandoId, setEditandoId] = useState(null)
+  const [favoritos, setFavoritos] = useState(() => {
+    const saved = localStorage.getItem("paquetesFavoritos")
+    return saved ? JSON.parse(saved) : []
+  })
 
   useEffect(() => {
     obtenerPaquetes()
@@ -57,6 +64,36 @@ export const Paquetes = () => {
     }
   }
 
+  const handleToggleFavorito = (paquete) => {
+    const esFavorito = favoritos.some((fav) => fav.id_paquete === paquete.id_paquete)
+
+    if (esFavorito) {
+      // Remover de favoritos
+      const nuevosFavoritos = favoritos.filter((fav) => fav.id_paquete !== paquete.id_paquete)
+      setFavoritos(nuevosFavoritos)
+      localStorage.setItem("paquetesFavoritos", JSON.stringify(nuevosFavoritos))
+      Swal.fire({
+        title: "Removido de favoritos",
+        text: `${paquete.nombrePaquete} ha sido removido de tus favoritos`,
+        icon: "info",
+        timer: 2000,
+        showConfirmButton: false,
+      })
+    } else {
+      // Agregar a favoritos
+      const nuevosFavoritos = [...favoritos, { ...paquete, fechaAgregado: new Date().toISOString() }]
+      setFavoritos(nuevosFavoritos)
+      localStorage.setItem("paquetesFavoritos", JSON.stringify(nuevosFavoritos))
+      Swal.fire({
+        title: "¡Agregado a favoritos!",
+        text: `${paquete.nombrePaquete} ha sido guardado en tus favoritos`,
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      })
+    }
+  }
+
   const [loading, setLoading] = useState(true)
 
   const obtenerPaquetes = async () => {
@@ -81,25 +118,45 @@ export const Paquetes = () => {
   if (loading) return <p className="text-center mt-8">Cargando paquetes...</p>
 
   if (paquetes.length === 0) {
-    ;<p className="text-center mt-8">No hay paquetes disponibles.</p>
-    ;<button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black">
-      Agregar Paquete
-    </button>
+    return (
+      <div className="flex flex-col items-center mt-16 gap-8">
+        <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+          <button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black">
+            Agregar Paquete
+          </button>
+        </RoleBasedComponent>
+        <p className="text-center mt-8">No hay paquetes disponibles.</p>
+      </div>
+    )
   }
 
   return (
     <div className="flex flex-col items-center mt-16 gap-8">
       <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
-        <button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black transition-all duration-200 hover:scale-105">
+        <button onClick={() => navigate("/crearPaquete")} className="w-max p-3 rounded-full bg-white text-black">
           Agregar Paquete
         </button>
       </RoleBasedComponent>
       <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {paquetes.map((paquete, index) => {
           const enEdicion = editandoId === paquete.id_paquete
+          const esFavorito = favoritos.some((fav) => fav.id_paquete === paquete.id_paquete)
 
           return (
-            <div key={paquete.id_paquete || index} className="bg-white rounded-2xl shadow p-4">
+            <div key={paquete.id_paquete || index} className="bg-white rounded-2xl shadow p-4 relative">
+              {/* Botón de favorito en la esquina superior derecha */}
+              <button
+                onClick={() => handleToggleFavorito(paquete)}
+                className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 hover:scale-110 z-10 ${
+                  esFavorito
+                    ? "bg-red-500 hover:bg-red-600 text-white shadow-lg"
+                    : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500 shadow-md backdrop-blur-sm"
+                }`}
+                title={esFavorito ? "Remover de favoritos" : "Agregar a favoritos"}
+              >
+                <Heart className={`w-4 h-4 ${esFavorito ? "fill-current" : ""}`} />
+              </button>
+
               {paquete.imagenUrl ? (
                 <img
                   src={paquete.imagenUrl || "/placeholder.svg"}
@@ -215,3 +272,36 @@ export const Paquetes = () => {
     </div>
   )
 }
+
+export const PaquetesCard = ({ paquete, onComprar, onFavorito, esFavorito }) => (
+  <div className="min-w-[300px] max-w-xs bg-white rounded-2xl shadow p-4 border border-emerald-100 flex-shrink-0 relative">
+    <button
+      onClick={() => onFavorito(paquete)}
+      className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 hover:scale-110 z-10 ${
+        esFavorito
+          ? "bg-red-500 hover:bg-red-600 text-white shadow-lg"
+          : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500 shadow-md backdrop-blur-sm"
+      }`}
+      title={esFavorito ? "Remover de favoritos" : "Agregar a favoritos"}
+    >
+      <Heart className={`w-4 h-4 ${esFavorito ? "fill-current" : ""}`} />
+    </button>
+    <h4 className="text-xl font-semibold mb-1">{paquete.nombrePaquete || paquete.paquete || "Paquete"}</h4>
+    <p className="text-gray-600 text-sm mb-2">{paquete.descripcion || ""}</p>
+    <ul className="text-sm space-y-1 mb-2">
+      {paquete.destino && <li><strong>Destino:</strong> {paquete.destino}</li>}
+      {paquete.hotel && <li><strong>Hotel:</strong> {paquete.hotel}</li>}
+      {paquete.duracion && <li><strong>Duración:</strong> {paquete.duracion}</li>}
+      {paquete.fechaSalida && <li><strong>Salida:</strong> {paquete.fechaSalida}</li>}
+      {paquete.precio && <li><strong>Precio:</strong> {paquete.precio}</li>}
+      {paquete.calificacion && <li><strong>Calificación:</strong> {paquete.calificacion}</li>}
+      {paquete.estado && <li><strong>Estado:</strong> {paquete.estado}</li>}
+    </ul>
+    <button
+      onClick={() => onComprar(paquete.nombrePaquete || paquete.paquete)}
+      className="w-full mt-2 px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 hover:scale-105"
+    >
+      Comprar
+    </button>
+  </div>
+)
