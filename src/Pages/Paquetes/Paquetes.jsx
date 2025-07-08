@@ -9,10 +9,6 @@ export const Paquetes = () => {
   const [paquetes, setPaquetes] = useState([])
   const [editandoId, setEditandoId] = useState(null)
 
-  useEffect(() => {
-    obtenerPaquetes()
-  }, [])
-
   const handleChange = (index, e) => {
     const { name, value } = e.target
     const nuevosPaquetes = [...paquetes]
@@ -32,16 +28,19 @@ export const Paquetes = () => {
     }
   }
 
-  const handleComprar = async (nombre) => {
-    if (typeof nombre !== "string") {
-      console.error("Nombre inválido:", nombre)
-      return alert("Error interno al procesar el paquete.")
+  const handleComprar = async (paquete) => {
+    const price = Number(paquete.precioTotal)
+
+    if (isNaN(price) || price <= 0) {
+      alert("El precio del paquete no es válido")
+      return
     }
 
     try {
       const response = await api.post("/api/payments/create", {
-        price: 10.0,
-        name: nombre,
+        price, // ya validado
+        name: paquete.nombrePaquete,
+        id_paquete: paquete.id_paquete,
         quantity: 1,
       })
 
@@ -57,10 +56,12 @@ export const Paquetes = () => {
     }
   }
 
+
   const [loading, setLoading] = useState(true)
 
   const obtenerPaquetes = async () => {
     try {
+  
       const response = await api.get("/packages")
       console.log("📦 Respuesta completa:", response)
       console.log("Contenido:", response.data)
@@ -176,7 +177,7 @@ export const Paquetes = () => {
 
               <div className="mt-4 flex flex-col gap-2">
                 <button
-                  onClick={() => handleComprar(paquete.nombrePaquete)}
+                  onClick={() => handleComprar(paquete)}
                   className="px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 hover:scale-105"
                 >
                   Comprar
