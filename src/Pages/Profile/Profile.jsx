@@ -14,11 +14,26 @@ export const Profile = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
+      const confirm = await Swal.fire({
+        title: "¿Estás seguro?",
+        text: "¿Deseas cerrar sesión?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Sí, cerrar sesión",
+        cancelButtonText: "Cancelar"
+      })
+
+      if (!confirm.isConfirmed) return
+
+      // 🔐 Limpiar sesión
       localStorage.removeItem("accessToken")
       localStorage.removeItem("refreshToken")
       localStorage.removeItem("Rol")
       onLogout?.()
 
+      // ✅ Mensaje de cierre exitoso
       await Swal.fire({
         title: "¡Cerraste sesión!",
         text: "Esperamos verte pronto.",
