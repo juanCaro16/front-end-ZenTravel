@@ -25,6 +25,7 @@ import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
 import useAuth  from "./Hooks/useAuth"
 import { Hoteles } from "./Pages/Hoteles/Hoteles"
 import { MisViajes } from "./Pages/MisViajes/MisViajes"
+import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
 
 export const App = () => {
   const { isAuthenticated, userRole, login, logout } = useAuth()
@@ -98,6 +99,14 @@ export const App = () => {
           element={
             <ProtectedRoute>
               <Hoteles />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/CrearHoteles"
+          element={
+            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
+              <CrearHoteles />
             </ProtectedRoute>
           }
         />
