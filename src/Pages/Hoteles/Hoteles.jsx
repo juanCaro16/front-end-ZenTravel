@@ -308,69 +308,11 @@ export const Hoteles = () => {
                     </span>
                   </div>
                   {yaCalificado && (
-
-                    <span className="ml-2 text-xs text-emerald-600 font-semibold">¡Ya calificaste!</span>
-                  )}
-                </li>
-              </ul>
-
-              <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
-                <div className="mt-4 flex flex-col gap-2">
-                  {enEdicion ? (
-                    <>
-                      <button
-                        onClick={() => handleGuardar(hotel)}
-                        className="px-5 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200"
-                      >
-                        Guardar
-                      </button>
-                      <button
-                        onClick={() => setEditandoId(null)}
-                        className="px-5 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-xl transition-all duration-200"
-                      >
-                        Cancelar
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => setEditandoId(hotel.id_hotel)}
-                        className="px-5 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200"
-                      >
-                        Editar
-                      </button>
-                      <button
-                        className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200"
-                        onClick={() => handleEliminar(hotel.id_hotel)}
-                      >
-                        Eliminar
-                      </button>
-                    </>
-                    
-                  )}
-                </div>
-              </RoleBasedComponent>
-              <div className="mt-2">
-                <button
-                  onClick={() => setVerHabitacionesId(hotel.id_hotel)}
-                  className="px-5 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-xl transition-all duration-200 w-[100%]"
-                >
-                  Ver habitaciones
-                </button>
-              </div>
-
-              {/* 🖼️ Galería de habitaciones */}
-              {verHabitacionesId === hotel.id_hotel && (
-                <div className="mt-4 relative">
-                  {(() => {
-                    let imagenes = [];
-
                     <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-semibold">
                       ¡Ya calificaste!
                     </span>
                   )}
                 </div>
-
 
                 <button
                   onClick={() => setHotelSeleccionado(hotel)}
@@ -416,24 +358,6 @@ export const Hoteles = () => {
                   ) : (
                     <h2 className="text-3xl font-bold mb-2">{hotelSeleccionado.nombre}</h2>
                   )}
-
-
-                    return imagenes.length ? (
-                      <HabitacionCarrusel imagenes={imagenes} />
-                    ) : (
-                      <p className="text-gray-500">No hay imágenes de habitaciones disponibles.</p>
-                    );
-                  })()}
-
-                  <button
-                    onClick={() => setVerHabitacionesId(null)}
-                    className="mt-3 px-4 py-2 text-sm bg-gray-300 hover:bg-gray-400 rounded"
-                  >
-                    Cerrar galería
-                  </button> 
-                </div>
-              )}
-
 
                   <div className="flex items-center gap-2">
                     <div className="flex items-center">
@@ -774,7 +698,6 @@ export const Hoteles = () => {
                   </RoleBasedComponent>
                 </div>
               </div>
-
             </div>
           </div>
         )}
