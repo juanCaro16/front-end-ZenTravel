@@ -1,7 +1,22 @@
+"use client"
+
 import { useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
-import { Package, MapPin, Calendar, DollarSign, ImageIcon, FileText, Hotel, Plane, Clock, Percent, Save, ArrowLeft, Upload, Eye, Star, } from "lucide-react"
+import {
+  Package,
+  MapPin,
+  Calendar,
+  DollarSign,
+  FileText,
+  Hotel,
+  Plane,
+  Clock,
+  Percent,
+  Save,
+  ArrowLeft,
+  Star,
+} from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export const CrearPaquetes = () => {
@@ -19,23 +34,21 @@ export const CrearPaquetes = () => {
     categoria: "",
     incluye: [],
     noIncluye: [],
-    cantidad: ""
+    cantidad: "",
   })
 
-  const [opcionesTransporte, setOpcionesTransporte] = useState([]);
-  const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
-
-  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
-  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
-
-  const [imagen, setImagen] = useState(null);
+  const [opcionesTransporte, setOpcionesTransporte] = useState([])
+  const [opcionesHabitacion, setOpcionesHabitacion] = useState([])
+  const [transporte, setTransporte] = useState({ origen: "", destino: "" })
+  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" })
+  const [imagen, setImagen] = useState(null)
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
 
   const handleFileChange = (e) => {
-    setImagen(e.target.files[0]);
-  };
+    setImagen(e.target.files[0])
+  }
 
   const handleChange = (e) => {
     const { name, value, type } = e.target
@@ -57,57 +70,53 @@ export const CrearPaquetes = () => {
       setMensaje("")
       setError("")
       setIsLoading(true)
-
       const formToSend = new FormData()
 
       if (!imagen || !(imagen instanceof File)) {
-        console.error("⚠️ La imagen no es válida o no fue seleccionada.");
-        return;
+        setError("⚠️ La imagen no es válida o no fue seleccionada.")
+        setIsLoading(false)
+        return
       }
 
-      formToSend.append("imagen", imagen);
-      formToSend.append("nombrePaquete", formData.nombrePaquete);
-      formToSend.append("descripcion", formData.descripcion);
-      formToSend.append("duracionDias", formData.duracionDias.toString());
-      formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible); // ✅ corregido
-      formToSend.append("descuento", formData.descuento.toString());
-      formToSend.append("Habitacion", Number(formData.Habitacion));
-      formToSend.append("nombreTransporte", formData.nombreTransporte);
-      formToSend.append("nombreDestino", formData.nombreDestino);
-      formToSend.append("categoria", formData.categoria);
-      formToSend.append("incluye", JSON.stringify(formData.incluye));
-      formToSend.append("noIncluye", JSON.stringify(formData.noIncluye));
-      formToSend.append("cantidad", (formData.cantidad ?? "1").toString());
+      formToSend.append("imagen", imagen)
+      formToSend.append("nombrePaquete", formData.nombrePaquete)
+      formToSend.append("descripcion", formData.descripcion)
+      formToSend.append("duracionDias", formData.duracionDias.toString())
+      formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible)
+      formToSend.append("descuento", formData.descuento.toString())
+      // ✅ CORREGIDO: Number en lugar de number
+      formToSend.append("Habitacion", Number(formData.Habitacion).toString())
+      formToSend.append("nombreTransporte", formData.nombreTransporte)
+      formToSend.append("nombreDestino", formData.nombreDestino)
+      formToSend.append("categoria", formData.categoria)
+      formToSend.append("incluye", JSON.stringify(formData.incluye))
+      formToSend.append("noIncluye", JSON.stringify(formData.noIncluye))
+      formToSend.append("cantidad", (formData.cantidad ?? "1").toString())
 
-      for (let pair of formToSend.entries()) {
-        console.log(`${pair[0]}:`, pair[1]);
+      for (const pair of formToSend.entries()) {
+        console.log(`${pair[0]}:`, pair[1])
       }
       
 
-      // ✅ Cambiar la URL del endpoint a la ruta correcta
       const response = await api.post("packages/Create/Package", formToSend, {
         headers: {
-          "Content-Type": "multipart/form-data", // obligatorio para enviar imágenes
+          "Content-Type": "multipart/form-data",
         },
-      });
+      })
 
-      console.log("✅ Éxito:", response.data);
-
+      console.log("✅ Éxito:", response.data)
       await Swal.fire({
         title: "¡Éxito!",
         text: "Paquete creado correctamente",
         icon: "success",
         confirmButtonColor: "#10b981",
       })
-
       navigate("/paquetes")
     } catch (err) {
-      console.error("❌ Error completo:", err);
-      console.error("❌ Response data:", err.response?.data);
-      console.error("❌ Response status:", err.response?.status);
-
+      console.error("❌ Error completo:", err)
+      console.error("❌ Response data:", err.response?.data)
+      console.error("❌ Response status:", err.response?.status)
       let errMsg = "Hubo un error al crear el paquete"
-
       if (err.response?.status === 400) {
         errMsg = "Datos inválidos. Verifica que todos los campos estén correctos."
       } else if (err.response?.status === 401) {
@@ -117,7 +126,6 @@ export const CrearPaquetes = () => {
       } else if (err.response?.data?.message) {
         errMsg = err.response.data.message
       }
-
       setError(errMsg)
       Swal.fire("Error", errMsg, "error")
     } finally {
@@ -127,49 +135,36 @@ export const CrearPaquetes = () => {
 
   const buscarTransportes = async () => {
     if (!transporte.origen || !transporte.destino) {
-      alert("Debes ingresar origen y destino.");
-      return;
+      alert("Debes ingresar origen y destino.")
+      return
     }
-
     try {
-      const res = await api.get(`packages/Transport/${transporte.origen}/${transporte.destino}`);
-      setOpcionesTransporte(res.data);
+      const res = await api.get(`packages/Transport/${transporte.origen}/${transporte.destino}`)
+      setOpcionesTransporte(res.data)
     } catch (error) {
-      console.error("❌ Error al buscar transportes:", error);
-      alert("Ocurrió un error al buscar transportes.");
+      console.error("❌ Error al buscar transportes:", error)
+      alert("Ocurrió un error al buscar transportes.")
     }
   }
 
-const buscarHabitacion = async () => {
-  if (!filtroHabitacion.nombreHotel) {
-    Swal.fire("Campo requerido", "Debes ingresar el nombre del hotel.", "warning");
-    return;
-  }
-
-  try {
-    console.log("🔍 Buscando habitaciones para:", filtroHabitacion.nombreHotel);
-    
-    const resultado = await api.get(`packages/RoomReservation/${filtroHabitacion.nombreHotel}`);
-    console.log("✅ Habitaciones encontradas:", resultado.data);
-
-    // Extraer solo el arreglo resultante
-    setOpcionesHabitacion(resultado.data.result || []);
-
-    if ((resultado.data.result || []).length === 0) {
-      Swal.fire("Sin resultados", "No hay habitaciones disponibles para este hotel.", "info");
+  const buscarHabitacion = async () => {
+    if (!filtroHabitacion.nombreHotel) {
+      Swal.fire("Campo requerido", "Debes ingresar el nombre del hotel.", "warning")
+      return
     }
-
-  } catch (error) {
-    console.error("❌ Error al buscar habitaciones:", error);
-    Swal.fire(
-      "Error",
-      error.response?.data?.message || "Ocurrió un error al buscar habitaciones.",
-      "error"
-    );
+    try {
+      console.log("🔍 Buscando habitaciones para:", filtroHabitacion.nombreHotel)
+      const resultado = await api.get(`packages/RoomReservation/${filtroHabitacion.nombreHotel}`)
+      console.log("✅ Habitaciones encontradas:", resultado.data)
+      setOpcionesHabitacion(resultado.data.result || [])
+      if ((resultado.data.result || []).length === 0) {
+        Swal.fire("Sin resultados", "No hay habitaciones disponibles para este hotel.", "info")
+      }
+    } catch (error) {
+      console.error("❌ Error al buscar habitaciones:", error)
+      Swal.fire("Error", error.response?.data?.message || "Ocurrió un error al buscar habitaciones.", "error")
+    }
   }
-};
-
-
 
   const nextStep = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1)
@@ -182,13 +177,13 @@ const buscarHabitacion = async () => {
   const isStepValid = () => {
     switch (currentStep) {
       case 1:
-        return formData.nombrePaquete && formData.descripcion
+        return formData.nombrePaquete && formData.descripcion && formData.categoria
       case 2:
         return formData.nombreDestino && formData.Habitacion && formData.nombreTransporte
       case 3:
-        return true // Este paso es opcional ahora
+        return true
       case 4:
-        return formData.duracionDias && formData.fechaInicioDisponible
+        return formData.duracionDias && formData.fechaInicioDisponible && formData.cantidad
       default:
         return false
     }
@@ -212,7 +207,6 @@ const buscarHabitacion = async () => {
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
               />
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-2" />
@@ -227,7 +221,6 @@ const buscarHabitacion = async () => {
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white resize-none"
               />
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <Star className="w-4 h-4 inline mr-2" />
@@ -239,10 +232,11 @@ const buscarHabitacion = async () => {
                     key={cat.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, categoria: cat.value })}
-                    className={`p-4 border-2 rounded-xl transition-all duration-200 ${formData.categoria === cat.value
+                    className={`p-4 border-2 rounded-xl transition-all duration-200 ${
+                      formData.categoria === cat.value
                         ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                         : "border-gray-300 hover:border-emerald-300 hover:bg-emerald-50"
-                      }`}
+                    }`}
                   >
                     <div className="text-2xl mb-2">{cat.icon}</div>
                     <div className="font-medium">{cat.label}</div>
@@ -250,13 +244,11 @@ const buscarHabitacion = async () => {
                 ))}
               </div>
             </div>
-
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Subir imagen:</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Subir imagen *:</label>
               <input
                 type="file"
                 className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
-
                 accept="image/*"
                 name="imagen"
                 onChange={handleFileChange}
@@ -264,12 +256,14 @@ const buscarHabitacion = async () => {
               />
             </div>
             {imagen && (
-              <img src={URL.createObjectURL(imagen)} alt="Vista previa" className="mt-2 rounded-md w-32 h-32 object-cover" />
+              <img
+                src={URL.createObjectURL(imagen) || "/placeholder.svg"}
+                alt="Vista previa"
+                className="mt-2 rounded-md w-32 h-32 object-cover"
+              />
             )}
-
           </div>
         )
-
       case 2:
         return (
           <div className="space-y-6">
@@ -282,128 +276,118 @@ const buscarHabitacion = async () => {
                 name="nombreDestino"
                 value={formData.nombreDestino}
                 onChange={(e) => {
-                  handleChange(e); // actualiza el formData
-                  setTransporte(prev => ({ ...prev, destino: e.target.value })); // también actualiza transporte.destino
+                  handleChange(e)
+                  setTransporte((prev) => ({ ...prev, destino: e.target.value }))
                 }}
                 placeholder="Ej: Cartagena de Indias"
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
               />
             </div>
 
-        <div>
-              
-        {/* Nombre del hotel */}
-        <input
-          name="nombreHotel"
-          value={filtroHabitacion.nombreHotel}
-          onChange={(e) =>
-            setFiltroHabitacion((prev) => ({ ...prev, nombreHotel: e.target.value }))
-          }
-          placeholder="Ej: Hotel Boutique Casa San Agustín"
-          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
-        />
-
-        {/* Botón buscar */}
-        <button
-          type="button"
-          onClick={buscarHabitacion}
-          className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        >
-          Buscar habitación
-        </button>
-        <option value="">Selecciona un transporte</option>
-        {opcionesHabitacion.length > 0 && (
-          <div className="w-full mt-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Habitaciones disponibles
-            </label>
-            <select
-              name="Habitacion"
-              value={formData.Habitacion}
-              onChange={(e) =>
-                setFormData({ ...formData, Habitacion: e.target.value })
-              }
-              className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
-            >
-              {opcionesHabitacion.map((item) => (
-                <option
-                  key={item.id_habitacion}
-                  value={item.id_habitacion}
+            {/* ✅ SECCIÓN DE HABITACIONES CORREGIDA */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Hotel className="w-5 h-5 mr-2" />
+                Buscar Habitación
+              </h3>
+              <div className="space-y-4">
+                <input
+                  name="nombreHotel"
+                  value={filtroHabitacion.nombreHotel}
+                  onChange={(e) => setFiltroHabitacion((prev) => ({ ...prev, nombreHotel: e.target.value }))}
+                  placeholder="Ej: Hotel Boutique Casa San Agustín"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+                />
+                <button
+                  type="button"
+                  onClick={buscarHabitacion}
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  {`#${item.numero} - ${item.tipo}, Precio: $${item.precio}`}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
-      </div>
+                  Buscar habitación
+                </button>
 
-            {/* Origen y Buscar Transportes */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Origen *
-              </label>
-              <input
-                type="text"
-                value={transporte.origen}
-                onChange={(e) => setTransporte((prev) => ({ ...prev, origen: e.target.value }))}
-                placeholder="Ciudad de origen"
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white mb-4"
-              />
-              <button
-                type="button"
-                onClick={buscarTransportes}
-                className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
-              >
-                Buscar Transportes
-              </button>
-              {opcionesTransporte.length > 0 && (
-                <div className="w-full h-20 mt-4">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Transporte disponible *
-                  </label>
-                  <select
-                    name="nombreTransporte"
-                    value={formData.nombreTransporte}
-                    onChange={(e) =>
-                      setFormData({ ...formData, nombreTransporte: e.target.value })
-                    }
-                    className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
-                    size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
-                  >
-                    <option value="">Selecciona un transporte</option>
-                    {opcionesTransporte.map((item) => (
-                      <option
-                        key={item.id_transporte}
-                        value={item.id_transporte}
-                        className="whitespace-normal break-words"
-                      >
-                        {`🚌 Transporte a ${item.destino} desde ${item.origen}, empresa: ${item.empresa}, tipo: ${item.tipo}, pasajes: ${item.capacidad}, salida: ${new Date(item.fecha_salida).toLocaleDateString()}`}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+                {opcionesHabitacion.length > 0 && (
+                  <div className="w-full">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Habitaciones disponibles *</label>
+                    <select
+                      name="Habitacion"
+                      value={formData.Habitacion}
+                      onChange={(e) => setFormData({ ...formData, Habitacion: e.target.value })}
+                      className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700"
+                    >
+                      <option value="">Selecciona una habitación</option>
+                      {opcionesHabitacion.map((item) => (
+                        <option key={item.id_habitacion} value={item.id_habitacion}>
+                          {`#${item.numero} - ${item.tipo}, Precio: $${item.precio}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ✅ SECCIÓN DE TRANSPORTES CORREGIDA */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <Plane className="w-5 h-5 mr-2" />
+                Buscar Transporte
+              </h3>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  value={transporte.origen}
+                  onChange={(e) => setTransporte((prev) => ({ ...prev, origen: e.target.value }))}
+                  placeholder="Ciudad de origen"
+                  className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
+                />
+                <button
+                  type="button"
+                  onClick={buscarTransportes}
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+                >
+                  Buscar Transportes
+                </button>
+
+                {opcionesTransporte.length > 0 && (
+                  <div className="w-full">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Transporte disponible *</label>
+                    <select
+                      name="nombreTransporte"
+                      value={formData.nombreTransporte}
+                      onChange={(e) => setFormData({ ...formData, nombreTransporte: e.target.value })}
+                      className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700"
+                    >
+                      <option value="">Selecciona un transporte</option>
+                      {opcionesTransporte.map((item) => (
+                        <option key={item.id_transporte} value={item.id_transporte}>
+                          {`🚌 Transporte a ${item.destino} desde ${item.origen}, empresa: ${item.empresa}, tipo: ${item.tipo}, pasajes: ${item.capacidad}, salida: ${new Date(item.fecha_salida).toLocaleDateString()}`}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )
-
       case 3:
         return (
           <div className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-4">
                 <Star className="w-4 h-4 inline mr-2" />
-                ¿Qué incluye el paquete? *
+                ¿Qué incluye el paquete?
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {incluyeOpciones.map((opcion) => (
                   <label
                     key={opcion}
-                    className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formData.incluye.includes(opcion)
+                    className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                      formData.incluye.includes(opcion)
                         ? "border-emerald-500 bg-emerald-50"
                         : "border-gray-300 hover:border-emerald-300 hover:bg-emerald-50"
-                      }`}
+                    }`}
                   >
                     <input
                       type="checkbox"
@@ -412,8 +396,9 @@ const buscarHabitacion = async () => {
                       className="sr-only"
                     />
                     <div
-                      className={`w-5 h-5 rounded border-2 mr-3 flex items-center justify-center ${formData.incluye.includes(opcion) ? "border-emerald-500 bg-emerald-500" : "border-gray-300"
-                        }`}
+                      className={`w-5 h-5 rounded border-2 mr-3 flex items-center justify-center ${
+                        formData.incluye.includes(opcion) ? "border-emerald-500 bg-emerald-500" : "border-gray-300"
+                      }`}
                     >
                       {formData.incluye.includes(opcion) && (
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -430,7 +415,6 @@ const buscarHabitacion = async () => {
                 ))}
               </div>
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Servicios adicionales no incluidos
@@ -452,7 +436,6 @@ const buscarHabitacion = async () => {
             </div>
           </div>
         )
-
       case 4:
         return (
           <div className="space-y-6">
@@ -472,27 +455,23 @@ const buscarHabitacion = async () => {
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Clock className="w-4 h-4 inline mr-2" />
-                  pasajes (cantidad) *
+                  <Package className="w-4 h-4 inline mr-2" />
+                  Pasajes (cantidad) *
                 </label>
                 <input
                   type="number"
                   name="cantidad"
                   value={formData.cantidad}
                   onChange={handleChange}
-                  placeholder="5"
+                  placeholder="2"
                   min="1"
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-
             </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <Percent className="w-4 h-4 inline mr-2" />
@@ -509,7 +488,6 @@ const buscarHabitacion = async () => {
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <Calendar className="w-4 h-4 inline mr-2" />
@@ -523,10 +501,7 @@ const buscarHabitacion = async () => {
                   className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
                 />
               </div>
-
             </div>
-
-            {/* Información sobre el proceso */}
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
               <h3 className="font-semibold text-emerald-900 mb-3">¡Casi listo!</h3>
               <p className="text-emerald-800">
@@ -536,7 +511,6 @@ const buscarHabitacion = async () => {
             </div>
           </div>
         )
-
       default:
         return null
     }
@@ -598,17 +572,19 @@ const buscarHabitacion = async () => {
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${currentStep >= step.number
+                  className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${
+                    currentStep >= step.number
                       ? "border-emerald-500 bg-emerald-500 text-white"
                       : "border-gray-300 bg-white text-gray-400"
-                    }`}
+                  }`}
                 >
                   {step.icon}
                 </div>
                 <div className="ml-3 hidden md:block">
                   <p
-                    className={`text-sm font-medium ${currentStep >= step.number ? "text-emerald-600" : "text-gray-400"
-                      }`}
+                    className={`text-sm font-medium ${
+                      currentStep >= step.number ? "text-emerald-600" : "text-gray-400"
+                    }`}
                   >
                     Paso {step.number}
                   </p>
@@ -618,8 +594,9 @@ const buscarHabitacion = async () => {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`hidden md:block w-16 h-1 mx-4 rounded ${currentStep > step.number ? "bg-emerald-500" : "bg-gray-300"
-                      }`}
+                    className={`hidden md:block w-16 h-1 mx-4 rounded ${
+                      currentStep > step.number ? "bg-emerald-500" : "bg-gray-300"
+                    }`}
                   />
                 )}
               </div>
@@ -643,7 +620,6 @@ const buscarHabitacion = async () => {
             <ArrowLeft className="w-4 h-4" />
             <span>Anterior</span>
           </button>
-
           {currentStep < 4 ? (
             <button
               onClick={nextStep}
@@ -675,15 +651,12 @@ const buscarHabitacion = async () => {
             <p className="text-green-600 font-medium">{mensaje}</p>
           </div>
         )}
-
         {error && (
           <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl">
             <p className="text-red-600 font-medium">{error}</p>
           </div>
         )}
-
       </div>
     </div>
   )
-
 }
