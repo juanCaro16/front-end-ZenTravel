@@ -1,3 +1,4 @@
+"use client"
 
 import { useState, useEffect } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
@@ -6,7 +7,6 @@ import { useNavigate } from "react-router-dom"
 import { RoleBasedComponent } from "../../Components/RoleBasedComponent/RoleBasedComponent"
 import { HabitacionCarrusel } from "../../Components/HabitacionCarrusel/HabitacionCarrusel"
 
-// Componente de estrellas realista y único por hotel
 const StarRating = ({ value, onChange, editable = true, uniqueId = "" }) => {
   const [hovered, setHovered] = useState(null)
   const displayValue = hovered || value
@@ -61,7 +61,7 @@ export const Hoteles = () => {
   const [editandoId, setEditandoId] = useState(null)
   const [loading, setLoading] = useState(true)
   const [verHabitacionesId, setVerHabitacionesId] = useState(null)
-  const [hotelSeleccionado, setHotelSeleccionado] = useState(null) // Nuevo estado para el modal
+  const [hotelSeleccionado, setHotelSeleccionado] = useState(null)
   const [calificados, setCalificados] = useState(() => {
     const saved = localStorage.getItem("hotelesCalificados")
     return saved ? JSON.parse(saved) : []
@@ -104,7 +104,6 @@ export const Hoteles = () => {
       Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
       setEditandoId(null)
       obtenerHoteles()
-      // Actualizar el hotel seleccionado si está abierto
       if (hotelSeleccionado?.id_hotel === hotel.id_hotel) {
         setHotelSeleccionado({ ...hotelSeleccionado, ...data })
       }
@@ -134,11 +133,10 @@ export const Hoteles = () => {
         const nuevosHoteles = [...hoteles]
         nuevosHoteles[index] = {
           ...nuevosHoteles[index],
-          estrellas: nuevoPromedio, // 🔁 Actualiza el promedio directamente
+          estrellas: nuevoPromedio,
         }
         setHoteles(nuevosHoteles)
 
-        // Actualizar el hotel seleccionado si está abierto
         if (hotelSeleccionado?.id_hotel === hotel.id_hotel) {
           setHotelSeleccionado({ ...hotelSeleccionado, estrellas: nuevoPromedio })
         }
@@ -165,8 +163,7 @@ export const Hoteles = () => {
       try {
         await api.delete(`/admin/deleteHotel/${id_hotel}`)
         Swal.fire("Eliminado", "El hotel ha sido eliminado.", "success")
-        obtenerHoteles() // Refresca la lista
-        // Cerrar modal si el hotel eliminado estaba abierto
+        obtenerHoteles()
         if (hotelSeleccionado?.id_hotel === id_hotel) {
           setHotelSeleccionado(null)
         }
@@ -185,11 +182,44 @@ export const Hoteles = () => {
     }
   }
 
+  const handleCrearPaquete = (hotel) => {
+    try {
+      navigate(`/CrearPaquete/${hotel.id_hotel}`, {
+        state: {
+          hotel: hotel,
+          nombre: hotel.nombre,
+          ubicacion: hotel.ubicacion,
+        },
+      })
+    } catch (error) {
+      console.error("Error al navegar:", error)
+      Swal.fire("Error", "No se pudo navegar a la página de crear paquete", "error")
+    }
+  }
+
+  const handleHacerReserva = (hotel) => {
+    try {
+      navigate(`/ReservarHotel/${hotel.id_hotel}`, {
+        state: {
+          hotel: hotel,
+          nombre: hotel.nombre,
+          ubicacion: hotel.ubicacion,
+          estrellas: hotel.estrellas,
+          descripcion: hotel.descripcion,
+          imagenes: hotel.imagenes,
+        },
+      })
+    } catch (error) {
+      console.error("Error al navegar:", error)
+      Swal.fire("Error", "No se pudo navegar a la página de reserva", "error")
+    }
+  }
+
   if (loading) return <p className="text-center mt-8 text-slate-600">Cargando hoteles...</p>
 
   return (
-    
-      <div className="flex flex-col items-center pt-16 gap-8 ">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="flex flex-col items-center pt-16 gap-8">
         <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
           <button
             onClick={handleAgregarHotel}
@@ -284,7 +314,6 @@ export const Hoteles = () => {
                   )}
                 </div>
 
-                {/* Botón Ver Hotel */}
                 <button
                   onClick={() => setHotelSeleccionado(hotel)}
                   className="w-full px-4 py-2 bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
@@ -296,11 +325,9 @@ export const Hoteles = () => {
           })}
         </div>
 
-        {/* Modal mejorado */}
         {hotelSeleccionado && (
           <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
-              {/* Header del modal */}
               <div className="relative bg-gradient-to-r from-blue-400 via-cyan-500 to-teal-500 text-white p-6">
                 <button
                   onClick={() => {
@@ -357,12 +384,9 @@ export const Hoteles = () => {
                 </div>
               </div>
 
-              {/* Contenido del modal */}
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                 <div className="grid lg:grid-cols-2 gap-8">
-                  {/* Información del hotel */}
                   <div className="space-y-6">
-                    {/* Imagen del hotel */}
                     <div>
                       <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center">
                         <svg
@@ -525,7 +549,6 @@ export const Hoteles = () => {
                     </div>
                   </div>
 
-                  {/* Imágenes de habitaciones */}
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center">
@@ -539,7 +562,7 @@ export const Hoteles = () => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a 2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
                         Habitaciones
@@ -551,7 +574,7 @@ export const Hoteles = () => {
                               verHabitacionesId === hotelSeleccionado.id_hotel ? null : hotelSeleccionado.id_hotel,
                             )
                           }
-                          className="w-full px-4 py-3 text-black bg-emerald-100 cursor-pointer  rounded-lg transition-all  duration-200 font-semibold shadow-md hover:shadow-lg hover:bg-emerald-200"
+                          className="w-full px-4 py-3 bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
                         >
                           {verHabitacionesId === hotelSeleccionado.id_hotel
                             ? "Ocultar Habitaciones"
@@ -601,11 +624,44 @@ export const Hoteles = () => {
               {/* Footer con botones de acción */}
               <div className="border-t bg-gradient-to-r from-slate-50 to-blue-50 px-6 py-4">
                 <div className="flex justify-between items-center">
-                  <div className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
-                    ID: {hotelSeleccionado.id_hotel}
+                  <div className="flex items-center gap-3">
+                    <div className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
+                      ID: {hotelSeleccionado.id_hotel}
+                    </div>
+
+                    <button
+                      onClick={() => handleCrearPaquete(hotelSeleccionado)}
+                      className="px-4 py-2 bg-gradient-to-r from-orange-400 to-amber-500 hover:from-orange-500 hover:to-amber-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        />
+                      </svg>
+                      Crear Paquete
+                    </button>
+
+                    <button
+                      onClick={() => handleHacerReserva(hotelSeleccionado)}
+                      className="px-4 py-2 bg-gradient-to-r from-green-400 to-emerald-500 hover:from-green-500 hover:to-emerald-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center gap-2"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3a1 1 0 011-1h6a1 1 0 011 1v4h3a2 2 0 012 2v6a2 2 0 01-2-2H5a2 2 0 01-2-2V9a2 2 0 012-2h3z"
+                        />
+                      </svg>
+                      Hacer Reserva
+                    </button>
                   </div>
 
-                  <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+                  {/* Botones de Editar y Eliminar - SOLO PARA ADMIN */}
+                  <RoleBasedComponent allowedRoles={["admin"]}>
                     <div className="flex gap-3">
                       {editandoId === hotelSeleccionado.id_hotel ? (
                         <>
@@ -645,7 +701,7 @@ export const Hoteles = () => {
             </div>
           </div>
         )}
-      
+      </div>
     </div>
   )
 }
