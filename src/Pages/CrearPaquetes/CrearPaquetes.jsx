@@ -23,15 +23,22 @@ export const CrearPaquetes = () => {
   })
 
   const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+
+  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [imagen ,setImagen] = useState(null);
+
   const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
 
   const [transporte, setTransporte] = useState({ origen: '', destino: '' });
   const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
 
   const [imagen, setImagen] = useState(null);
+
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  // Estado para controlar el tamaño del select de transporte
+  const [transporteSelectSize, setTransporteSelectSize] = useState(1);
 
   const handleFileChange = (e) => {
     setImagen(e.target.files[0]);
@@ -365,11 +372,14 @@ const buscarHabitacion = async () => {
                   <select
                     name="nombreTransporte"
                     value={formData.nombreTransporte}
-                    onChange={(e) =>
-                      setFormData({ ...formData, nombreTransporte: e.target.value })
-                    }
+                    onFocus={() => setTransporteSelectSize(Math.min(opcionesTransporte.length, 4))}
+                    onBlur={() => setTransporteSelectSize(1)}
+                    onChange={(e) => {
+                      setFormData({ ...formData, nombreTransporte: e.target.value });
+                      setTransporteSelectSize(1); // Cierra la lista al seleccionar
+                    }}
                     className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
-                    size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
+                    size={transporteSelectSize}
                   >
                     <option value="">Selecciona un transporte</option>
                     {opcionesTransporte.map((item) => (

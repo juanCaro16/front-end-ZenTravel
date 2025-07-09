@@ -1,3 +1,5 @@
+"use client"
+
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
@@ -15,6 +17,7 @@ import {
   Eye,
   Edit2,
   Trash2,
+  MessageCircle,
 } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
@@ -91,6 +94,230 @@ const NewUserModal = ({ open, onClose, onCreate }) => {
   )
 }
 
+const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
+  const [form, setForm] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (open && paquete) {
+      setForm({
+        id_paquete: paquete.id_paquete,
+        nombrePaquete: paquete.nombrePaquete || "",
+        descripcion: paquete.descripcion || "",
+        duracionDias: paquete.duracionDias || "",
+        descuento: paquete.descuento || 0,
+        imagenUrl: paquete.imagenUrl || "",
+        estado: paquete.estado || "activo",
+        nombre_destino: paquete.nombre_destino || paquete.nombreDestino || "",
+        categoria: paquete.categoria || "",
+        nombreHotel: paquete.nombreHotel || "",
+        numero_habitacion: paquete.numero_habitacion || "",
+        // Campos de solo lectura
+        precio: paquete.precio || 0,
+        precioTotal: paquete.precioTotal || 0,
+      })
+    }
+  }, [open, paquete])
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setLoading(true)
+    await onSave(form)
+    setLoading(false)
+  }
+
+  if (!open || !form) return null
+  return (
+    <div className="fixed inset-0 bg-emerald-100 bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Editar Paquete</h3>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Nombre del Paquete */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Paquete</label>
+            <input
+              name="nombrePaquete"
+              value={form.nombrePaquete}
+              onChange={handleChange}
+              required
+              placeholder="Nombre del paquete"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+            />
+          </div>
+
+          {/* Descripción */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea
+              name="descripcion"
+              value={form.descripcion}
+              onChange={handleChange}
+              placeholder="Descripción del paquete"
+              rows="3"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+            />
+          </div>
+
+          {/* Duración y Descuento */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Duración (días)</label>
+              <input
+                name="duracionDias"
+                value={form.duracionDias}
+                onChange={handleChange}
+                required
+                placeholder="Duración en días"
+                type="number"
+                min="1"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
+              <input
+                name="descuento"
+                value={form.descuento}
+                onChange={handleChange}
+                placeholder="Descuento"
+                type="number"
+                min="0"
+                max="100"
+                step="0.01"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* URL de Imagen */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
+            <input
+              name="imagenUrl"
+              value={form.imagenUrl}
+              onChange={handleChange}
+              placeholder="https://ejemplo.com/imagen.jpg"
+              type="url"
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+            />
+          </div>
+
+          {/* Estado */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+            <select
+              name="estado"
+              value={form.estado}
+              onChange={handleChange}
+              className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+
+          {/* Destino y Categoría */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Destino</label>
+              <input
+                name="nombre_destino"
+                value={form.nombre_destino}
+                onChange={handleChange}
+                placeholder="Destino del paquete"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
+              <select
+                name="categoria"
+                value={form.categoria}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              >
+                <option value="">Seleccionar categoría</option>
+                <option value="playa">Playa</option>
+                <option value="aventura">Aventura</option>
+                <option value="cultural">Cultural</option>
+                <option value="naturaleza">Naturaleza</option>
+                <option value="ciudad">Ciudad</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Hotel y Habitación */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Hotel</label>
+              <input
+                name="nombreHotel"
+                value={form.nombreHotel}
+                onChange={handleChange}
+                placeholder="Nombre del hotel"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Número de Habitación</label>
+              <input
+                name="numero_habitacion"
+                value={form.numero_habitacion}
+                onChange={handleChange}
+                placeholder="Número de habitación"
+                className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
+          {/* Precio (Solo lectura) */}
+          <div className="bg-gray-50 p-4 rounded-lg border">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">
+              Información de Precio (Calculado automáticamente)
+            </h4>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">Precio base:</span>
+                <span className="ml-2 font-semibold">
+                  ${form.precio ? Number(form.precio).toLocaleString("es-CO") : "0"} COP
+                </span>
+              </div>
+              <div>
+                <span className="text-gray-600">Precio total:</span>
+                <span className="ml-2 font-semibold text-emerald-600">
+                  ${form.precioTotal ? Number(form.precioTotal).toLocaleString("es-CO") : "0"} COP
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Botones */}
+          <div className="flex space-x-3 pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 bg-emerald-500 text-white rounded-lg p-3 hover:bg-emerald-600 transition font-medium"
+            >
+              {loading ? "Guardando..." : "Guardar Cambios"}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-gray-500 text-white rounded-lg p-3 hover:bg-gray-600 transition font-medium"
+            >
+              Cancelar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  )
+}
+
 export const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState("dashboard")
   const [infoDashBoard, setInfoDashBoard] = useState(null)
@@ -99,6 +326,8 @@ export const AdminPanel = () => {
   const [filterRol, setFilterRol] = useState("")
   const [infoPaquetes, setInfoPaquetes] = useState(null)
   const [loadingPaquetes, setLoadingPaquetes] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editPaquete, setEditPaquete] = useState(null)
 
   const navigate = useNavigate()
 
@@ -197,6 +426,70 @@ export const AdminPanel = () => {
       Swal.fire("Error", "Error al obtener los paquetes", "error")
     } finally {
       setLoadingPaquetes(false)
+    }
+  }
+
+  const handleSavePaquete = async (paqueteData) => {
+    try {
+      const id = paqueteData.id_paquete
+      await api.put(`packages/IDPackage/${id}`, paqueteData)
+
+      Swal.fire({
+        title: "¡Éxito!",
+        text: "Paquete actualizado exitosamente",
+        icon: "success",
+        confirmButtonColor: "#10b981",
+        timer: 2000,
+        showConfirmButton: false,
+      })
+
+      setEditModalOpen(false)
+      setEditPaquete(null)
+      handleGetPaquetes() // Refresca la lista de paquetes
+    } catch (error) {
+      console.error("❌ Error al actualizar paquete:", error)
+      Swal.fire({
+        title: "Error",
+        text: "No se pudo actualizar el paquete",
+        icon: "error",
+        confirmButtonColor: "#10b981",
+      })
+    }
+  }
+
+  const handleDeletePaquete = async (id_paquete, nombrePaquete) => {
+    const confirm = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: `Esta acción eliminará el paquete "${nombrePaquete}" permanentemente.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    })
+
+    if (confirm.isConfirmed) {
+      try {
+        await api.delete(`packages/IDPackage/${id_paquete}`)
+        Swal.fire({
+          title: "Eliminado",
+          text: "El paquete ha sido eliminado exitosamente",
+          icon: "success",
+          confirmButtonColor: "#10b981",
+          timer: 2000,
+          showConfirmButton: false,
+        })
+        handleGetPaquetes() // Refresca la lista
+      } catch (error) {
+        console.error("❌ Error al eliminar paquete:", error)
+        Swal.fire({
+          title: "Error",
+          text: "No se pudo eliminar el paquete",
+          icon: "error",
+          confirmButtonColor: "#10b981",
+        })
+      }
     }
   }
 
@@ -536,12 +829,17 @@ export const AdminPanel = () => {
                                 <button
                                   className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
                                   title="Editar paquete"
+                                  onClick={() => {
+                                    setEditPaquete(paquete)
+                                    setEditModalOpen(true)
+                                  }}
                                 >
                                   <Edit2 className="w-4 h-4" />
                                 </button>
                                 <button
                                   className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
                                   title="Eliminar paquete"
+                                  onClick={() => handleDeletePaquete(paquete.id_paquete, paquete.nombrePaquete)}
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
@@ -554,6 +852,467 @@ export const AdminPanel = () => {
                   </table>
                 </div>
               )}
+            </div>
+            {/* Modal de Edición */}
+            {editModalOpen && (
+              <EditarPaqueteModal
+                open={editModalOpen}
+                onClose={() => {
+                  setEditModalOpen(false)
+                  setEditPaquete(null)
+                }}
+                paquete={editPaquete}
+                onSave={handleSavePaquete}
+              />
+            )}
+          </div>
+        )
+
+      case "settings":
+        return (
+          <div className="space-y-8">
+            {/* Configuración General */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
+                  <Settings className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Configuración General</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de la Empresa</label>
+                  <input
+                    type="text"
+                    defaultValue="ZenTravel"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email de Contacto</label>
+                  <input
+                    type="email"
+                    defaultValue="info@zentravel.com"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Principal</label>
+                  <input
+                    type="tel"
+                    defaultValue="601 743 6620"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Moneda</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="COP">Peso Colombiano (COP)</option>
+                    <option value="USD">Dólar Americano (USD)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Zona Horaria</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="America/Bogota">Bogotá (GMT-5)</option>
+                    <option value="America/New_York">Nueva York (GMT-5)</option>
+                    <option value="Europe/Madrid">Madrid (GMT+1)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Idioma Principal</label>
+                  <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                    <option value="pt">Português</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors duration-200">
+                  Guardar Configuración General
+                </button>
+              </div>
+            </div>
+
+            {/* Gestión de Roles y Permisos */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                    <Shield className="w-5 h-5 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900">Roles y Permisos</h3>
+                </div>
+                <button className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200">
+                  Crear Nuevo Rol
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { name: "Administrador", users: 2, color: "bg-red-100 text-red-800", permissions: "Acceso completo" },
+                  {
+                    name: "Empleado",
+                    users: 5,
+                    color: "bg-blue-100 text-blue-800",
+                    permissions: "Gestión de paquetes y clientes",
+                  },
+                  {
+                    name: "Cliente",
+                    users: 150,
+                    color: "bg-green-100 text-green-800",
+                    permissions: "Compra y reservas",
+                  },
+                ].map((role, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-900">{role.name}</h4>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${role.color}`}>
+                        {role.users} usuarios
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-3">{role.permissions}</p>
+                    <div className="flex space-x-2">
+                      <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm transition-colors duration-200">
+                        Editar
+                      </button>
+                      {role.name !== "Administrador" && (
+                        <button className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm transition-colors duration-200">
+                          Eliminar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Configuración de Pagos */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
+                  <DollarSign className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Configuración de Pagos</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Métodos de Pago Activos</h4>
+                  <div className="space-y-3">
+                    {[
+                      { name: "PayPal", status: true, icon: "💳" },
+                      { name: "Tarjeta de Crédito", status: true, icon: "💳" },
+                      { name: "PSE", status: false, icon: "🏦" },
+                      { name: "Nequi", status: false, icon: "📱" },
+                    ].map((method, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-3">{method.icon}</span>
+                          <span className="font-medium">{method.name}</span>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" defaultChecked={method.status} className="sr-only peer" />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Configuración de Comisiones</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Comisión por Transacción (%)
+                      </label>
+                      <input
+                        type="number"
+                        defaultValue="3.5"
+                        step="0.1"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tarifa Fija (COP)</label>
+                      <input
+                        type="number"
+                        defaultValue="2000"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Días para Reembolso</label>
+                      <input
+                        type="number"
+                        defaultValue="7"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200">
+                  Guardar Configuración de Pagos
+                </button>
+              </div>
+            </div>
+
+            {/* Personalización de la Plataforma */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center mr-3">
+                  <Star className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Personalización</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Colores del Tema</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Color Principal</label>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          defaultValue="#10b981"
+                          className="w-12 h-10 border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          defaultValue="#10b981"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Color Secundario</label>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="color"
+                          defaultValue="#14b8a6"
+                          className="w-12 h-10 border border-gray-300 rounded"
+                        />
+                        <input
+                          type="text"
+                          defaultValue="#14b8a6"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Configuración de SophIA</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Personalidad de la IA</label>
+                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="friendly">Amigable y Cercana</option>
+                        <option value="professional">Profesional</option>
+                        <option value="casual">Casual y Relajada</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Idioma de Respuestas</label>
+                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                        <option value="auto">Detectar automáticamente</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Respuestas Automáticas</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors duration-200">
+                  Guardar Personalización
+                </button>
+              </div>
+            </div>
+
+            {/* Configuración de Notificaciones */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mr-3">
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Notificaciones</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Notificaciones por Email</h4>
+                  <div className="space-y-3">
+                    {[
+                      "Nueva reserva realizada",
+                      "Pago confirmado",
+                      "Cancelación de reserva",
+                      "Nuevo usuario registrado",
+                      "Reporte diario de ventas",
+                    ].map((notification, index) => (
+                      <div key={index} className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">{notification}</span>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                          <input type="checkbox" defaultChecked={index < 3} className="sr-only peer" />
+                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Configuración SMTP</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Servidor SMTP</label>
+                      <input
+                        type="text"
+                        defaultValue="smtp.gmail.com"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Puerto</label>
+                      <input
+                        type="number"
+                        defaultValue="587"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Email de Envío</label>
+                      <input
+                        type="email"
+                        defaultValue="noreply@zentravel.com"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors duration-200">
+                  Guardar Configuración de Notificaciones
+                </button>
+              </div>
+            </div>
+
+            {/* Respaldos y Seguridad */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+              <div className="flex items-center mb-6">
+                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900">Seguridad y Respaldos</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Respaldos Automáticos</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Frecuencia de Respaldo</label>
+                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="daily">Diario</option>
+                        <option value="weekly">Semanal</option>
+                        <option value="monthly">Mensual</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Retener Respaldos</label>
+                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                        <option value="30">30 días</option>
+                        <option value="90">90 días</option>
+                        <option value="365">1 año</option>
+                      </select>
+                    </div>
+
+                    <div className="pt-2">
+                      <button className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200">
+                        Crear Respaldo Manual
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="font-medium text-gray-900 mb-4">Configuración de Seguridad</h4>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Autenticación de Dos Factores</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Logs de Actividad</span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" defaultChecked className="sr-only peer" />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                      </label>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Tiempo de Sesión (minutos)</label>
+                      <input
+                        type="number"
+                        defaultValue="60"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    <div className="pt-2">
+                      <button className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
+                        Ver Logs de Seguridad
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <button className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
+                  Guardar Configuración de Seguridad
+                </button>
+              </div>
             </div>
           </div>
         )
