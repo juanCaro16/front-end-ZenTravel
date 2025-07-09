@@ -1,4 +1,3 @@
-"use client"
 
 import { Route, Routes } from "react-router-dom"
 import { AppHeader } from "./Layouts/AppHeader/AppHeader"
