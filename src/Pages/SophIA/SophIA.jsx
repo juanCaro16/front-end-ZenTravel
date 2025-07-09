@@ -52,7 +52,8 @@ export const SophIA = () => {
     if (savedPaquetes) {
       try {
         setPaquetesIA(JSON.parse(savedPaquetes))
-      } catch { }
+      } catch (error) { console.log(error);
+       }
     }
   }, [])
 

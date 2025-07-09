@@ -1,23 +1,7 @@
 import { useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
-import {
-  Package,
-  MapPin,
-  Calendar,
-  DollarSign,
-  ImageIcon,
-  FileText,
-  Hotel,
-  Plane,
-  Clock,
-  Percent,
-  Save,
-  ArrowLeft,
-  Upload,
-  Eye,
-  Star,
-} from "lucide-react"
+import {Package,MapPin,Calendar,DollarSign,ImageIcon,FileText,Hotel,Plane,Clock,Percent,Save,ArrowLeft,Upload,Eye,Star,} from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export const CrearPaquetes = () => {
@@ -39,8 +23,10 @@ export const CrearPaquetes = () => {
   })
 
   const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+  const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
 
   const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [Habitacion, setHabitacion] = useState({ nombreHotel: '' });
 
   const [imagen ,setImagen] = useState(null);
   const [mensaje, setMensaje] = useState("")
@@ -115,9 +101,9 @@ export const CrearPaquetes = () => {
 
       navigate("/paquetes")
     } catch (err) {
-      console.error("❌ Error completo:", error);
-      console.error("❌ Response data:", error.response?.data);
-      console.error("❌ Response status:", error.response?.status);
+      console.error("❌ Error completo:", err);
+      console.error("❌ Response data:", err.response?.data);
+      console.error("❌ Response status:", err.response?.status);
 
       let errMsg = "Hubo un error al crear el paquete"
 
@@ -150,6 +136,28 @@ export const CrearPaquetes = () => {
     } catch (error) {
       console.error("❌ Error al buscar transportes:", error);
       alert("Ocurrió un error al buscar transportes.");
+    }
+  }
+
+  const buscarHabitacion = async () => {
+    console.log("🔍 Ejecutando buscarHabitacion");
+    if (!Habitacion.nombreHotel) {
+      Swal.fire("Error", "Debes ingresar el nombre del hotel.", "warning");
+      return;
+    }
+
+    try {
+      const resultado = await api.get(`packages/RoomReservation/${Habitacion.nombreHotel}`);
+      console.log("✅ Resultado habitaciones:", resultado.data);
+      setOpcionesHabitacion(resultado.data);
+    } catch (error) {
+      console.error("Error al buscar habitaciones:", error);
+
+      Swal.fire(
+        "Error",
+        error.response?.data?.message || "Ocurrió un error al buscar habitaciones.",
+        "error"
+      );
     }
   };
 
@@ -238,26 +246,17 @@ export const CrearPaquetes = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Subir imagen:</label>
               <input
                 type="file"
+                className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
+
                 accept="image/*"
                 name="imagen"
                 onChange={handleFileChange}
                 required
               />
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
-                >
-                  <Upload className="w-5 h-5" />
-                </button>
               </div>
-              {formData.imagen && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-xl">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Eye className="w-4 h-4" />
-                    <span>Vista previa disponible</span>
-                  </div>
-                </div>
-              )}
+            {imagen && (
+              <img src={URL.createObjectURL(imagen)} alt="Vista previa" className="mt-2 rounded-md w-32 h-32 object-cover" />
+            )}
               
             </div>
         )
@@ -281,19 +280,57 @@ export const CrearPaquetes = () => {
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
               />
             </div>
+            {/* buscar habitaciones */}
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 <Hotel className="w-4 h-4 inline mr-2" />
-                Hotel incluido *
+                Hotel 
               </label>
               <input
                 name="Habitacion"
-                value={formData.Habitacion}
-                onChange={handleChange}
+                value={Habitacion.nombreHotel}
+                onChange={(e) => setHabitacion((prev) => ({ ...prev, nombreHotel: e.target.value }))}
                 placeholder="Ej: Hotel Boutique Casa San Agustín"
                 className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
               />
+              <button
+                type="button"
+                onClick={buscarHabitacion}
+                className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2"
+              >
+                Buscar habitacion
+              </button>
+              <option value="">Selecciona un transporte</option>
+              {opcionesHabitacion.length > 0 && (
+                <div className="w-full h-20 mt-4">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    habitaciones de hotel disponible
+                  </label>
+                  <select
+                    name="habitaciones"
+                    value={formData.Habitacion}
+                    onChange={(e) =>
+                      setFormData({ ...formData, Habitacion: e.target.value })
+                    }
+                    className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
+                    size={opcionesHabitacion.length > 3 ? 4 : opcionesHabitacion.length}
+                  >
+                    <option value="">Selecciona una habitacion</option>
+                    {opcionesHabitacion.map((item) => (
+                      <option
+                        key={item.id_habitacion}
+                        value={item.id_habitacion}
+                        className="whitespace-normal break-words"
+                      >
+                        {`numero de la habitacion ${item.numero} tipo ${item.tipo}, precio: ${item.precio}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            
+
             </div>
 
             {/* Origen y Buscar Transportes */}
