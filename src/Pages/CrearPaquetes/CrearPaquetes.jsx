@@ -37,26 +37,11 @@ export const CrearPaquetes = () => {
     cantidad: "",
   })
 
-<<<<<<< HEAD
   const [opcionesTransporte, setOpcionesTransporte] = useState([])
   const [opcionesHabitacion, setOpcionesHabitacion] = useState([])
   const [transporte, setTransporte] = useState({ origen: "", destino: "" })
   const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" })
   const [imagen, setImagen] = useState(null)
-=======
-  const [opcionesTransporte, setOpcionesTransporte] = useState([]);
-
-  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
-  const [imagen ,setImagen] = useState(null);
-
-  const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
-
-  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
-  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
-
-  const [imagen, setImagen] = useState(null);
-
->>>>>>> bc2fefb9dc546ab0e332eee97393358bc211d1fa
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
