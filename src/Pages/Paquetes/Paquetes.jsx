@@ -181,7 +181,7 @@ export const Paquetes = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="flex flex-col items-center pt-16 gap-8">
-          <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
+          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
             <button
               onClick={() => navigate("/crearPaquete")}
               className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -196,32 +196,6 @@ export const Paquetes = () => {
   }
 
   return (
-
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      <div className="flex flex-col items-center pt-16 gap-8">
-        <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
-          <button
-            onClick={() => navigate("/crearPaquete")}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          >
-            + Agregar Paquete
-          </button>
-        </RoleBasedComponent>
-
-        <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl">
-          {paquetes.map((paquete, index) => {
-            const enEdicion = editandoId === paquete.id_paquete
-            const esFavorito = favoritos.some((fav) => fav.id_paquete === paquete.id_paquete)
-
-            return (
-              <div
-                key={paquete.id_paquete || index}
-                className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-5 transform hover:-translate-y-1 border border-slate-100 cursor-pointer relative"
-                onClick={() => {
-                  console.log("Card clicked, paquete:", paquete) // Para debug
-                  setPaqueteSeleccionado(paquete)
-                  setShowPreviewModal(true)
-
 
     <div className="flex flex-col items-center pt-16 gap-8">
       <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
@@ -538,84 +512,6 @@ export const Paquetes = () => {
                         </div>
                       )}
                     </div>
-
-                  )}
-                </div>
-
-                {/* Botones de acción */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleComprar(paquete)
-                    }}
-                    className="flex-1 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:scale-105"
-                  >
-                    Comprar
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      console.log("Eye button clicked, paquete:", paquete) // Para debug
-                      setPaqueteSeleccionado(paquete)
-                      setShowPreviewModal(true)
-                    }}
-                    className="px-4 py-2 bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white rounded-xl transition-all duration-200 font-semibold shadow-md hover:shadow-lg flex items-center justify-center"
-                    title="Ver detalles"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                </div>
-
-                {/* Botones de edición para admin */}
-                <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
-                  <div className="mt-2">
-                    {enEdicion ? (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleGuardar(paquete)
-                          }}
-                          className="flex-1 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 text-sm"
-                        >
-                          Guardar
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditandoId(null)
-                          }}
-                          className="flex-1 px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-xl transition-all duration-200 text-sm"
-                        >
-                          Cancelar
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditandoId(paquete.id_paquete)
-                          }}
-                          className="flex-1 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 text-sm"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleEliminar(paquete)
-                          }}
-                          className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200 text-sm flex items-center justify-center"
-                          title="Eliminar paquete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-
                   </div>
 
                   {/* Descripción */}
