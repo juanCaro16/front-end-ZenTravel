@@ -726,4 +726,3 @@ export const PaquetesCard = ({ paquete, onComprar, onFavorito, esFavorito }) => 
     </button>
   </div>
 )
-
