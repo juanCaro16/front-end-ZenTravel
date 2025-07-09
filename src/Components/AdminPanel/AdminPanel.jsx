@@ -17,7 +17,6 @@ import {
   Eye,
   Edit2,
   Trash2,
-  MessageCircle,
 } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
@@ -39,6 +38,7 @@ const NewUserModal = ({ open, onClose, onCreate }) => {
   }
 
   if (!open) return null
+
   return (
     <div className="fixed inset-0 bg-emerald-100 bg-opacity-80 flex items-center justify-center z-50 transition-all">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative animate-fade-in">
@@ -112,7 +112,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
         categoria: paquete.categoria || "",
         nombreHotel: paquete.nombreHotel || "",
         numero_habitacion: paquete.numero_habitacion || "",
-        // Campos de solo lectura
         precio: paquete.precio || 0,
         precioTotal: paquete.precioTotal || 0,
       })
@@ -131,12 +130,12 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
   }
 
   if (!open || !form) return null
+
   return (
     <div className="fixed inset-0 bg-emerald-100 bg-opacity-50 flex items-center justify-center z-50">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-semibold text-gray-800 mb-4">Editar Paquete</h3>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Nombre del Paquete */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Paquete</label>
             <input
@@ -148,8 +147,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
             />
           </div>
-
-          {/* Descripción */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
             <textarea
@@ -161,8 +158,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
             />
           </div>
-
-          {/* Duración y Descuento */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Duración (días)</label>
@@ -192,8 +187,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               />
             </div>
           </div>
-
-          {/* URL de Imagen */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">URL de la Imagen</label>
             <input
@@ -205,8 +198,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-emerald-300 focus:border-emerald-500"
             />
           </div>
-
-          {/* Estado */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Estado</label>
             <select
@@ -219,8 +210,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               <option value="inactivo">Inactivo</option>
             </select>
           </div>
-
-          {/* Destino y Categoría */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Destino</label>
@@ -249,8 +238,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               </select>
             </div>
           </div>
-
-          {/* Hotel y Habitación */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Hotel</label>
@@ -273,8 +260,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               />
             </div>
           </div>
-
-          {/* Precio (Solo lectura) */}
           <div className="bg-gray-50 p-4 rounded-lg border">
             <h4 className="text-sm font-medium text-gray-700 mb-2">
               Información de Precio (Calculado automáticamente)
@@ -294,8 +279,6 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               </div>
             </div>
           </div>
-
-          {/* Botones */}
           <div className="flex space-x-3 pt-4">
             <button
               type="submit"
@@ -328,67 +311,7 @@ export const AdminPanel = () => {
   const [loadingPaquetes, setLoadingPaquetes] = useState(false)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [editPaquete, setEditPaquete] = useState(null)
-
   const navigate = useNavigate()
-
-  useEffect(() => {
-    handleGetInfo()
-    handleGetInfoUser()
-  }, [])
-
-  // Cambia la consulta al backend según el filtro de rol
-  const handleFilterUserByRol = async (rol) => {
-    try {
-      let endpoint = "admin/Users/cliente"
-      if (rol === "admin") endpoint = "admin/Users/admin"
-      else if (rol === "Empleado") endpoint = "admin/Users/empleado"
-      // Si es "Todos" o vacío, usa cliente (o podrías crear un endpoint para todos)
-      const response = await api.get(endpoint)
-      setInfoUser(response.data)
-    } catch (error) {
-      setInfoUser({ user: [] })
-      Swal.fire("Error", "Error al filtrar usuarios por rol", "error")
-    }
-  }
-
-  // useEffect para filtrar usuarios por rol SOLO cuando cambia el filtro y el tab activo es "users"
-  useEffect(() => {
-    if (activeTab === "users") {
-      handleFilterUserByRol(filterRol || "cliente")
-    }
-    // eslint-disable-next-line
-  }, [filterRol, activeTab])
-
-  const adminTabs = [
-    { id: "dashboard", label: "Dashboard", icon: <BarChart3 className="w-5 h-5" /> },
-    { id: "users", label: "Usuarios", icon: <Users className="w-5 h-5" /> },
-    { id: "packages", label: "Paquetes", icon: <Package className="w-5 h-5" /> },
-    { id: "reports", label: "Reportes", icon: <FileText className="w-5 h-5" /> },
-    { id: "settings", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
-  ]
-
-  const handleNewUser = async (data) => {
-    try {
-      const response = await api.post("admin/CreateUsers", data)
-      console.log("Nuevo usuario creado con éxito:", response.data)
-      setModalOpen(false)
-      handleGetInfoUser() // refresca la lista
-      // Mostrar la contraseña generada si viene en la respuesta
-      if (response.data && response.data.password) {
-        Swal.fire({
-          title: "Usuario creado exitosamente",
-          html: `<b>Contraseña generada:</b> <span style='font-family:monospace'>${response.data.password}</span>`,
-          icon: "success",
-          confirmButtonColor: "#10b981",
-        })
-      } else {
-        Swal.fire("Usuario creado exitosamente", "", "success")
-      }
-    } catch (error) {
-      Swal.fire("Error", "Error al crear usuario", "error")
-      console.error(error)
-    }
-  }
 
   const handleGetInfo = async () => {
     try {
@@ -408,7 +331,6 @@ export const AdminPanel = () => {
       console.log("informacion de usuario traida con exito✅")
       console.log("informacion del usuario", response.data)
       setInfoUser(response.data)
-      // Aquí podrías hacer algo con la información del usuario si es necesario
     } catch (error) {
       console.error("Error al obtener la información del usuario:", error)
       Swal.fire("Error", "Error al obtener la información del usuario", "error")
@@ -429,11 +351,32 @@ export const AdminPanel = () => {
     }
   }
 
+  const handleNewUser = async (data) => {
+    try {
+      const response = await api.post("admin/CreateUsers", data)
+      console.log("Nuevo usuario creado con éxito:", response.data)
+      setModalOpen(false)
+      handleGetInfoUser()
+      if (response.data && response.data.password) {
+        Swal.fire({
+          title: "Usuario creado exitosamente",
+          html: `<b>Contraseña generada:</b> <span style='font-family:monospace'>${response.data.password}</span>`,
+          icon: "success",
+          confirmButtonColor: "#10b981",
+        })
+      } else {
+        Swal.fire("Usuario creado exitosamente", "", "success")
+      }
+    } catch (error) {
+      Swal.fire("Error", "Error al crear usuario", "error")
+      console.error(error)
+    }
+  }
+
   const handleSavePaquete = async (paqueteData) => {
     try {
       const id = paqueteData.id_paquete
       await api.put(`packages/IDPackage/${id}`, paqueteData)
-
       Swal.fire({
         title: "¡Éxito!",
         text: "Paquete actualizado exitosamente",
@@ -442,10 +385,9 @@ export const AdminPanel = () => {
         timer: 2000,
         showConfirmButton: false,
       })
-
       setEditModalOpen(false)
       setEditPaquete(null)
-      handleGetPaquetes() // Refresca la lista de paquetes
+      handleGetPaquetes()
     } catch (error) {
       console.error("❌ Error al actualizar paquete:", error)
       Swal.fire({
@@ -468,7 +410,6 @@ export const AdminPanel = () => {
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
     })
-
     if (confirm.isConfirmed) {
       try {
         await api.delete(`packages/IDPackage/${id_paquete}`)
@@ -480,7 +421,7 @@ export const AdminPanel = () => {
           timer: 2000,
           showConfirmButton: false,
         })
-        handleGetPaquetes() // Refresca la lista
+        handleGetPaquetes()
       } catch (error) {
         console.error("❌ Error al eliminar paquete:", error)
         Swal.fire({
@@ -493,13 +434,116 @@ export const AdminPanel = () => {
     }
   }
 
-  useEffect(() => {
-    if (activeTab === "packages") {
-      handleGetPaquetes()
-    }
-  }, [activeTab])
+  const handleDeleteUser = async (userId, userName, userRole) => {
+  const formattedRole = formatRole(userRole);
 
-  // Actualiza los valores de stats con la info del backend si está disponible
+  const confirm = await Swal.fire({
+    title: "¿Estás seguro?",
+    text: `Esta acción eliminará al ${formattedRole} "${userName}" permanentemente.`,
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#d33",
+    cancelButtonColor: "#6b7280",
+    confirmButtonText: "Sí, eliminar",
+    cancelButtonText: "Cancelar",
+  });
+
+  if (!confirm.isConfirmed) return;
+
+  // ✅ Solo dejamos el endpoint correcto
+  const endpoint = `/admin/UserDelete/${userId}`;
+
+  try {
+    console.log(`🔍 Intentando DELETE ${endpoint}`);
+    await api.delete(endpoint);
+
+    Swal.fire({
+      title: "Eliminado",
+      text: `El ${formattedRole} ha sido eliminado exitosamente.`,
+      icon: "success",
+      confirmButtonColor: "#10b981",
+      timer: 2000,
+      showConfirmButton: false,
+    });
+
+    // Aquí puedes actualizar tu lista si usas setUsuarios(...)
+  } catch (error) {
+    const status = error.response?.status;
+    const message = error.response?.data?.error || error.message;
+
+    console.error("❌ Error al eliminar usuario:", status, message);
+
+    let errorMessage = "No se pudo eliminar el usuario.";
+
+    if (message?.includes("no existe")) {
+      errorMessage = "El usuario no existe.";
+    } else if (status === 404) {
+      errorMessage = "Usuario no encontrado.";
+    } else if (status === 403) {
+      errorMessage = "No tienes permisos para eliminar este usuario.";
+    } else if (status === 500) {
+      errorMessage = "Error interno del servidor.";
+    }
+
+    Swal.fire("Error", errorMessage, "error");
+  }
+};
+
+  const handleFilterUserByRol = async (rol) => {
+    try {
+      let endpoint = "admin/Users/cliente"
+      if (rol === "admin") endpoint = "admin/Users/admin"
+      else if (rol === "Empleado") endpoint = "admin/Users/empleado"
+      const response = await api.get(endpoint)
+      setInfoUser(response.data)
+
+      console.log(
+        "🔍 Usuarios obtenidos:",
+        response.data?.user?.map((u) => ({
+          id: u.id_usuario,
+          nombre: u.nombre,
+          rol: u.rol,
+          rolType: typeof u.rol,
+        })),
+      )
+    } catch (error) {
+      setInfoUser({ user: [] })
+      Swal.fire("Error", "Error al filtrar usuarios por rol", "error")
+    }
+  }
+
+  const isAdminOrEmployee = (userRole) => {
+    if (!userRole) return false
+    const role = userRole.toLowerCase().trim()
+    return role === "admin" || role === "empleado" || role === "employee"
+  }
+
+  const getRoleBadgeColor = (userRole) => {
+    if (!userRole) return "bg-gray-100 text-gray-800"
+    const role = userRole.toLowerCase().trim()
+
+    if (role === "admin") return "bg-red-100 text-red-800"
+    if (role === "empleado" || role === "employee") return "bg-blue-100 text-blue-800"
+    return "bg-green-100 text-green-800"
+  }
+
+  const formatRole = (userRole) => {
+    if (!userRole) return "Cliente"
+    const role = userRole.toLowerCase().trim()
+
+    if (role === "admin") return "Admin"
+    if (role === "empleado" || role === "employee") return "Empleado"
+    return "Cliente"
+  }
+
+  const adminTabs = [
+    { id: "dashboard", label: "Dashboard", icon: <BarChart3 className="w-5 h-5" /> },
+    { id: "users", label: "Usuarios", icon: <Users className="w-5 h-5" /> },
+    { id: "packages", label: "Paquetes", icon: <Package className="w-5 h-5" /> },
+    { id: "reports", label: "Reportes", icon: <FileText className="w-5 h-5" /> },
+    { id: "settings", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
+  ]
+
   const stats = [
     {
       title: "Total Usuarios",
@@ -538,7 +582,6 @@ export const AdminPanel = () => {
       case "dashboard":
         return (
           <div className="space-y-6">
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {stats.map((stat, index) => (
                 <div key={index} className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
@@ -555,13 +598,10 @@ export const AdminPanel = () => {
                 </div>
               ))}
             </div>
-
-            {/* Recent Activity */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Actividad Reciente</h3>
               <div className="space-y-4">
                 {(infoDashBoard?.actividadReciente || []).map((activity, index) => {
-                  // Formatear fecha
                   const fecha = activity.created_at
                     ? new Date(activity.created_at).toLocaleString("es-CO", {
                         dateStyle: "medium",
@@ -584,7 +624,6 @@ export const AdminPanel = () => {
             </div>
           </div>
         )
-
       case "users":
         const usuariosFiltrados = infoUser?.user || []
         return (
@@ -607,6 +646,27 @@ export const AdminPanel = () => {
                 <option value="admin">Admin</option>
               </select>
             </div>
+
+            {usuariosFiltrados.length > 0 && (
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Debug Info:</strong> Se encontraron {usuariosFiltrados.length} usuarios.
+                </p>
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-sm text-blue-700 hover:text-blue-900">
+                    Ver detalles de usuarios (para debug)
+                  </summary>
+                  <div className="mt-2 text-xs bg-white p-2 rounded border">
+                    {usuariosFiltrados.map((u, i) => (
+                      <div key={i} className="mb-1">
+                        ID: {u.id_usuario}, Nombre: {u.nombre}, Rol: "{u.rol}" ({typeof u.rol})
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              </div>
+            )}
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -615,12 +675,13 @@ export const AdminPanel = () => {
                     <th className="text-left py-3 px-4 font-medium text-gray-700">Usuario</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-700">Email</th>
                     <th className="text-left py-3 px-4 font-medium text-gray-700">Rol</th>
+                    <th className="text-left py-3 px-4 font-medium text-gray-700">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {usuariosFiltrados.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="text-center py-4 text-gray-400">
+                      <td colSpan={5} className="text-center py-4 text-gray-400">
                         No hay usuarios para este rol.
                       </td>
                     </tr>
@@ -630,7 +691,24 @@ export const AdminPanel = () => {
                         <td className="py-3 px-4">{user.id_usuario}</td>
                         <td className="py-3 px-4">{user.nombre}</td>
                         <td className="py-3 px-4">{user.email}</td>
-                        <td className="py-3 px-4">{user.rol || "Empleado"}</td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(user.rol)}`}>
+                            {formatRole(user.rol)}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {isAdminOrEmployee(user.rol) ? (
+                            <button
+                              onClick={() => handleDeleteUser(user.id_usuario, user.nombre, user.rol)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                              title={`Eliminar ${formatRole(user.rol)}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <span className="text-gray-400 text-sm">Sin acciones</span>
+                          )}
+                        </td>
                       </tr>
                     ))
                   )}
@@ -639,12 +717,10 @@ export const AdminPanel = () => {
             </div>
           </div>
         )
-
       case "packages":
         const paquetes = infoPaquetes?.paquetes || []
         return (
           <div className="space-y-6">
-            {/* Packages Management Header */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -654,7 +730,7 @@ export const AdminPanel = () => {
                 <div className="flex items-center space-x-3">
                   <button
                     onClick={() => navigate("/crearPaquete")}
-                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
+                    className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg flex items-center space-x-2"
                   >
                     <Package className="w-5 h-5" />
                     <span>Crear Paquete</span>
@@ -662,8 +738,6 @@ export const AdminPanel = () => {
                 </div>
               </div>
             </div>
-
-            {/* Package Statistics */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
@@ -677,7 +751,6 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </div>
-
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -696,7 +769,6 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </div>
-
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -709,7 +781,6 @@ export const AdminPanel = () => {
                   </div>
                 </div>
               </div>
-
               <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -728,13 +799,10 @@ export const AdminPanel = () => {
                 </div>
               </div>
             </div>
-
-            {/* Packages Table */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h4 className="text-lg font-semibold text-gray-900">Lista de Paquetes</h4>
               </div>
-
               {loadingPaquetes ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
@@ -820,7 +888,7 @@ export const AdminPanel = () => {
                             <td className="py-4 px-6">
                               <div className="flex items-center space-x-2">
                                 <button
-                                  onClick={() => navigate(`/paquetes`)}
+                                  onClick={() => navigate(`/paquetes/${paquete.id_paquete}`)}
                                   className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors duration-200"
                                   title="Ver detalles"
                                 >
@@ -853,7 +921,6 @@ export const AdminPanel = () => {
                 </div>
               )}
             </div>
-            {/* Modal de Edición */}
             {editModalOpen && (
               <EditarPaqueteModal
                 open={editModalOpen}
@@ -867,11 +934,9 @@ export const AdminPanel = () => {
             )}
           </div>
         )
-
       case "settings":
         return (
           <div className="space-y-8">
-            {/* Configuración General */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
@@ -879,7 +944,6 @@ export const AdminPanel = () => {
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Configuración General</h3>
               </div>
-
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nombre de la Empresa</label>
@@ -889,7 +953,6 @@ export const AdminPanel = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email de Contacto</label>
                   <input
@@ -898,7 +961,6 @@ export const AdminPanel = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono Principal</label>
                   <input
@@ -907,7 +969,6 @@ export const AdminPanel = () => {
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Moneda</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
@@ -916,7 +977,6 @@ export const AdminPanel = () => {
                     <option value="EUR">Euro (EUR)</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Zona Horaria</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
@@ -925,7 +985,6 @@ export const AdminPanel = () => {
                     <option value="Europe/Madrid">Madrid (GMT+1)</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Idioma Principal</label>
                   <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
@@ -935,388 +994,14 @@ export const AdminPanel = () => {
                   </select>
                 </div>
               </div>
-
               <div className="mt-6">
                 <button className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors duration-200">
                   Guardar Configuración General
                 </button>
               </div>
             </div>
-
-            {/* Gestión de Roles y Permisos */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900">Roles y Permisos</h3>
-                </div>
-                <button className="px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors duration-200">
-                  Crear Nuevo Rol
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { name: "Administrador", users: 2, color: "bg-red-100 text-red-800", permissions: "Acceso completo" },
-                  {
-                    name: "Empleado",
-                    users: 5,
-                    color: "bg-blue-100 text-blue-800",
-                    permissions: "Gestión de paquetes y clientes",
-                  },
-                  {
-                    name: "Cliente",
-                    users: 150,
-                    color: "bg-green-100 text-green-800",
-                    permissions: "Compra y reservas",
-                  },
-                ].map((role, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-900">{role.name}</h4>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${role.color}`}>
-                        {role.users} usuarios
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">{role.permissions}</p>
-                    <div className="flex space-x-2">
-                      <button className="px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-sm transition-colors duration-200">
-                        Editar
-                      </button>
-                      {role.name !== "Administrador" && (
-                        <button className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm transition-colors duration-200">
-                          Eliminar
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Configuración de Pagos */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center mr-3">
-                  <DollarSign className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Configuración de Pagos</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Métodos de Pago Activos</h4>
-                  <div className="space-y-3">
-                    {[
-                      { name: "PayPal", status: true, icon: "💳" },
-                      { name: "Tarjeta de Crédito", status: true, icon: "💳" },
-                      { name: "PSE", status: false, icon: "🏦" },
-                      { name: "Nequi", status: false, icon: "📱" },
-                    ].map((method, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 border border-gray-200 rounded-lg"
-                      >
-                        <div className="flex items-center">
-                          <span className="mr-3">{method.icon}</span>
-                          <span className="font-medium">{method.name}</span>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" defaultChecked={method.status} className="sr-only peer" />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Configuración de Comisiones</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Comisión por Transacción (%)
-                      </label>
-                      <input
-                        type="number"
-                        defaultValue="3.5"
-                        step="0.1"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Tarifa Fija (COP)</label>
-                      <input
-                        type="number"
-                        defaultValue="2000"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Días para Reembolso</label>
-                      <input
-                        type="number"
-                        defaultValue="7"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <button className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors duration-200">
-                  Guardar Configuración de Pagos
-                </button>
-              </div>
-            </div>
-
-            {/* Personalización de la Plataforma */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-pink-600 rounded-lg flex items-center justify-center mr-3">
-                  <Star className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Personalización</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Colores del Tema</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Color Principal</label>
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          defaultValue="#10b981"
-                          className="w-12 h-10 border border-gray-300 rounded"
-                        />
-                        <input
-                          type="text"
-                          defaultValue="#10b981"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Color Secundario</label>
-                      <div className="flex items-center space-x-3">
-                        <input
-                          type="color"
-                          defaultValue="#14b8a6"
-                          className="w-12 h-10 border border-gray-300 rounded"
-                        />
-                        <input
-                          type="text"
-                          defaultValue="#14b8a6"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Configuración de SophIA</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Personalidad de la IA</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="friendly">Amigable y Cercana</option>
-                        <option value="professional">Profesional</option>
-                        <option value="casual">Casual y Relajada</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Idioma de Respuestas</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="es">Español</option>
-                        <option value="en">English</option>
-                        <option value="auto">Detectar automáticamente</option>
-                      </select>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Respuestas Automáticas</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" defaultChecked className="sr-only peer" />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <button className="px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg transition-colors duration-200">
-                  Guardar Personalización
-                </button>
-              </div>
-            </div>
-
-            {/* Configuración de Notificaciones */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg flex items-center justify-center mr-3">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Notificaciones</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Notificaciones por Email</h4>
-                  <div className="space-y-3">
-                    {[
-                      "Nueva reserva realizada",
-                      "Pago confirmado",
-                      "Cancelación de reserva",
-                      "Nuevo usuario registrado",
-                      "Reporte diario de ventas",
-                    ].map((notification, index) => (
-                      <div key={index} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-700">{notification}</span>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" defaultChecked={index < 3} className="sr-only peer" />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Configuración SMTP</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Servidor SMTP</label>
-                      <input
-                        type="text"
-                        defaultValue="smtp.gmail.com"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Puerto</label>
-                      <input
-                        type="number"
-                        defaultValue="587"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Email de Envío</label>
-                      <input
-                        type="email"
-                        defaultValue="noreply@zentravel.com"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <button className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors duration-200">
-                  Guardar Configuración de Notificaciones
-                </button>
-              </div>
-            </div>
-
-            {/* Respaldos y Seguridad */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <div className="flex items-center mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mr-3">
-                  <Shield className="w-5 h-5 text-white" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900">Seguridad y Respaldos</h3>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Respaldos Automáticos</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Frecuencia de Respaldo</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="daily">Diario</option>
-                        <option value="weekly">Semanal</option>
-                        <option value="monthly">Mensual</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Retener Respaldos</label>
-                      <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                        <option value="30">30 días</option>
-                        <option value="90">90 días</option>
-                        <option value="365">1 año</option>
-                      </select>
-                    </div>
-
-                    <div className="pt-2">
-                      <button className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200">
-                        Crear Respaldo Manual
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Configuración de Seguridad</h4>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Autenticación de Dos Factores</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" defaultChecked className="sr-only peer" />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                      </label>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Logs de Actividad</span>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input type="checkbox" defaultChecked className="sr-only peer" />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                      </label>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Tiempo de Sesión (minutos)</label>
-                      <input
-                        type="number"
-                        defaultValue="60"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                      />
-                    </div>
-
-                    <div className="pt-2">
-                      <button className="w-full px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
-                        Ver Logs de Seguridad
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <button className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors duration-200">
-                  Guardar Configuración de Seguridad
-                </button>
-              </div>
-            </div>
           </div>
         )
-
       default:
         return (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
@@ -1329,10 +1014,26 @@ export const AdminPanel = () => {
     }
   }
 
+  useEffect(() => {
+    handleGetInfo()
+    handleGetInfoUser()
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === "users") {
+      handleFilterUserByRol(filterRol || "cliente")
+    }
+  }, [filterRol, activeTab])
+
+  useEffect(() => {
+    if (activeTab === "packages") {
+      handleGetPaquetes()
+    }
+  }, [activeTab])
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center space-x-3 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
@@ -1344,8 +1045,6 @@ export const AdminPanel = () => {
             </div>
           </div>
         </div>
-
-        {/* Navigation Tabs */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-6">
           <div className="flex overflow-x-auto">
             {adminTabs.map((tab) => (
@@ -1364,8 +1063,6 @@ export const AdminPanel = () => {
             ))}
           </div>
         </div>
-
-        {/* Content */}
         {renderContent()}
       </div>
     </div>
