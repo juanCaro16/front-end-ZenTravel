@@ -71,7 +71,7 @@ export const CrearPaquetes = () => {
       formToSend.append("duracionDias", formData.duracionDias.toString());
       formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible); // ✅ corregido
       formToSend.append("descuento", formData.descuento.toString());
-      formToSend.append("Habitacion", formData.Habitacion);
+      formToSend.append("Habitacion", Number(formData.Habitacion));
       formToSend.append("nombreTransporte", formData.nombreTransporte);
       formToSend.append("nombreDestino", formData.nombreDestino);
       formToSend.append("categoria", formData.categoria);
@@ -82,6 +82,7 @@ export const CrearPaquetes = () => {
       for (let pair of formToSend.entries()) {
         console.log(`${pair[0]}:`, pair[1]);
       }
+      
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
       const response = await api.post("packages/Create/Package", formToSend, {
