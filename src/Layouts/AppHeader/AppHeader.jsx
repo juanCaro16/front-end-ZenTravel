@@ -100,7 +100,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 />
               </RoleBasedComponent>
 
-              <RoleBasedComponent allowedRoles={["Empleado"]}>
+              <RoleBasedComponent allowedRoles={["empleado"]}>
                 <ItemNavLink
                   content="Panel Empleado"
                   route="/employee"
@@ -228,7 +228,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             </RoleBasedComponent>
 
-            <RoleBasedComponent allowedRoles={["Empleado"]}>
+            <RoleBasedComponent allowedRoles={["empleado"]}>
               <ItemNavLink
                 content="Panel Empleado"
                 route="/employee"
@@ -236,7 +236,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             </RoleBasedComponent>
 
-            <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+            <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
               <ItemNavLink
                 content="Crear Paquete"
                 route="/crearPaquete"

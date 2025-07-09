@@ -181,7 +181,7 @@ export const Paquetes = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="flex flex-col items-center pt-16 gap-8">
-          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+          <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
             <button
               onClick={() => navigate("/crearPaquete")}
               className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -198,7 +198,7 @@ export const Paquetes = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="flex flex-col items-center pt-16 gap-8">
-        <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+        <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
           <button
             onClick={() => navigate("/crearPaquete")}
             className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
@@ -375,7 +375,7 @@ export const Paquetes = () => {
                 </div>
 
                 {/* Botones de edición para admin */}
-                <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+                <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
                   <div className="mt-2">
                     {enEdicion ? (
                       <div className="flex gap-2">
