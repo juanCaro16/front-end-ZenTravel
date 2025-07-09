@@ -37,14 +37,31 @@ export const CrearPaquetes = () => {
     cantidad: "",
   })
 
+<<<<<<< HEAD
   const [opcionesTransporte, setOpcionesTransporte] = useState([])
   const [opcionesHabitacion, setOpcionesHabitacion] = useState([])
   const [transporte, setTransporte] = useState({ origen: "", destino: "" })
   const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" })
   const [imagen, setImagen] = useState(null)
+=======
+  const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+
+  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [imagen ,setImagen] = useState(null);
+
+  const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
+
+  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
+
+  const [imagen, setImagen] = useState(null);
+
+>>>>>>> bc2fefb9dc546ab0e332eee97393358bc211d1fa
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  // Estado para controlar el tamaño del select de transporte
+  const [transporteSelectSize, setTransporteSelectSize] = useState(1);
 
   const handleFileChange = (e) => {
     setImagen(e.target.files[0])

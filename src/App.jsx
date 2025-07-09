@@ -30,8 +30,9 @@ export const App = () => {
   const { isAuthenticated, userRole, login, logout } = useAuth()
   const location = useLocation() // Obtén la ubicación actual
 
-  const hideHeaderPaths = ["/", "/register"]
-  const shouldHideHeader = hideHeaderPaths.includes(location.pathname)
+  const hideHeaderPaths = ["/", "/register", "/reset-password"]
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname) ||
+    (/^\/reset-password\//.test(location.pathname))
 
   useEffect(() => {
     // Verifica el token cada vez que cambie la ruta
