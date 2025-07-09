@@ -89,7 +89,7 @@ export const CrearPaquetes = () => {
       // ✅ CORREGIDO: Number en lugar de number
       formToSend.append("Habitacion", Number(formData.Habitacion).toString())
       formToSend.append("nombreTransporte", formData.nombreTransporte)
-      formToSend.append("nombreDestino", formData.nombreDestino)
+      formToSend.append("nombreDestino", (formData.nombreDestino).toString())
       formToSend.append("categoria", formData.categoria)
       formToSend.append("incluye", JSON.stringify(formData.incluye))
       formToSend.append("noIncluye", JSON.stringify(formData.noIncluye))
