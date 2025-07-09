@@ -582,7 +582,7 @@ export const Hoteles = () => {
                       </button>
 
                       {verHabitacionesId === hotelSeleccionado.id_hotel && (
-                        <div className="mt-4">
+                        <div className="mt-4 space-y-6">
                           {(() => {
                             let imagenes = []
                             try {
@@ -592,6 +592,7 @@ export const Hoteles = () => {
                                   : hotelSeleccionado.imageneshabitaciones
                               imagenes = Array.isArray(imgs) ? imgs : []
                             } catch (e) { }
+
                             return imagenes.length ? (
                               <HabitacionCarrusel imagenes={imagenes} />
                             ) : (
@@ -613,6 +614,53 @@ export const Hoteles = () => {
                               </div>
                             )
                           })()}
+
+                          {/* Botón solo para admin/empleado */}
+                          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+                            <div className="pt-2">
+                              <button
+                                onClick={() => document.getElementById("inputHabitacionesModal").click()}
+                                className="w-full px-4 py-3 bg-gradient-to-r bg-emerald-300 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                              >
+                                + Agregar imágenes de habitaciones
+                              </button>
+
+                              {/* Input oculto */}
+                              <input
+                                type="file"
+                                id="inputHabitacionesModal"
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                  const nuevas = Array.from(e.target.files || [])
+                                  if (!nuevas.length) return
+
+                                  const index = hoteles.findIndex((h) => h.id_hotel === hotelSeleccionado.id_hotel)
+                                  if (index !== -1) {
+                                    const hotelActual = hoteles[index]
+                                    let actuales = []
+                                    try {
+                                      actuales = typeof hotelActual.imageneshabitaciones === "string"
+                                        ? JSON.parse(hotelActual.imageneshabitaciones)
+                                        : hotelActual.imageneshabitaciones || []
+                                    } catch (e) { }
+
+                                    const nuevasUrls = nuevas.map(img => URL.createObjectURL(img)) // temporal preview
+                                    const todas = [...actuales, ...nuevasUrls]
+
+                                    const nuevosHoteles = [...hoteles]
+                                    nuevosHoteles[index].imageneshabitaciones = todas
+                                    setHoteles(nuevosHoteles)
+
+                                    setHotelSeleccionado({ ...hotelSeleccionado, imageneshabitaciones: todas })
+
+                                    // ⚠️ Aquí podrías hacer un PATCH si ya quieres subir al backend
+                                  }
+                                }}
+                              />
+                            </div>
+                          </RoleBasedComponent>
                         </div>
                       )}
                     </div>
