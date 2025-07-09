@@ -78,7 +78,7 @@ export const App = () => {
         <Route
           path="/employee"
           element={
-            <ProtectedRoute requiredRoles={["Empleado"]}>
+            <ProtectedRoute requiredRoles={["empleado"]}>
               <EmployeePanel />
             </ProtectedRoute>
           }
@@ -105,7 +105,7 @@ export const App = () => {
         <Route
           path="/CrearHoteles"
           element={
-            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
+            <ProtectedRoute requiredRoles={["admin", "empleado"]}>
               <CrearHoteles />
             </ProtectedRoute>
           }
@@ -123,7 +123,7 @@ export const App = () => {
         <Route
           path="/crearPaquete"
           element={
-            <ProtectedRoute requiredRoles={["admin", "Empleado"]}>
+            <ProtectedRoute requiredRoles={["admin", "empleado"]}>
               <CrearPaquetes />
             </ProtectedRoute>
           }
