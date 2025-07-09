@@ -49,7 +49,7 @@ export const Main = () => {
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl lg:text-2xl font-light leading-relaxed max-w-3xl mx-auto text-gray-100">
+            <p className="text-lg md:text-xl lg:text-2xl font-light leading-relaxed w-[100%] mx-auto text-gray-100">
               Explora los rincones más hermosos de Colombia.
               <span className="block mt-2 text-emerald-200">
                 Viajes únicos que conectan con la naturaleza, cultura y aventura.
@@ -66,7 +66,7 @@ export const Main = () => {
               </button>
 
               <button
-                onClick={() => navigate("/SophIA")}
+                onClick={() => navigate("/ZenIA")}
                 className="px-8 py-4 border-2 border-white/30 hover:border-white/60 text-white hover:bg-white/10 rounded-full font-semibold text-lg backdrop-blur-sm transition-all duration-300"
               >
                 Habla con ZenIA

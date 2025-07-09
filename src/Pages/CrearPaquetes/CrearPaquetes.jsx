@@ -1,23 +1,7 @@
 import { useState } from "react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
-import {
-  Package,
-  MapPin,
-  Calendar,
-  DollarSign,
-  ImageIcon,
-  FileText,
-  Hotel,
-  Plane,
-  Clock,
-  Percent,
-  Save,
-  ArrowLeft,
-  Upload,
-  Eye,
-  Star,
-} from "lucide-react"
+import { Package, MapPin, Calendar, DollarSign, ImageIcon, FileText, Hotel, Plane, Clock, Percent, Save, ArrowLeft, Upload, Eye, Star, } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 
 export const CrearPaquetes = () => {
@@ -35,12 +19,21 @@ export const CrearPaquetes = () => {
     categoria: "",
     incluye: [],
     noIncluye: [],
-    cantidad:""
+    cantidad: ""
   })
 
   const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+
   const [transporte, setTransporte] = useState({ origen: '', destino: '' });
   const [imagen ,setImagen] = useState(null);
+
+  const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
+
+  const [transporte, setTransporte] = useState({ origen: '', destino: '' });
+  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
+
+  const [imagen, setImagen] = useState(null);
+
   const [mensaje, setMensaje] = useState("")
   const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -85,7 +78,7 @@ export const CrearPaquetes = () => {
       formToSend.append("duracionDias", formData.duracionDias.toString());
       formToSend.append("fechaInicioDisponible", formData.fechaInicioDisponible); // ✅ corregido
       formToSend.append("descuento", formData.descuento.toString());
-      formToSend.append("Habitacion", formData.Habitacion);
+      formToSend.append("Habitacion", Number(formData.Habitacion));
       formToSend.append("nombreTransporte", formData.nombreTransporte);
       formToSend.append("nombreDestino", formData.nombreDestino);
       formToSend.append("categoria", formData.categoria);
@@ -96,15 +89,16 @@ export const CrearPaquetes = () => {
       for (let pair of formToSend.entries()) {
         console.log(`${pair[0]}:`, pair[1]);
       }
+      
 
       // ✅ Cambiar la URL del endpoint a la ruta correcta
-    const response = await api.post("packages/Create/Package", formToSend, {
-      headers: {
-        "Content-Type": "multipart/form-data", // obligatorio para enviar imágenes
-      },
-    });
+      const response = await api.post("packages/Create/Package", formToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data", // obligatorio para enviar imágenes
+        },
+      });
 
-    console.log("✅ Éxito:", response.data);
+      console.log("✅ Éxito:", response.data);
 
       await Swal.fire({
         title: "¡Éxito!",
@@ -115,9 +109,9 @@ export const CrearPaquetes = () => {
 
       navigate("/paquetes")
     } catch (err) {
-      console.error("❌ Error completo:", error);
-      console.error("❌ Response data:", error.response?.data);
-      console.error("❌ Response status:", error.response?.status);
+      console.error("❌ Error completo:", err);
+      console.error("❌ Response data:", err.response?.data);
+      console.error("❌ Response status:", err.response?.status);
 
       let errMsg = "Hubo un error al crear el paquete"
 
@@ -151,7 +145,38 @@ export const CrearPaquetes = () => {
       console.error("❌ Error al buscar transportes:", error);
       alert("Ocurrió un error al buscar transportes.");
     }
-  };
+  }
+
+const buscarHabitacion = async () => {
+  if (!filtroHabitacion.nombreHotel) {
+    Swal.fire("Campo requerido", "Debes ingresar el nombre del hotel.", "warning");
+    return;
+  }
+
+  try {
+    console.log("🔍 Buscando habitaciones para:", filtroHabitacion.nombreHotel);
+    
+    const resultado = await api.get(`packages/RoomReservation/${filtroHabitacion.nombreHotel}`);
+    console.log("✅ Habitaciones encontradas:", resultado.data);
+
+    // Extraer solo el arreglo resultante
+    setOpcionesHabitacion(resultado.data.result || []);
+
+    if ((resultado.data.result || []).length === 0) {
+      Swal.fire("Sin resultados", "No hay habitaciones disponibles para este hotel.", "info");
+    }
+
+  } catch (error) {
+    console.error("❌ Error al buscar habitaciones:", error);
+    Swal.fire(
+      "Error",
+      error.response?.data?.message || "Ocurrió un error al buscar habitaciones.",
+      "error"
+    );
+  }
+};
+
+
 
   const nextStep = () => {
     if (currentStep < 4) setCurrentStep(currentStep + 1)
@@ -170,7 +195,7 @@ export const CrearPaquetes = () => {
       case 3:
         return true // Este paso es opcional ahora
       case 4:
-        return formData.duracionDias && formData.fechaInicioDisponible 
+        return formData.duracionDias && formData.fechaInicioDisponible
       default:
         return false
     }
@@ -221,11 +246,10 @@ export const CrearPaquetes = () => {
                     key={cat.value}
                     type="button"
                     onClick={() => setFormData({ ...formData, categoria: cat.value })}
-                    className={`p-4 border-2 rounded-xl transition-all duration-200 ${
-                      formData.categoria === cat.value
+                    className={`p-4 border-2 rounded-xl transition-all duration-200 ${formData.categoria === cat.value
                         ? "border-emerald-500 bg-emerald-50 text-emerald-700"
                         : "border-gray-300 hover:border-emerald-300 hover:bg-emerald-50"
-                    }`}
+                      }`}
                   >
                     <div className="text-2xl mb-2">{cat.icon}</div>
                     <div className="font-medium">{cat.label}</div>
@@ -238,28 +262,19 @@ export const CrearPaquetes = () => {
               <label className="block text-sm font-semibold text-gray-700 mb-2">Subir imagen:</label>
               <input
                 type="file"
+                className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
+
                 accept="image/*"
                 name="imagen"
                 onChange={handleFileChange}
                 required
               />
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-gray-100 border border-gray-300 rounded-xl hover:bg-gray-200 transition-colors duration-200"
-                >
-                  <Upload className="w-5 h-5" />
-                </button>
-              </div>
-              {formData.imagen && (
-                <div className="mt-3 p-3 bg-gray-50 rounded-xl">
-                  <div className="flex items-center space-x-2 text-sm text-gray-600">
-                    <Eye className="w-4 h-4" />
-                    <span>Vista previa disponible</span>
-                  </div>
-                </div>
-              )}
-              
             </div>
+            {imagen && (
+              <img src={URL.createObjectURL(imagen)} alt="Vista previa" className="mt-2 rounded-md w-32 h-32 object-cover" />
+            )}
+
+          </div>
         )
 
       case 2:
@@ -282,19 +297,53 @@ export const CrearPaquetes = () => {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                <Hotel className="w-4 h-4 inline mr-2" />
-                Hotel incluido *
-              </label>
-              <input
-                name="Habitacion"
-                value={formData.Habitacion}
-                onChange={handleChange}
-                placeholder="Ej: Hotel Boutique Casa San Agustín"
-                className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-gray-50 focus:bg-white"
-              />
-            </div>
+        <div>
+              
+        {/* Nombre del hotel */}
+        <input
+          name="nombreHotel"
+          value={filtroHabitacion.nombreHotel}
+          onChange={(e) =>
+            setFiltroHabitacion((prev) => ({ ...prev, nombreHotel: e.target.value }))
+          }
+          placeholder="Ej: Hotel Boutique Casa San Agustín"
+          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+        />
+
+        {/* Botón buscar */}
+        <button
+          type="button"
+          onClick={buscarHabitacion}
+          className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        >
+          Buscar habitación
+        </button>
+        <option value="">Selecciona un transporte</option>
+        {opcionesHabitacion.length > 0 && (
+          <div className="w-full mt-4">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Habitaciones disponibles
+            </label>
+            <select
+              name="Habitacion"
+              value={formData.Habitacion}
+              onChange={(e) =>
+                setFormData({ ...formData, Habitacion: e.target.value })
+              }
+              className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
+            >
+              {opcionesHabitacion.map((item) => (
+                <option
+                  key={item.id_habitacion}
+                  value={item.id_habitacion}
+                >
+                  {`#${item.numero} - ${item.tipo}, Precio: $${item.precio}`}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
 
             {/* Origen y Buscar Transportes */}
             <div>
@@ -361,11 +410,10 @@ export const CrearPaquetes = () => {
                 {incluyeOpciones.map((opcion) => (
                   <label
                     key={opcion}
-                    className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
-                      formData.incluye.includes(opcion)
+                    className={`flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${formData.incluye.includes(opcion)
                         ? "border-emerald-500 bg-emerald-50"
                         : "border-gray-300 hover:border-emerald-300 hover:bg-emerald-50"
-                    }`}
+                      }`}
                   >
                     <input
                       type="checkbox"
@@ -374,9 +422,8 @@ export const CrearPaquetes = () => {
                       className="sr-only"
                     />
                     <div
-                      className={`w-5 h-5 rounded border-2 mr-3 flex items-center justify-center ${
-                        formData.incluye.includes(opcion) ? "border-emerald-500 bg-emerald-500" : "border-gray-300"
-                      }`}
+                      className={`w-5 h-5 rounded border-2 mr-3 flex items-center justify-center ${formData.incluye.includes(opcion) ? "border-emerald-500 bg-emerald-500" : "border-gray-300"
+                        }`}
                     >
                       {formData.incluye.includes(opcion) && (
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
@@ -517,7 +564,7 @@ export const CrearPaquetes = () => {
   const incluyeOpciones = [
     "Alojamiento",
     "Desayuno",
-    "Almuerzo",  
+    "Almuerzo",
     "Cena",
     "Transporte local",
     "Guía turístico",
@@ -561,19 +608,17 @@ export const CrearPaquetes = () => {
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${
-                    currentStep >= step.number
+                  className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${currentStep >= step.number
                       ? "border-emerald-500 bg-emerald-500 text-white"
                       : "border-gray-300 bg-white text-gray-400"
-                  }`}
+                    }`}
                 >
                   {step.icon}
                 </div>
                 <div className="ml-3 hidden md:block">
                   <p
-                    className={`text-sm font-medium ${
-                      currentStep >= step.number ? "text-emerald-600" : "text-gray-400"
-                    }`}
+                    className={`text-sm font-medium ${currentStep >= step.number ? "text-emerald-600" : "text-gray-400"
+                      }`}
                   >
                     Paso {step.number}
                   </p>
@@ -583,9 +628,8 @@ export const CrearPaquetes = () => {
                 </div>
                 {index < steps.length - 1 && (
                   <div
-                    className={`hidden md:block w-16 h-1 mx-4 rounded ${
-                      currentStep > step.number ? "bg-emerald-500" : "bg-gray-300"
-                    }`}
+                    className={`hidden md:block w-16 h-1 mx-4 rounded ${currentStep > step.number ? "bg-emerald-500" : "bg-gray-300"
+                      }`}
                   />
                 )}
               </div>
@@ -651,5 +695,5 @@ export const CrearPaquetes = () => {
       </div>
     </div>
   )
-  
+
 }
