@@ -429,7 +429,7 @@ export const Paquetes = () => {
 
       {/* Modal de Preview del Paquete */}
       {showPreviewModal && paqueteSeleccionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
             {/* Header del modal */}
             <div className="relative bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white p-6">
