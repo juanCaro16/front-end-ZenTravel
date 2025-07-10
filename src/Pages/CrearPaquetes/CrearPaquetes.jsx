@@ -288,11 +288,6 @@ const buscarHabitacion = async (nombreHotel) => {
           }}
         />
 
-        {hotelSeleccionado && (
-          <p className="text-sm text-gray-600">
-            Hotel seleccionado: <strong>{hotelSeleccionado}</strong>
-          </p>
-        )}
 
         {opcionesHabitacion.length > 0 && (
           <div className="mt-4">
