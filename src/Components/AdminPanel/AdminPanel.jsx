@@ -97,10 +97,12 @@ const NewUserModal = ({ open, onClose, onCreate }) => {
 const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
   const [form, setForm] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [precioOriginal, setPrecioOriginal] = useState(0)
+  const [duracionOriginal, setDuracionOriginal] = useState(0)
 
   useEffect(() => {
     if (open && paquete) {
-      setForm({
+      const formData = {
         id_paquete: paquete.id_paquete,
         nombrePaquete: paquete.nombrePaquete || "",
         descripcion: paquete.descripcion || "",
@@ -114,12 +116,59 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
         numero_habitacion: paquete.numero_habitacion || "",
         precio: paquete.precio || 0,
         precioTotal: paquete.precioTotal || 0,
-      })
+      }
+
+      setForm(formData)
+      setPrecioOriginal(paquete.precio || 0)
+      setDuracionOriginal(paquete.duracionDias || 1)
     }
   }, [open, paquete])
 
+  const calcularPrecioAutomatico = (nuevaDuracion) => {
+    if (!precioOriginal || !duracionOriginal || nuevaDuracion <= 0) return precioOriginal
+
+    // Calcular precio base por día
+    const precioPorDia = precioOriginal / duracionOriginal
+
+    // Calcular nuevo precio base
+    const nuevoPrecioBase = precioPorDia * nuevaDuracion
+
+    // Aplicar descuento si existe
+    const descuentoDecimal = (form?.descuento || 0) / 100
+    const precioConDescuento = nuevoPrecioBase * (1 - descuentoDecimal)
+
+    return Math.round(precioConDescuento)
+  }
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+
+    if (name === "duracionDias") {
+      const nuevaDuracion = Number.parseInt(value) || 0
+      const nuevoPrecio = calcularPrecioAutomatico(nuevaDuracion)
+
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        precio: nuevoPrecio,
+        precioTotal: nuevoPrecio,
+      }))
+    } else if (name === "descuento") {
+      const nuevoDescuento = Number.parseFloat(value) || 0
+      const precioPorDia = precioOriginal / duracionOriginal
+      const precioBase = precioPorDia * (form?.duracionDias || duracionOriginal)
+      const descuentoDecimal = nuevoDescuento / 100
+      const precioConDescuento = precioBase * (1 - descuentoDecimal)
+
+      setForm((prev) => ({
+        ...prev,
+        [name]: value,
+        precio: Math.round(precioConDescuento),
+        precioTotal: Math.round(precioConDescuento),
+      }))
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }))
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -160,7 +209,10 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Duración (días)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Duración (días)
+                <span className="text-xs text-blue-600 ml-1">- El precio se recalcula automáticamente</span>
+              </label>
               <input
                 name="duracionDias"
                 value={form.duracionDias}
@@ -173,7 +225,10 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Descuento (%)
+                <span className="text-xs text-blue-600 ml-1">- Afecta el precio final</span>
+              </label>
               <input
                 name="descuento"
                 value={form.descuento}
@@ -260,24 +315,30 @@ const EditarPaqueteModal = ({ open, onClose, paquete, onSave }) => {
               />
             </div>
           </div>
-          <div className="bg-gray-50 p-4 rounded-lg border">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">
+          <div className="bg-gradient-to-r from-blue-50 to-emerald-50 p-4 rounded-lg border border-blue-200">
+            <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center">
+              <DollarSign className="w-4 h-4 mr-2 text-emerald-600" />
               Información de Precio (Calculado automáticamente)
             </h4>
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-600">Precio base:</span>
-                <span className="ml-2 font-semibold">
+              <div className="bg-white p-3 rounded-lg border">
+                <span className="text-gray-600 block">Precio original ({duracionOriginal} días):</span>
+                <span className="text-lg font-bold text-gray-800">
+                  ${precioOriginal ? Number(precioOriginal).toLocaleString("es-CO") : "0"} COP
+                </span>
+              </div>
+              <div className="bg-white p-3 rounded-lg border">
+                <span className="text-gray-600 block">Precio recalculado ({form.duracionDias} días):</span>
+                <span className="text-lg font-bold text-emerald-600">
                   ${form.precio ? Number(form.precio).toLocaleString("es-CO") : "0"} COP
                 </span>
               </div>
-              <div>
-                <span className="text-gray-600">Precio total:</span>
-                <span className="ml-2 font-semibold text-emerald-600">
-                  ${form.precioTotal ? Number(form.precioTotal).toLocaleString("es-CO") : "0"} COP
-                </span>
-              </div>
             </div>
+            {form.descuento > 0 && (
+              <div className="mt-2 text-xs text-blue-600 bg-blue-100 p-2 rounded">
+                💡 Descuento del {form.descuento}% aplicado al precio recalculado
+              </div>
+            )}
           </div>
           <div className="flex space-x-3 pt-4">
             <button
@@ -435,59 +496,60 @@ export const AdminPanel = () => {
   }
 
   const handleDeleteUser = async (userId, userName, userRole) => {
-  const formattedRole = formatRole(userRole);
+    const formattedRole = formatRole(userRole)
 
-  const confirm = await Swal.fire({
-    title: "¿Estás seguro?",
-    text: `Esta acción eliminará al ${formattedRole} "${userName}" permanentemente.`,
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#d33",
-    cancelButtonColor: "#6b7280",
-    confirmButtonText: "Sí, eliminar",
-    cancelButtonText: "Cancelar",
-  });
+    const confirm = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: `Esta acción eliminará al ${formattedRole} "${userName}" permanentemente.`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#6b7280",
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    })
 
-  if (!confirm.isConfirmed) return;
+    if (!confirm.isConfirmed) return
 
-  // ✅ Solo dejamos el endpoint correcto
-  const endpoint = `/admin/UserDelete/${userId}`;
+    // ✅ Solo dejamos el endpoint correcto
+    const endpoint = `/admin/UserDelete/${userId}`
 
-  try {
-    console.log(`🔍 Intentando DELETE ${endpoint}`);
-    await api.delete(endpoint);
+    try {
+      console.log(`🔍 Intentando DELETE ${endpoint}`)
+      await api.delete(endpoint)
 
-    Swal.fire({
-      title: "Eliminado",
-      text: `El ${formattedRole} ha sido eliminado exitosamente.`,
-      icon: "success",
-      confirmButtonColor: "#10b981",
-      timer: 2000,
-      showConfirmButton: false,
-    });
+      Swal.fire({
+        title: "Eliminado",
+        text: `El ${formattedRole} ha sido eliminado exitosamente.`,
+        icon: "success",
+        confirmButtonColor: "#10b981",
+        timer: 2000,
+        showConfirmButton: false,
+      })
 
-    // Aquí puedes actualizar tu lista si usas setUsuarios(...)
-  } catch (error) {
-    const status = error.response?.status;
-    const message = error.response?.data?.error || error.message;
+      // Actualizar la lista de usuarios tras eliminar
+      handleFilterUserByRol(filterRol)
+    } catch (error) {
+      const status = error.response?.status
+      const message = error.response?.data?.error || error.message
 
-    console.error("❌ Error al eliminar usuario:", status, message);
+      console.error("❌ Error al eliminar usuario:", status, message)
 
-    let errorMessage = "No se pudo eliminar el usuario.";
+      let errorMessage = "No se pudo eliminar el usuario."
 
-    if (message?.includes("no existe")) {
-      errorMessage = "El usuario no existe.";
-    } else if (status === 404) {
-      errorMessage = "Usuario no encontrado.";
-    } else if (status === 403) {
-      errorMessage = "No tienes permisos para eliminar este usuario.";
-    } else if (status === 500) {
-      errorMessage = "Error interno del servidor.";
+      if (message?.includes("no existe")) {
+        errorMessage = "El usuario no existe."
+      } else if (status === 404) {
+        errorMessage = "Usuario no encontrado."
+      } else if (status === 403) {
+        errorMessage = "No tienes permisos para eliminar este usuario."
+      } else if (status === 500) {
+        errorMessage = "Error interno del servidor."
+      }
+
+      Swal.fire("Error", errorMessage, "error")
     }
-
-    Swal.fire("Error", errorMessage, "error");
   }
-};
 
   const handleFilterUserByRol = async (rol) => {
     try {
@@ -1003,14 +1065,7 @@ export const AdminPanel = () => {
           </div>
         )
       default:
-        return (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              {adminTabs.find((tab) => tab.id === activeTab)?.label}
-            </h3>
-            <p className="text-gray-600">Contenido de {activeTab} en desarrollo...</p>
-          </div>
-        )
+        return null
     }
   }
 
