@@ -179,7 +179,7 @@ export const Paquetes = () => {
 
   if (paquetes.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen ">
         <div className="flex flex-col items-center pt-16 gap-8">
           <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
             <button
