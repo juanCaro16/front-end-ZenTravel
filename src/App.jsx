@@ -1,3 +1,4 @@
+"use client"
 
 import { Route, Routes } from "react-router-dom"
 import { AppHeader } from "./Layouts/AppHeader/AppHeader"
@@ -21,18 +22,18 @@ import { ProtectedRoute } from "./Components/ProtectedRoute/ProtectedRoute"
 import { AdminPanel } from "./Components/AdminPanel/AdminPanel"
 import { EmployeePanel } from "./Components/EmployeePanel/EmployeePanel"
 import { TestPermissions } from "./Components/TestPermissions/TestPermissions"
-import useAuth  from "./Hooks/useAuth"
+import useAuth from "./Hooks/useAuth"
 import { Hoteles } from "./Pages/Hoteles/Hoteles"
 import { MisViajes } from "./Pages/MisViajes/MisViajes"
 import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
+import { ReservarHotel } from "./Pages/ReservaHotel/ReservaHotel"
 
 export const App = () => {
   const { isAuthenticated, userRole, login, logout } = useAuth()
   const location = useLocation() // Obtén la ubicación actual
 
   const hideHeaderPaths = ["/", "/register", "/reset-password"]
-  const shouldHideHeader = hideHeaderPaths.includes(location.pathname) ||
-    (/^\/reset-password\//.test(location.pathname))
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname) || /^\/reset-password\//.test(location.pathname)
 
   useEffect(() => {
     // Verifica el token cada vez que cambie la ruta
@@ -102,6 +103,16 @@ export const App = () => {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/reservar-hotel/:id"
+          element={
+            <ProtectedRoute>
+              <ReservarHotel />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/CrearHoteles"
           element={

@@ -3,103 +3,99 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import {
-  Heart,
   Calendar,
   MapPin,
-  Clock,
-  Eye,
-  Package,
   Users,
-  DollarSign,
+  Clock,
+  Star,
+  Heart,
+  Package,
+  Plane,
+  Hotel,
+  Eye,
+  Trash2,
   Filter,
   Search,
-  Download,
-  Share2,
 } from "lucide-react"
 import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 
 export const MisViajes = () => {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState("favoritos")
-  const [favoritos, setFavoritos] = useState([])
   const [reservas, setReservas] = useState([])
-  const [filtro, setFiltro] = useState("")
-  const [busqueda, setBusqueda] = useState("")
-  const [loading, setLoading] = useState(false)
+  const [reservasLocales, setReservasLocales] = useState([])
+  const [paquetesFavoritos, setPaquetesFavoritos] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState("dashboard")
 
-  // Cargar favoritos del localStorage
   useEffect(() => {
-    const favoritosGuardados = localStorage.getItem("paquetesFavoritos")
-    if (favoritosGuardados) {
-      setFavoritos(JSON.parse(favoritosGuardados))
-    }
+    cargarDatos()
   }, [])
 
-  // Cargar reservas del usuario (simulado por ahora)
-  useEffect(() => {
-    cargarReservas()
-  }, [])
-
-  const cargarReservas = async () => {
+  const cargarDatos = async () => {
     try {
       setLoading(true)
-      // Aquí iría la llamada real a la API para obtener las reservas del usuario
-      // const response = await api.get("/user/reservas")
-      // setReservas(response.data)
-
-      // Por ahora simulamos algunas reservas
-      const reservasSimuladas = [
-        {
-          id: 1,
-          nombrePaquete: "Aventura en Cartagena",
-          fechaReserva: "2024-01-15",
-          fechaViaje: "2024-03-20",
-          estado: "confirmado",
-          precio: 850000,
-          destino: "Cartagena",
-          duracion: 4,
-          personas: 2,
-        },
-        {
-          id: 2,
-          nombrePaquete: "Escapada a San Andrés",
-          fechaReserva: "2024-02-10",
-          fechaViaje: "2024-04-15",
-          estado: "pendiente",
-          precio: 1200000,
-          destino: "San Andrés",
-          duracion: 5,
-          personas: 1,
-        },
-      ]
-      setReservas(reservasSimuladas)
+      await Promise.all([cargarReservas(), cargarReservasLocales(), cargarPaquetesFavoritos()])
     } catch (error) {
-      console.error("Error al cargar reservas:", error)
+      console.error("Error al cargar datos:", error)
     } finally {
       setLoading(false)
     }
   }
 
-  const eliminarFavorito = (id) => {
+  const cargarReservas = async () => {
+    try {
+      const response = await api.get("reservations/user")
+      setReservas(response.data.reservas || [])
+    } catch (error) {
+      console.error("Error al cargar reservas:", error)
+      setReservas([])
+    }
+  }
+
+  const cargarReservasLocales = () => {
+    try {
+      const reservasGuardadas = localStorage.getItem("reservasLocales")
+      if (reservasGuardadas) {
+        setReservasLocales(JSON.parse(reservasGuardadas))
+      }
+    } catch (error) {
+      console.error("Error al cargar reservas locales:", error)
+      setReservasLocales([])
+    }
+  }
+
+  const cargarPaquetesFavoritos = () => {
+    try {
+      const favoritos = localStorage.getItem("paquetesFavoritos")
+      if (favoritos) {
+        setPaquetesFavoritos(JSON.parse(favoritos))
+      }
+    } catch (error) {
+      console.error("Error al cargar paquetes favoritos:", error)
+      setPaquetesFavoritos([])
+    }
+  }
+
+  const eliminarDeFavoritos = (idPaquete) => {
     Swal.fire({
       title: "¿Eliminar de favoritos?",
-      text: "Este paquete será removido de tu lista de favoritos",
+      text: "Este paquete se eliminará de tu lista de favoritos",
       icon: "question",
       showCancelButton: true,
-      confirmButtonColor: "#ef4444",
+      confirmButtonColor: "#10b981",
       cancelButtonColor: "#6b7280",
       confirmButtonText: "Sí, eliminar",
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        const nuevosFavoritos = favoritos.filter((fav) => fav.id_paquete !== id)
-        setFavoritos(nuevosFavoritos)
+        const nuevosFavoritos = paquetesFavoritos.filter((paquete) => paquete.id_paquete !== idPaquete)
+        setPaquetesFavoritos(nuevosFavoritos)
         localStorage.setItem("paquetesFavoritos", JSON.stringify(nuevosFavoritos))
 
         Swal.fire({
           title: "Eliminado",
-          text: "El paquete ha sido removido de favoritos",
+          text: "El paquete ha sido eliminado de tus favoritos",
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
@@ -108,100 +104,472 @@ export const MisViajes = () => {
     })
   }
 
-  const comprarPaquete = async (paquete) => {
+  const formatearFecha = (fecha) => {
+    if (!fecha) return "Fecha no disponible"
     try {
-      const response = await api.post("/api/payments/create", {
-        price: 10.0,
-        name: paquete.nombrePaquete,
-        quantity: 1,
+      return new Date(fecha).toLocaleDateString("es-CO", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       })
-
-      const approvalUrl = response.data.approval_url
-      if (approvalUrl) {
-        window.location.href = approvalUrl
-      } else {
-        Swal.fire("Error", "No se pudo procesar el pago", "error")
-      }
     } catch (error) {
-      console.error("Error al procesar pago:", error)
-      Swal.fire("Error", "Error al procesar el pago", "error")
+      return "Fecha inválida"
     }
   }
 
-  const compartirPaquete = (paquete) => {
-    if (navigator.share) {
-      navigator.share({
-        title: paquete.nombrePaquete,
-        text: paquete.descripcion,
-        url: window.location.origin + "/paquetes",
-      })
-    } else {
-      // Fallback para navegadores que no soportan Web Share API
-      navigator.clipboard.writeText(window.location.origin + "/paquetes")
-      Swal.fire({
-        title: "Enlace copiado",
-        text: "El enlace ha sido copiado al portapapeles",
-        icon: "success",
-        timer: 2000,
-        showConfirmButton: false,
-      })
-    }
+  const formatearPrecio = (precio) => {
+    if (!precio) return "Precio no disponible"
+    return `$${Number(precio).toLocaleString("es-CO")} COP`
   }
 
-  const filtrarElementos = (elementos) => {
-    return elementos.filter((elemento) => {
-      const coincideBusqueda =
-        elemento.nombrePaquete?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        elemento.destino?.toLowerCase().includes(busqueda.toLowerCase()) ||
-        elemento.nombre_destino?.toLowerCase().includes(busqueda.toLowerCase())
-
-      if (activeTab === "favoritos") {
-        const coincideFiltro = filtro === "" || elemento.categoria === filtro
-        return coincideBusqueda && coincideFiltro
-      } else {
-        const coincideFiltro = filtro === "" || elemento.estado === filtro
-        return coincideBusqueda && coincideFiltro
-      }
-    })
-  }
+  const totalReservas = reservas.length + reservasLocales.length
+  const totalFavoritos = paquetesFavoritos.length
 
   const tabs = [
-    { id: "favoritos", label: "Favoritos", icon: <Heart className="w-5 h-5" />, count: favoritos.length },
-    { id: "reservas", label: "Mis Reservas", icon: <Calendar className="w-5 h-5" />, count: reservas.length },
+    { id: "dashboard", label: "Dashboard", icon: <Package className="w-5 h-5" /> },
+    { id: "reservas", label: "Mis Reservas", icon: <Calendar className="w-5 h-5" /> },
+    { id: "favoritos", label: "Favoritos", icon: <Heart className="w-5 h-5" /> },
   ]
 
-  const estadoColors = {
-    confirmado: "bg-green-100 text-green-800",
-    pendiente: "bg-yellow-100 text-yellow-800",
-    cancelado: "bg-red-100 text-red-800",
-    completado: "bg-blue-100 text-blue-800",
+  const renderDashboard = () => (
+    <div className="space-y-6 sm:space-y-8">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-100 text-xs sm:text-sm font-medium">Total Reservas</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1">{totalReservas}</p>
+            </div>
+            <Calendar className="w-6 h-6 sm:w-8 sm:h-8 text-blue-200" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-green-100 text-xs sm:text-sm font-medium">Del Sistema</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1">{reservas.length}</p>
+            </div>
+            <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-green-200" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-purple-100 text-xs sm:text-sm font-medium">Locales</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1">{reservasLocales.length}</p>
+            </div>
+            <Hotel className="w-6 h-6 sm:w-8 sm:h-8 text-purple-200" />
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-pink-100 text-xs sm:text-sm font-medium">Favoritos</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1">{totalFavoritos}</p>
+            </div>
+            <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-pink-200" />
+          </div>
+        </div>
+      </div>
+
+      {/* Acciones Rápidas */}
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Acciones Rápidas</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <button
+            onClick={() => navigate("/paquetes")}
+            className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 rounded-lg sm:rounded-xl border border-emerald-200 transition-all duration-200 group"
+          >
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-emerald-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">Explorar Paquetes</p>
+              <p className="text-xs sm:text-sm text-gray-600">Descubre nuevos destinos</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => navigate("/hoteles")}
+            className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 rounded-lg sm:rounded-xl border border-blue-200 transition-all duration-200 group"
+          >
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Hotel className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">Reservar Hotel</p>
+              <p className="text-xs sm:text-sm text-gray-600">Encuentra alojamiento</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("favoritos")}
+            className="flex items-center space-x-3 p-3 sm:p-4 bg-gradient-to-r from-pink-50 to-rose-50 hover:from-pink-100 hover:to-rose-100 rounded-lg sm:rounded-xl border border-pink-200 transition-all duration-200 group"
+          >
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-pink-500 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div className="text-left">
+              <p className="font-semibold text-gray-900 text-sm sm:text-base">Ver Favoritos</p>
+              <p className="text-xs sm:text-sm text-gray-600">{totalFavoritos} paquetes guardados</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Resumen de Actividad */}
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+        <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Actividad Reciente</h3>
+        <div className="space-y-3 sm:space-y-4">
+          {totalReservas === 0 && totalFavoritos === 0 ? (
+            <div className="text-center py-8 sm:py-12">
+              <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-300 mx-auto mb-3 sm:mb-4" />
+              <p className="text-gray-500 text-sm sm:text-base">No tienes actividad reciente</p>
+              <p className="text-gray-400 text-xs sm:text-sm mt-1">¡Comienza explorando nuestros paquetes!</p>
+            </div>
+          ) : (
+            <>
+              {reservas.slice(0, 3).map((reserva, index) => (
+                <div key={index} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 text-sm sm:text-base">
+                      Reserva confirmada: {reserva.nombrePaquete || "Paquete"}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      {formatearFecha(reserva.fechaReserva)} • {formatearPrecio(reserva.precioTotal)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+              {paquetesFavoritos.slice(0, 2).map((paquete, index) => (
+                <div key={index} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                  <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                  <div className="flex-1">
+                    <p className="font-medium text-gray-900 text-sm sm:text-base">
+                      Agregado a favoritos: {paquete.nombrePaquete}
+                    </p>
+                    <p className="text-xs sm:text-sm text-gray-500">
+                      {paquete.nombre_destino} • {formatearPrecio(paquete.precioTotal)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderReservas = () => (
+    <div className="space-y-6 sm:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Mis Reservas</h2>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">
+            Gestiona todas tus reservas de viaje en un solo lugar
+          </p>
+        </div>
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <button className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-medium">Filtrar</span>
+          </button>
+          <button className="flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
+            <Search className="w-4 h-4" />
+            <span className="text-sm font-medium">Buscar</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Reservas del Sistema */}
+      {reservas.length > 0 && (
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <Plane className="w-4 h-4 text-green-600" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900">Reservas del Sistema</h3>
+            <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+              {reservas.length}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {reservas.map((reserva, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">
+                      {reserva.nombrePaquete || "Paquete de Viaje"}
+                    </h4>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 mb-2">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>{reserva.destino || "Destino no especificado"}</span>
+                    </div>
+                  </div>
+                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                    Confirmada
+                  </span>
+                </div>
+                <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Fecha: {formatearFecha(reserva.fechaReserva)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Personas: {reserva.cantidadPersonas || 1}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Duración: {reserva.duracionDias || "N/A"} días</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                  <span className="font-bold text-emerald-600 text-sm sm:text-base">
+                    {formatearPrecio(reserva.precioTotal)}
+                  </span>
+                  <button className="flex items-center space-x-1 sm:space-x-2 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-xs sm:text-sm">
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Ver Detalles</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Reservas Locales */}
+      {reservasLocales.length > 0 && (
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+          <div className="flex items-center space-x-3 mb-4 sm:mb-6">
+            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Hotel className="w-4 h-4 text-purple-600" />
+            </div>
+            <h3 className="text-lg sm:text-xl font-bold text-gray-900">Reservas Locales</h3>
+            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+              {reservasLocales.length}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            {reservasLocales.map((reserva, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:shadow-md transition-shadow"
+              >
+                <div className="flex items-start justify-between mb-3 sm:mb-4">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">
+                      {reserva.nombrePaquete || "Reserva Local"}
+                    </h4>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 mb-2">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>{reserva.destino || "Destino local"}</span>
+                    </div>
+                  </div>
+                  <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs font-medium rounded-full">
+                    Local
+                  </span>
+                </div>
+                <div className="space-y-2 text-xs sm:text-sm text-gray-600">
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Fecha: {formatearFecha(reserva.fechaReserva)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Users className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Personas: {reserva.cantidadPersonas || 1}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+                  <span className="font-bold text-purple-600 text-sm sm:text-base">
+                    {formatearPrecio(reserva.precioTotal)}
+                  </span>
+                  <button className="flex items-center space-x-1 sm:space-x-2 px-3 py-1.5 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors text-xs sm:text-sm">
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Ver Detalles</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Estado vacío */}
+      {reservas.length === 0 && reservasLocales.length === 0 && (
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-8 sm:p-12 text-center">
+          <Calendar className="w-16 h-16 sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">No tienes reservas aún</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+            ¡Explora nuestros increíbles paquetes de viaje y haz tu primera reserva!
+          </p>
+          <button
+            onClick={() => navigate("/paquetes")}
+            className="inline-flex items-center space-x-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-semibold transition-colors"
+          >
+            <Package className="w-5 h-5" />
+            <span>Explorar Paquetes</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )
+
+  const renderFavoritos = () => (
+    <div className="space-y-6 sm:space-y-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Paquetes Favoritos</h2>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Tus paquetes de viaje guardados para más tarde</p>
+        </div>
+        <div className="flex items-center space-x-2 sm:space-x-3">
+          <span className="px-3 py-1.5 bg-pink-100 text-pink-800 text-sm font-medium rounded-full">
+            {totalFavoritos} favoritos
+          </span>
+        </div>
+      </div>
+
+      {/* Lista de Favoritos */}
+      {paquetesFavoritos.length > 0 ? (
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-4 sm:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            {paquetesFavoritos.map((paquete, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <div className="relative">
+                  <img
+                    src={paquete.imagenUrl || "/placeholder.svg?height=200&width=300"}
+                    alt={paquete.nombrePaquete}
+                    className="w-full h-40 sm:h-48 object-cover"
+                  />
+                  <div className="absolute top-3 right-3">
+                    <button
+                      onClick={() => eliminarDeFavoritos(paquete.id_paquete)}
+                      className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </button>
+                  </div>
+                  {paquete.descuento > 0 && (
+                    <div className="absolute top-3 left-3">
+                      <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                        -{paquete.descuento}%
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className="p-4 sm:p-6">
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-2">
+                      {paquete.nombrePaquete}
+                    </h3>
+                    <div className="flex items-center space-x-1 ml-2">
+                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                      <span className="text-xs text-gray-600">4.8</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>{paquete.nombre_destino || paquete.nombreDestino}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>{paquete.duracionDias} días</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                      <Package className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span className="capitalize">{paquete.categoria || "Aventura"}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-lg sm:text-xl font-bold text-emerald-600">
+                        {formatearPrecio(paquete.precioTotal || paquete.precio)}
+                      </span>
+                      <p className="text-xs text-gray-500">por persona</p>
+                    </div>
+                    <button
+                      onClick={() => navigate(`/paquetes/${paquete.id_paquete}`)}
+                      className="flex items-center space-x-1 sm:space-x-2 px-3 sm:px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-xs sm:text-sm font-medium"
+                    >
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>Ver Detalles</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-lg border border-gray-200 p-8 sm:p-12 text-center">
+          <Heart className="w-16 h-16 sm:w-20 sm:h-20 text-gray-300 mx-auto mb-4 sm:mb-6" />
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">No tienes favoritos aún</h3>
+          <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">
+            Guarda tus paquetes favoritos para encontrarlos fácilmente más tarde
+          </p>
+          <button
+            onClick={() => navigate("/paquetes")}
+            className="inline-flex items-center space-x-2 px-6 py-3 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-semibold transition-colors"
+          >
+            <Heart className="w-5 h-5" />
+            <span>Explorar Paquetes</span>
+          </button>
+        </div>
+      )}
+    </div>
+  )
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando tus viajes...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-6 sm:py-8 px-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full mb-6 shadow-lg">
-            <Package className="w-10 h-10 text-white" />
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-xl flex items-center justify-center">
+              <Package className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Mis Viajes</h1>
+              <p className="text-sm sm:text-base text-gray-600">Gestiona tus reservas y paquetes favoritos</p>
+            </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Mis
-            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"> Viajes</span>
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Gestiona tus paquetes favoritos y revisa el estado de tus reservas
-          </p>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 mb-8">
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 sm:mb-8">
           <div className="flex overflow-x-auto">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
+                className={`flex items-center space-x-2 px-4 sm:px-6 py-3 sm:py-4 border-b-2 transition-colors whitespace-nowrap text-sm sm:text-base ${
                   activeTab === tab.id
                     ? "border-emerald-500 text-emerald-600 bg-emerald-50"
                     : "border-transparent text-gray-600 hover:text-emerald-600 hover:bg-emerald-50"
@@ -209,257 +577,15 @@ export const MisViajes = () => {
               >
                 {tab.icon}
                 <span className="font-medium">{tab.label}</span>
-                <span
-                  className={`px-2 py-1 rounded-full text-xs ${
-                    activeTab === tab.id ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {tab.count}
-                </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Filtros y búsqueda */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            {/* Búsqueda */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Buscar por nombre o destino..."
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-              />
-            </div>
-
-            {/* Filtro */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={filtro}
-                onChange={(e) => setFiltro(e.target.value)}
-                className="pl-10 pr-8 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 bg-white"
-              >
-                <option value="">Todos</option>
-                {activeTab === "favoritos" ? (
-                  <>
-                    <option value="aventura">Aventura</option>
-                    <option value="playa">Playa</option>
-                    <option value="cultural">Cultural</option>
-                    <option value="naturaleza">Naturaleza</option>
-                    <option value="urbano">Urbano</option>
-                    <option value="gastronomico">Gastronómico</option>
-                  </>
-                ) : (
-                  <>
-                    <option value="confirmado">Confirmado</option>
-                    <option value="pendiente">Pendiente</option>
-                    <option value="cancelado">Cancelado</option>
-                    <option value="completado">Completado</option>
-                  </>
-                )}
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {/* Contenido */}
-        {activeTab === "favoritos" ? (
-          <div>
-            {filtrarElementos(favoritos).length === 0 ? (
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
-                <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No tienes favoritos aún</h3>
-                <p className="text-gray-600 mb-6">Explora nuestros paquetes y guarda los que más te gusten</p>
-                <button
-                  onClick={() => navigate("/paquetes")}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
-                >
-                  Explorar Paquetes
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filtrarElementos(favoritos).map((paquete) => (
-                  <div
-                    key={paquete.id_paquete}
-                    className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                  >
-                    <div className="relative">
-                      <img
-                        src={paquete.imagenUrl || "/placeholder.svg?height=200&width=300"}
-                        alt={paquete.nombrePaquete}
-                        className="w-full h-48 object-cover"
-                      />
-                      <div className="absolute top-4 right-4">
-                        <button
-                          onClick={() => eliminarFavorito(paquete.id_paquete)}
-                          className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 transition-colors duration-200"
-                        >
-                          <Heart className="w-5 h-5 fill-current" />
-                        </button>
-                      </div>
-                      {paquete.categoria && (
-                        <div className="absolute top-4 left-4">
-                          <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-medium rounded-full">
-                            {paquete.categoria}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{paquete.nombrePaquete}</h3>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-2">{paquete.descripcion}</p>
-
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center text-sm text-gray-600">
-                          <MapPin className="w-4 h-4 mr-2" />
-                          <span>{paquete.nombre_destino || paquete.nombreDestino || "Destino no especificado"}</span>
-                        </div>
-                        <div className="flex items-center text-sm text-gray-600">
-                          <Clock className="w-4 h-4 mr-2" />
-                          <span>{paquete.duracionDias} días</span>
-                        </div>
-                        {paquete.precioTotal && (
-                          <div className="flex items-center text-sm text-gray-600">
-                            <DollarSign className="w-4 h-4 mr-2" />
-                            <span>${Number(paquete.precioTotal).toLocaleString()} COP</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => navigate("/paquetes")}
-                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors duration-200"
-                            title="Ver detalles"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            onClick={() => compartirPaquete(paquete)}
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                            title="Compartir"
-                          >
-                            <Share2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        <button
-                          onClick={() => comprarPaquete(paquete)}
-                          className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
-                        >
-                          Comprar
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div>
-            {loading ? (
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
-                <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-gray-600">Cargando reservas...</p>
-              </div>
-            ) : filtrarElementos(reservas).length === 0 ? (
-              <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
-                <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No tienes reservas</h3>
-                <p className="text-gray-600 mb-6">Cuando realices una reserva, aparecerá aquí</p>
-                <button
-                  onClick={() => navigate("/paquetes")}
-                  className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-semibold transition-all duration-200 transform hover:scale-105"
-                >
-                  Explorar Paquetes
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {filtrarElementos(reservas).map((reserva) => (
-                  <div
-                    key={reserva.id}
-                    className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-3">
-                          <h3 className="text-xl font-bold text-gray-900">{reserva.nombrePaquete}</h3>
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${estadoColors[reserva.estado]}`}
-                          >
-                            {reserva.estado.charAt(0).toUpperCase() + reserva.estado.slice(1)}
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <MapPin className="w-4 h-4 mr-2" />
-                            <span>{reserva.destino}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Calendar className="w-4 h-4 mr-2" />
-                            <span>{new Date(reserva.fechaViaje).toLocaleDateString()}</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Clock className="w-4 h-4 mr-2" />
-                            <span>{reserva.duracion} días</span>
-                          </div>
-                          <div className="flex items-center">
-                            <Users className="w-4 h-4 mr-2" />
-                            <span>
-                              {reserva.personas} persona{reserva.personas > 1 ? "s" : ""}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="mt-3 text-sm text-gray-500">
-                          <span>Reservado el: {new Date(reserva.fechaReserva).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col lg:items-end gap-3">
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">${reserva.precio.toLocaleString()} COP</p>
-                          <p className="text-sm text-gray-500">Total pagado</p>
-                        </div>
-
-                        <div className="flex gap-2">
-                          <button
-                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors duration-200"
-                            title="Ver detalles"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                            title="Descargar"
-                          >
-                            <Download className="w-4 h-4" />
-                          </button>
-                          <button
-                            className="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors duration-200"
-                            title="Compartir"
-                          >
-                            <Share2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Content */}
+        {activeTab === "dashboard" && renderDashboard()}
+        {activeTab === "reservas" && renderReservas()}
+        {activeTab === "favoritos" && renderFavoritos()}
       </div>
     </div>
   )
