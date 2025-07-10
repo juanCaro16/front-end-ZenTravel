@@ -73,7 +73,7 @@ export const CrearHoteles = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center mt-10 p-2">
+    <div className="h-auto flex items-center justify-center mt-10 p-2">
       <form
         onSubmit={handleSubmit}
         className="w-130 bg-white shadow-xl rounded-2xl px-6 py-10 space-y-5"

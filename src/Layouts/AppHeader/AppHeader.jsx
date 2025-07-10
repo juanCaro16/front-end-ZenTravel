@@ -24,7 +24,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
   
 
   return (
-    <header className="w-screen bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
+    <header className="w-[100%] bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
       <div className=" mx-auto sm:px-6 lg:px-8">
         <div className="w-full flex items-center h-16 ">
           {/* Logo y navegación principal */}
@@ -100,7 +100,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 />
               </RoleBasedComponent>
 
-              <RoleBasedComponent allowedRoles={["Empleado"]}>
+              <RoleBasedComponent allowedRoles={["empleado"]}>
                 <ItemNavLink
                   content="Panel Empleado"
                   route="/employee"
@@ -114,7 +114,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           {/* Controles adicionales */}
           <div className="flex items-center ml-auto">
             {/* Info adicional - Desktop */}
-            <div className="hidden xl:flex items-center space-x-4 text-sm text-gray-600">
+            <div className="hidden xl:flex items-center w-full  space-x-4 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <Globe className="w-4 h-4" />
                 <img src="https://flagcdn.com/w20/co.png" alt="Colombia" className="w-5 h-3 rounded-sm" />
@@ -129,7 +129,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                     <HelpCircle className="w-4 h-4" />
                     <span>Ayuda</span>
                   </div>
-                }
+                } 
                 route="/soporte"
                 myStyles="flex items-center space-x-1 text-gray-600 hover:text-emerald-600 transition-colors duration-200"
               />
@@ -228,7 +228,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             </RoleBasedComponent>
 
-            <RoleBasedComponent allowedRoles={["Empleado"]}>
+            <RoleBasedComponent allowedRoles={["empleado"]}>
               <ItemNavLink
                 content="Panel Empleado"
                 route="/employee"
@@ -236,7 +236,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               />
             </RoleBasedComponent>
 
-            <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+            <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
               <ItemNavLink
                 content="Crear Paquete"
                 route="/crearPaquete"
