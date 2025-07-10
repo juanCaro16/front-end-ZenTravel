@@ -93,31 +93,31 @@ export const Hoteles = () => {
     setHoteles(nuevosHoteles)
   }
 
-const handleGuardar = async (hotel) => {
-  try {
-    const formData = new FormData()
-    formData.append("nombre", hotel.nombre)
-    formData.append("descripcion", hotel.descripcion || "") // Por si viene vacío
-    formData.append("ubicacion", hotel.ubicacion)
+  const handleGuardar = async (hotel) => {
+    try {
+      const formData = new FormData()
+      formData.append("nombre", hotel.nombre)
+      formData.append("descripcion", hotel.descripcion || "") // Por si viene vacío
+      formData.append("ubicacion", hotel.ubicacion)
 
-    // Agregar imágenes nuevas si existen
-    if (hotel.imageneshabitacionesNuevas && hotel.imageneshabitacionesNuevas.length) {
-      for (const img of hotel.imageneshabitacionesNuevas) {
-        formData.append("imageneshabitaciones", img)
+      // Agregar imágenes nuevas si existen
+      if (hotel.imageneshabitacionesNuevas && hotel.imageneshabitacionesNuevas.length) {
+        for (const img of hotel.imageneshabitacionesNuevas) {
+          formData.append("imageneshabitaciones", img)
+        }
       }
+
+      await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+
+      Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
+      setEditandoId(null)
+      obtenerHoteles()
+    } catch (error) {
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
     }
-
-    await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-
-    Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
-    setEditandoId(null)
-    obtenerHoteles()
-  } catch (error) {
-    Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
   }
-}
 
 
   const handleStarChange = async (index, estrellas) => {
@@ -640,7 +640,7 @@ const handleGuardar = async (hotel) => {
                                 accept="image/*"
                                 className="hidden"
                                 onChange={(e) => {
-                                 const nuevas = Array.from(e.target.files || [])
+                                  const nuevas = Array.from(e.target.files || [])
                                   if (!nuevas.length) return
 
                                   const index = hoteles.findIndex((h) => h.id_hotel === hotelSeleccionado.id_hotel)
@@ -651,7 +651,7 @@ const handleGuardar = async (hotel) => {
                                       actuales = typeof hotelActual.imageneshabitaciones === "string"
                                         ? JSON.parse(hotelActual.imageneshabitaciones)
                                         : hotelActual.imageneshabitaciones || []
-                                    } catch (e) {}
+                                    } catch (e) { }
 
                                     const nuevasUrls = nuevas.map(img => URL.createObjectURL(img)) // Previews
                                     const todas = [...actuales, ...nuevasUrls]
@@ -679,7 +679,6 @@ const handleGuardar = async (hotel) => {
               </div>
             </div>
 
-            {/* Footer con botones de acción */}
             <div className="border-t bg-gradient-to-r from-slate-50 to-blue-50 px-6 py-4">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
@@ -718,7 +717,6 @@ const handleGuardar = async (hotel) => {
                   </button>
                 </div>
 
-                {/* Botones de Editar y Eliminar - SOLO PARA ADMIN */}
                 <RoleBasedComponent allowedRoles={["admin"]}>
                   <div className="flex gap-3">
                     {editandoId === hotelSeleccionado.id_hotel ? (
@@ -760,6 +758,5 @@ const handleGuardar = async (hotel) => {
         </div>
       )}
     </div>
-
   )
 }
