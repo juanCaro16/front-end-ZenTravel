@@ -105,6 +105,7 @@ export const Hoteles = () => {
     setHoteles(nuevosHoteles)
   }
 
+
   const handleGuardar = async (hotel) => {
     try {
       const id = hotel.id_hotel
@@ -114,8 +115,34 @@ export const Hoteles = () => {
     } catch (error) {
       console.error("❌ Error al actualizar:", error)
       Swal.fire("Error", "No se pudo actualizar el hotel", "error")
+
+const handleGuardar = async (hotel) => {
+  try {
+    const formData = new FormData()
+    formData.append("nombre", hotel.nombre)
+    formData.append("descripcion", hotel.descripcion || "") // Por si viene vacío
+    formData.append("ubicacion", hotel.ubicacion)
+
+    // Agregar imágenes nuevas si existen
+    if (hotel.imageneshabitacionesNuevas && hotel.imageneshabitacionesNuevas.length) {
+      for (const img of hotel.imageneshabitacionesNuevas) {
+        formData.append("imageneshabitaciones", img)
+      }
+
     }
+
+    await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+
+    Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
+    setEditandoId(null)
+    obtenerHoteles()
+  } catch (error) {
+    Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
   }
+}
+
 
   const handleEliminar = async (hotel) => {
     try {
@@ -286,6 +313,7 @@ export const Hoteles = () => {
                 Mostrando {hotelesFiltrados.length} de {hoteles.length} hoteles
               </div>
             </div>
+
           </div>
         )}
 
@@ -300,6 +328,16 @@ export const Hoteles = () => {
               {hoteles.length === 0 ? "Aún no se han registrado hoteles." : "Intenta ajustar los filtros de búsqueda."}
             </p>
             {filtros.nombre || filtros.ubicacion || filtros.estrellasMin || filtros.estrellasMax ? (
+
+          )
+        })}
+      </div>
+
+      {hotelSeleccionado && (
+        <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
+            <div className="relative bg-gradient-to-r from-blue-400 via-cyan-500 to-teal-500 text-white p-6">
+
               <button
                 onClick={limpiarFiltros}
                 className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
@@ -465,6 +503,7 @@ export const Hoteles = () => {
                     </button>
                   </div>
 
+
                   {/* Botones de edición para admin */}
                   <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
                     <div>
@@ -511,6 +550,122 @@ export const Hoteles = () => {
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-slate-800 mb-3 flex items-center">
+                      <svg
+                        className="w-5 h-5 mr-2 text-purple-500"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a 2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      Habitaciones
+                    </h3>
+                    <div className="bg-slate-50 p-4 rounded-lg">
+                      <button
+                        onClick={() =>
+                          setVerHabitacionesId(
+                            verHabitacionesId === hotelSeleccionado.id_hotel ? null : hotelSeleccionado.id_hotel,
+                          )
+                        }
+                        className="w-full px-4 py-3 bg-gradient-to-r bg-emerald-300 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                      >
+                        {verHabitacionesId === hotelSeleccionado.id_hotel
+                          ? "Ocultar Habitaciones"
+                          : "Ver Habitaciones"}
+                      </button>
+
+                      {verHabitacionesId === hotelSeleccionado.id_hotel && (
+                        <div className="mt-4 space-y-6">
+                          {(() => {
+                            let imagenes = []
+                            try {
+                              const imgs =
+                                typeof hotelSeleccionado.imageneshabitaciones === "string"
+                                  ? JSON.parse(hotelSeleccionado.imageneshabitaciones)
+                                  : hotelSeleccionado.imageneshabitaciones
+                              imagenes = Array.isArray(imgs) ? imgs : []
+                            } catch (e) { }
+
+                            return imagenes.length ? (
+                              <HabitacionCarrusel imagenes={imagenes} />
+                            ) : (
+                              <div className="text-center py-8">
+                                <svg
+                                  className="w-16 h-16 mx-auto text-slate-400 mb-4"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                                <p className="text-slate-500 text-lg">No hay imágenes de habitaciones disponibles</p>
+                              </div>
+                            )
+                          })()}
+
+                          {/* Botón solo para admin/empleado */}
+                          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+                            <div className="pt-2">
+                              <button
+                                onClick={() => document.getElementById("inputHabitacionesModal").click()}
+                                className="w-full px-4 py-3 bg-gradient-to-r bg-emerald-300 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                              >
+                                + Agregar imágenes de habitaciones
+                              </button>
+
+                              <input
+                                type="file"
+                                id="inputHabitacionesModal"
+                                multiple
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                 const nuevas = Array.from(e.target.files || [])
+                                  if (!nuevas.length) return
+
+                                  const index = hoteles.findIndex((h) => h.id_hotel === hotelSeleccionado.id_hotel)
+                                  if (index !== -1) {
+                                    const hotelActual = hoteles[index]
+                                    let actuales = []
+                                    try {
+                                      actuales = typeof hotelActual.imageneshabitaciones === "string"
+                                        ? JSON.parse(hotelActual.imageneshabitaciones)
+                                        : hotelActual.imageneshabitaciones || []
+                                    } catch (e) {}
+
+                                    const nuevasUrls = nuevas.map(img => URL.createObjectURL(img)) // Previews
+                                    const todas = [...actuales, ...nuevasUrls]
+
+                                    const nuevosHoteles = [...hoteles]
+                                    nuevosHoteles[index].imageneshabitaciones = todas
+                                    nuevosHoteles[index].imageneshabitacionesNuevas = nuevas // 👈 Para backend
+                                    setHoteles(nuevosHoteles)
+
+                                    setHotelSeleccionado({
+                                      ...hotelSeleccionado,
+                                      imageneshabitaciones: todas,
+                                      imageneshabitacionesNuevas: nuevas // 👈 Para backend
+                                    })
+                                  }
+                                }}
+                              />
+                            </div>
+                          </RoleBasedComponent>
+
                         </div>
                       )}
                     </div>

@@ -120,7 +120,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
           {/* Controles adicionales */}
           <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Info adicional - Desktop */}
-            <div className="hidden xl:flex items-center space-x-4 text-sm text-gray-600">
+            <div className="hidden xl:flex items-center w-full  space-x-4 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
                 <Globe className="w-4 h-4" />
                 <img src="https://flagcdn.com/w20/co.png" alt="Colombia" className="w-5 h-3 rounded-sm" />
@@ -135,7 +135,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                     <HelpCircle className="w-4 h-4" />
                     <span>Ayuda</span>
                   </div>
-                }
+                } 
                 route="/soporte"
                 myStyles="flex items-center space-x-1 text-gray-600 hover:text-emerald-600 transition-colors duration-200"
               />
