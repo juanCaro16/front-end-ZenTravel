@@ -3,6 +3,7 @@ import api from "../../Services/AxiosInstance/AxiosInstance"
 import Swal from "sweetalert2"
 import { Package, MapPin, Calendar, DollarSign, ImageIcon, FileText, Hotel, Plane, Clock, Percent, Save, ArrowLeft, Upload, Eye, Star, } from "lucide-react"
 import { useNavigate } from "react-router-dom"
+import { HotelSelector } from "../../Components/BuscaHotel/HotelSelector"
 
 export const CrearPaquetes = () => {
   const navigate = useNavigate()
@@ -23,10 +24,13 @@ export const CrearPaquetes = () => {
   })
 
   const [opcionesTransporte, setOpcionesTransporte] = useState([]);
+  const [hotelSeleccionado, setHotelSeleccionado] = useState("");
   const [opcionesHabitacion, setOpcionesHabitacion] = useState([]);
 
+
+
   const [transporte, setTransporte] = useState({ origen: '', destino: '' });
-  const [filtroHabitacion, setFiltroHabitacion] = useState({ nombreHotel: "" });
+
 
   const [imagen, setImagen] = useState(null);
   const [mensaje, setMensaje] = useState("")
@@ -140,32 +144,15 @@ export const CrearPaquetes = () => {
     }
   }
 
-const buscarHabitacion = async () => {
-  if (!filtroHabitacion.nombreHotel) {
-    Swal.fire("Campo requerido", "Debes ingresar el nombre del hotel.", "warning");
-    return;
-  }
+const buscarHabitacion = async (nombreHotel) => {
+  if (!nombreHotel) return;
 
   try {
-    console.log("🔍 Buscando habitaciones para:", filtroHabitacion.nombreHotel);
-    
-    const resultado = await api.get(`packages/RoomReservation/${filtroHabitacion.nombreHotel}`);
-    console.log("✅ Habitaciones encontradas:", resultado.data);
-
-    // Extraer solo el arreglo resultante
-    setOpcionesHabitacion(resultado.data.result || []);
-
-    if ((resultado.data.result || []).length === 0) {
-      Swal.fire("Sin resultados", "No hay habitaciones disponibles para este hotel.", "info");
-    }
-
+    const res = await api.get(`packages/RoomReservation/${nombreHotel}`);
+    setOpcionesHabitacion(res.data.result || []);
   } catch (error) {
     console.error("❌ Error al buscar habitaciones:", error);
-    Swal.fire(
-      "Error",
-      error.response?.data?.message || "Ocurrió un error al buscar habitaciones.",
-      "error"
-    );
+    Swal.fire("Error", "No se pudieron cargar las habitaciones.", "error");
   }
 };
 
@@ -293,27 +280,22 @@ const buscarHabitacion = async () => {
         <div>
               
         {/* Nombre del hotel */}
-        <input
-          name="nombreHotel"
-          value={filtroHabitacion.nombreHotel}
-          onChange={(e) =>
-            setFiltroHabitacion((prev) => ({ ...prev, nombreHotel: e.target.value }))
-          }
-          placeholder="Ej: Hotel Boutique Casa San Agustín"
-          className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500"
+        <HotelSelector
+          destino={formData.nombreDestino}
+          onSelect={(nombreHotel) => {
+            setHotelSeleccionado(nombreHotel);
+            buscarHabitacion(nombreHotel);
+          }}
         />
 
-        {/* Botón buscar */}
-        <button
-          type="button"
-          onClick={buscarHabitacion}
-          className="mt-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl shadow-md transition-all duration-200 font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
-        >
-          Buscar habitación
-        </button>
-        <option value="">Selecciona un transporte</option>
+        {hotelSeleccionado && (
+          <p className="text-sm text-gray-600">
+            Hotel seleccionado: <strong>{hotelSeleccionado}</strong>
+          </p>
+        )}
+
         {opcionesHabitacion.length > 0 && (
-          <div className="w-full mt-4">
+          <div className="mt-4">
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Habitaciones disponibles
             </label>
@@ -323,19 +305,21 @@ const buscarHabitacion = async () => {
               onChange={(e) =>
                 setFormData({ ...formData, Habitacion: e.target.value })
               }
-              className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
+              className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm"
             >
+              <option value="">Selecciona una habitación</option>
               {opcionesHabitacion.map((item) => (
                 <option
                   key={item.id_habitacion}
                   value={item.id_habitacion}
                 >
-                  {`#${item.numero} - ${item.tipo}, Precio: $${item.precio}`}
+                  Habitación {item.numero} - Tipo: {item.tipo} - ${item.precio}
                 </option>
               ))}
             </select>
           </div>
         )}
+
       </div>
 
             {/* Origen y Buscar Transportes */}
