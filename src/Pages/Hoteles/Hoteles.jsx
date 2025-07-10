@@ -108,6 +108,21 @@ export const Hoteles = () => {
 
   const handleGuardar = async (hotel) => {
     try {
+      const formData = new FormData()
+      formData.append("nombre", hotel.nombre)
+      formData.append("descripcion", hotel.descripcion || "") // Por si viene vacío
+      formData.append("ubicacion", hotel.ubicacion)
+
+      // Agregar imágenes nuevas si existen
+      if (hotel.imageneshabitacionesNuevas && hotel.imageneshabitacionesNuevas.length) {
+        for (const img of hotel.imageneshabitacionesNuevas) {
+          formData.append("imageneshabitaciones", img)
+        }
+      }
+
+
+  const handleGuardar = async (hotel) => {
+    try {
       const id = hotel.id_hotel
       await api.put(`/packages/Hotel/${id}`, hotel)
       Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
@@ -131,17 +146,18 @@ const handleGuardar = async (hotel) => {
 
     }
 
-    await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    })
 
-    Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
-    setEditandoId(null)
-    obtenerHoteles()
-  } catch (error) {
-    Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
+      await api.put(`/packages/EditarHotel/${hotel.id_hotel}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
+
+      Swal.fire("Éxito", "Hotel actualizado exitosamente", "success")
+      setEditandoId(null)
+      obtenerHoteles()
+    } catch (error) {
+      Swal.fire("Error", error?.response?.data?.error || "No se pudo actualizar el hotel", "error")
+    }
   }
-}
 
 
   const handleEliminar = async (hotel) => {
@@ -634,7 +650,7 @@ const handleGuardar = async (hotel) => {
                                 accept="image/*"
                                 className="hidden"
                                 onChange={(e) => {
-                                 const nuevas = Array.from(e.target.files || [])
+                                  const nuevas = Array.from(e.target.files || [])
                                   if (!nuevas.length) return
 
                                   const index = hoteles.findIndex((h) => h.id_hotel === hotelSeleccionado.id_hotel)
@@ -645,7 +661,7 @@ const handleGuardar = async (hotel) => {
                                       actuales = typeof hotelActual.imageneshabitaciones === "string"
                                         ? JSON.parse(hotelActual.imageneshabitaciones)
                                         : hotelActual.imageneshabitaciones || []
-                                    } catch (e) {}
+                                    } catch (e) { }
 
                                     const nuevasUrls = nuevas.map(img => URL.createObjectURL(img)) // Previews
                                     const todas = [...actuales, ...nuevasUrls]
@@ -709,6 +725,13 @@ const handleGuardar = async (hotel) => {
                 </div>
               </div>
 
+
+            <div className="border-t bg-gradient-to-r from-slate-50 to-blue-50 px-6 py-4">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-3">
+                  <div className="text-sm text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200">
+                    ID: {hotelSeleccionado.id_hotel}
+
               {/* Contenido del modal */}
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                 <div className="grid lg:grid-cols-2 gap-8">
@@ -762,6 +785,7 @@ const handleGuardar = async (hotel) => {
                           "Hotel con excelentes servicios y ubicación privilegiada. Perfecto para una estadía cómoda y memorable."}
                       </p>
                     </div>
+
                   </div>
 
                   {/* Columna derecha - Información */}
@@ -775,6 +799,41 @@ const handleGuardar = async (hotel) => {
                           <span className="text-slate-600">Nombre:</span>
                           <span className="font-semibold">{hotelSeleccionado.nombre}</span>
                         </div>
+
+
+                <RoleBasedComponent allowedRoles={["admin"]}>
+                  <div className="flex gap-3">
+                    {editandoId === hotelSeleccionado.id_hotel ? (
+                      <>
+                        <button
+                          onClick={() => setEditandoId(null)}
+                          className="px-6 py-2 bg-slate-400 hover:bg-slate-500 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                        >
+                          Cancelar
+                        </button>
+                        <button
+                          onClick={() => handleGuardar(hotelSeleccionado)}
+                          className="px-6 py-2 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                        >
+                          Guardar
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => setEditandoId(hotelSeleccionado.id_hotel)}
+                          className="px-6 py-2 bg-gradient-to-r from-blue-400 to-cyan-500 hover:from-blue-500 hover:to-cyan-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          onClick={() => handleEliminar(hotelSeleccionado.id_hotel)}
+                          className="px-6 py-2 bg-gradient-to-r from-red-400 to-pink-500 hover:from-red-500 hover:to-pink-600 text-white rounded-lg transition-all duration-200 font-semibold shadow-md hover:shadow-lg"
+                        >
+                          Eliminar
+                        </button>
+                      </>
+                    )}
 
                         <div className="flex items-center justify-between">
                           <span className="text-slate-600">Ubicación:</span>
@@ -844,6 +903,7 @@ const handleGuardar = async (hotel) => {
                       <Calendar className="w-5 h-5" />
                       Reservar Hotel
                     </button>
+
                   </div>
                 </div>
               </div>
