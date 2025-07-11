@@ -253,7 +253,7 @@ export const MisViajes = () => {
                       Reserva confirmada: {reserva.nombreHotel || "Hotel"}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      {formatearFecha(reserva.fecha_inicio)} • {formatearPrecio(reserva.precio || 0)}
+                      {formatearFecha(reserva.fecha_inicio)} • {formatearPrecio(reserva.precio || reserva.precioTotal || 0)}
                     </p>
                   </div>
                 </div>
@@ -329,7 +329,7 @@ export const MisViajes = () => {
                     </h4>
                     <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 mb-2">
                       <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span>{reserva.destino || reserva.nombreHotel || "Destino no especificado"}</span>
+                      <span>{reserva.destino || reserva.nombreHotel || "cartagena"}</span>
                     </div>
                   </div>
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">

@@ -405,7 +405,7 @@ export const Paquetes = () => {
 
       const approvalUrl = response.data.approval_url
       if (approvalUrl) {
-        window.location.href = approvalUrl
+        window.open(approvalUrl, "_blank")
       } else {
         alert("No se pudo obtener la URL de aprobación")
       }
