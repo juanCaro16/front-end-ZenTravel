@@ -116,7 +116,7 @@ export const App = () => {
         />
 
         <Route
-          path="/CrearHoteles"
+          path="/CrearHotel"
           element={
             <ProtectedRoute requiredRoles={["admin", "empleado"]}>
               <CrearHoteles />

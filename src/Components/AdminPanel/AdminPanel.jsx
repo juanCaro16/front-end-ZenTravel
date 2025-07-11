@@ -602,20 +602,20 @@ export const AdminPanel = () => {
     { id: "dashboard", label: "Dashboard", icon: <BarChart3 className="w-5 h-5" /> },
     { id: "users", label: "Usuarios", icon: <Users className="w-5 h-5" /> },
     { id: "packages", label: "Paquetes", icon: <Package className="w-5 h-5" /> },
-    ]
+  ]
 
   const stats = [
     {
       title: "Total Usuarios",
       value: infoDashBoard?.totalUsuarios?.toString() || "0",
-      change: "+12%",
+      change: "",
       icon: <Users className="w-6 h-6" />,
       color: "bg-blue-500",
     },
     {
       title: "Paquetes Activos",
       value: infoDashBoard?.paquetesActivos?.toString() || "0",
-      change: "+5%",
+      change: "",
       icon: <Package className="w-6 h-6" />,
       color: "bg-green-500",
     },
@@ -624,17 +624,11 @@ export const AdminPanel = () => {
       value: infoDashBoard?.ventasDelMes
         ? `$${Number(infoDashBoard.ventasDelMes).toLocaleString("es-CO", { minimumFractionDigits: 2 })}`
         : "$0.00",
-      change: "+18%",
+      change: "", // << ya no se muestra nada
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-purple-500",
-    },
-    {
-      title: "Reservas Pendientes",
-      value: infoDashBoard?.reservasPendientes?.toString() || "0",
-      change: "-3%",
-      icon: <Calendar className="w-6 h-6" />,
-      color: "bg-orange-500",
-    },
+    }
+
   ]
 
   const renderContent = () => {
@@ -650,7 +644,7 @@ export const AdminPanel = () => {
                       <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                       <p className={`text-sm mt-1 ${stat.change.startsWith("+") ? "text-green-600" : "text-red-600"}`}>
-                        {stat.change} vs mes anterior
+                        {stat.change} 
                       </p>
                     </div>
                     <div className={`${stat.color} p-3 rounded-lg text-white`}>{stat.icon}</div>
@@ -664,9 +658,9 @@ export const AdminPanel = () => {
                 {(infoDashBoard?.actividadReciente || []).map((activity, index) => {
                   const fecha = activity.created_at
                     ? new Date(activity.created_at).toLocaleString("es-CO", {
-                        dateStyle: "medium",
-                        timeStyle: "short",
-                      })
+                      dateStyle: "medium",
+                      timeStyle: "short",
+                    })
                     : ""
                   return (
                     <div key={index} className="flex items-center space-x-4 p-3 hover:bg-gray-50 rounded-lg">
@@ -918,15 +912,14 @@ export const AdminPanel = () => {
                             </td>
                             <td className="py-4 px-6">
                               <span
-                                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                  paquete.categoria === "cultural"
-                                    ? "bg-purple-100 text-purple-800"
-                                    : paquete.categoria === "aventura"
-                                      ? "bg-orange-100 text-orange-800"
-                                      : paquete.categoria === "playa"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : "bg-green-100 text-green-800"
-                                }`}
+                                className={`px-3 py-1 rounded-full text-xs font-medium ${paquete.categoria === "cultural"
+                                  ? "bg-purple-100 text-purple-800"
+                                  : paquete.categoria === "aventura"
+                                    ? "bg-orange-100 text-orange-800"
+                                    : paquete.categoria === "playa"
+                                      ? "bg-blue-100 text-blue-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
                               >
                                 {paquete.categoria || "Sin categoría"}
                               </span>
@@ -1104,11 +1097,10 @@ export const AdminPanel = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${
-                  activeTab === tab.id
-                    ? "border-emerald-500 text-emerald-600 bg-emerald-50"
-                    : "border-transparent text-gray-600 hover:text-emerald-600 hover:bg-emerald-50"
-                }`}
+                className={`flex items-center space-x-2 px-6 py-4 border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
+                  ? "border-emerald-500 text-emerald-600 bg-emerald-50"
+                  : "border-transparent text-gray-600 hover:text-emerald-600 hover:bg-emerald-50"
+                  }`}
               >
                 {tab.icon}
                 <span className="font-medium">{tab.label}</span>
