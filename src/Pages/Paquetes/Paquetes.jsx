@@ -18,13 +18,15 @@ import {
   DollarSign,
   Star,
   Calculator,
+  Edit,
+  Save,
+  XCircle,
 } from "lucide-react"
 
 export const Paquetes = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
-
   const [paquetes, setPaquetes] = useState([])
   const [paquetesFiltrados, setPaquetesFiltrados] = useState([])
   const [editandoId, setEditandoId] = useState(null)
@@ -57,7 +59,6 @@ export const Paquetes = () => {
 
   useEffect(() => {
     obtenerPaquetes()
-
     // Mostrar mensaje de reserva exitosa si existe
     if (mensajeReserva) {
       Swal.fire({
@@ -152,7 +153,6 @@ export const Paquetes = () => {
 
     // Calcular precio por día basado en los valores originales
     const precioPorDia = precioOriginal / duracionOriginal
-
     // Calcular nuevo precio total
     const nuevoPrecioTotal = Math.round(precioPorDia * nuevaDuracion)
 
@@ -183,6 +183,15 @@ export const Paquetes = () => {
         const nuevoPrecio = calcularPrecioAutomatico(paqueteId, nuevaDuracion)
         if (nuevoPrecio !== null) {
           nuevosPaquetes[paqueteIndex]["precioTotal"] = nuevoPrecio
+          // Marcar que el precio fue recalculado
+          nuevosPaquetes[paqueteIndex]["precioRecalculado"] = true
+
+          console.log(`🔄 Precio recalculado para paquete ${paqueteId}:`, {
+            duracionOriginal: preciosOriginales[paqueteId].duracionOriginal,
+            precioOriginal: preciosOriginales[paqueteId].precioOriginal,
+            nuevaDuracion: nuevaDuracion,
+            nuevoPrecio: nuevoPrecio,
+          })
         }
       }
     }
@@ -199,47 +208,54 @@ export const Paquetes = () => {
         duracionOriginal: Number(paquete.duracionDias),
       },
     }))
-
     setEditandoId(paquete.id_paquete)
+
+    console.log(`📝 Iniciando edición del paquete ${paquete.id_paquete}:`, {
+      precioOriginal: Number(paquete.precioTotal),
+      duracionOriginal: Number(paquete.duracionDias),
+    })
   }
 
   const handleCancelarEdicion = () => {
-    setEditandoId(null)
-    // Limpiar los precios originales del paquete que se estaba editando
     if (editandoId) {
+      // Revertir cambios locales
+      obtenerPaquetes()
+      // Limpiar los precios originales del paquete que se estaba editando
       setPreciosOriginales((prev) => {
         const newPreciosOriginales = { ...prev }
         delete newPreciosOriginales[editandoId]
         return newPreciosOriginales
       })
     }
+    setEditandoId(null)
   }
 
   const handleGuardar = async (paquete) => {
     try {
       const id = paquete.id_paquete
 
+      // Asegurar que el precio sea el valor recalculado actual
+      const precioFinal = Number(paquete.precioTotal)
+      const duracionFinal = Number(paquete.duracionDias)
+
+      console.log(`💾 Guardando paquete ${id}:`, {
+        duracionDias: duracionFinal,
+        precioTotal: precioFinal,
+        precioRecalculado: paquete.precioRecalculado,
+      })
+
       // Preparar los datos con el formato exacto que espera el backend
-      // Basado en el procedimiento almacenado ActualizarPaqueteFlexible
       const datosActualizados = {
-        // Campos básicos del paquete
         nombrePaquete: String(paquete.nombrePaquete || "").trim(),
         descripcion: String(paquete.descripcion || "").trim(),
-        duracionDias: Number.parseInt(paquete.duracionDias) || 1,
-        precioTotal: Number.parseFloat(paquete.precioTotal) || 0,
-
-        // Campos adicionales que pueden ser requeridos
+        duracionDias: duracionFinal,
+        precioTotal: precioFinal, // Enviar el precio recalculado
         nombre_destino: String(paquete.nombre_destino || "").trim(),
         id_hotel: paquete.id_hotel ? Number.parseInt(paquete.id_hotel) : null,
         imagenUrl: paquete.imagenUrl || null,
-
-        // Campos que pueden ser necesarios para el procedimiento almacenado
-        // (ajustar según la estructura real de tu base de datos)
         estado: paquete.estado || "activo",
         fechaCreacion: paquete.fechaCreacion || null,
         fechaActualizacion: new Date().toISOString(),
-
-        // Campos adicionales que podrían estar en el procedimiento
         categoria: paquete.categoria || null,
         serviciosIncluidos: paquete.serviciosIncluidos || null,
         restricciones: paquete.restricciones || null,
@@ -250,17 +266,30 @@ export const Paquetes = () => {
       }
 
       console.log("📤 Enviando datos actualizados:", datosActualizados)
-      console.log("🔍 ID del paquete:", id)
 
-      // Hacer la petición con manejo de errores específico
       const response = await api.put(`packages/IDPackage/${id}`, datosActualizados, {
         headers: {
           "Content-Type": "application/json",
         },
-        timeout: 10000, // 10 segundos de timeout
+        timeout: 15000,
       })
 
       console.log("✅ Respuesta del servidor:", response.data)
+
+      // CRÍTICO: Actualizar el estado local inmediatamente con los datos guardados
+      // NO recargar desde el servidor para evitar que se pierdan los cambios
+      const paquetesActualizados = paquetes.map((p) => {
+        if (p.id_paquete === id) {
+          return {
+            ...p,
+            ...datosActualizados,
+            precioRecalculado: false, // Limpiar la bandera
+          }
+        }
+        return p
+      })
+
+      setPaquetes(paquetesActualizados)
 
       Swal.fire({
         title: "¡Éxito!",
@@ -271,7 +300,6 @@ export const Paquetes = () => {
       })
 
       setEditandoId(null)
-
       // Limpiar los precios originales
       setPreciosOriginales((prev) => {
         const newPreciosOriginales = { ...prev }
@@ -279,13 +307,12 @@ export const Paquetes = () => {
         return newPreciosOriginales
       })
 
-      // Recargar los paquetes para obtener los datos actualizados del servidor
-      await obtenerPaquetes()
+      // NO llamar obtenerPaquetes() aquí para evitar sobrescribir los cambios
+      console.log("✅ Paquete actualizado localmente, precio preservado:", precioFinal)
     } catch (error) {
       console.error("❌ Error completo al actualizar:", error)
       console.error("❌ Respuesta del error:", error.response?.data)
       console.error("❌ Status del error:", error.response?.status)
-      console.error("❌ Config de la petición:", error.config)
 
       let errorMessage = "No se pudo actualizar el paquete"
 
@@ -367,6 +394,7 @@ export const Paquetes = () => {
       alert("El precio del paquete no es válido")
       return
     }
+
     try {
       const response = await api.post("/api/payments/create", {
         price,
@@ -374,6 +402,7 @@ export const Paquetes = () => {
         id_paquete: paquete.id_paquete,
         quantity: 1,
       })
+
       const approvalUrl = response.data.approval_url
       if (approvalUrl) {
         window.location.href = approvalUrl
@@ -388,6 +417,7 @@ export const Paquetes = () => {
 
   const handleToggleFavorito = (paquete) => {
     const esFavorito = favoritos.some((fav) => fav.id_paquete === paquete.id_paquete)
+
     if (esFavorito) {
       const nuevosFavoritos = favoritos.filter((fav) => fav.id_paquete !== paquete.id_paquete)
       setFavoritos(nuevosFavoritos)
@@ -428,7 +458,7 @@ export const Paquetes = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br  to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-slate-600 text-sm sm:text-base">Cargando paquetes...</p>
@@ -618,7 +648,9 @@ export const Paquetes = () => {
               // Obtener información de precio original para mostrar el recálculo
               const precioOriginalData = preciosOriginales[paquete.id_paquete]
               const mostrarRecalculo =
-                enEdicion && precioOriginalData && Number(paquete.duracionDias) !== precioOriginalData.duracionOriginal
+                enEdicion &&
+                precioOriginalData &&
+                (Number(paquete.duracionDias) !== precioOriginalData.duracionOriginal || paquete.precioRecalculado)
 
               return (
                 <div
@@ -738,6 +770,7 @@ export const Paquetes = () => {
                         <span className="font-semibold">{paquete.duracionDias} días</span>
                       )}
                     </div>
+
                     <div className="flex items-center justify-between">
                       <span className="flex items-center">
                         <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
@@ -758,6 +791,7 @@ export const Paquetes = () => {
                         </span>
                       )}
                     </div>
+
                     {paquete.precioTotal && (
                       <div className="flex items-center justify-between">
                         <span className="flex items-center">
@@ -845,8 +879,9 @@ export const Paquetes = () => {
                               e.stopPropagation()
                               handleGuardar(paquete)
                             }}
-                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm"
+                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-green-500 hover:bg-green-600 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm flex items-center justify-center gap-1"
                           >
+                            <Save className="w-3 h-3" />
                             Guardar
                           </button>
                           <button
@@ -854,8 +889,9 @@ export const Paquetes = () => {
                               e.stopPropagation()
                               handleCancelarEdicion()
                             }}
-                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm"
+                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm flex items-center justify-center gap-1"
                           >
+                            <XCircle className="w-3 h-3" />
                             Cancelar
                           </button>
                         </div>
@@ -866,8 +902,9 @@ export const Paquetes = () => {
                               e.stopPropagation()
                               handleIniciarEdicion(paquete)
                             }}
-                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm"
+                            className="flex-1 px-2 sm:px-4 py-1.5 sm:py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-xl transition-all duration-200 text-xs sm:text-sm flex items-center justify-center gap-1"
                           >
+                            <Edit className="w-3 h-3" />
                             Editar
                           </button>
                           <button
@@ -892,7 +929,7 @@ export const Paquetes = () => {
 
         {/* Modal de Preview del Paquete */}
         {showPreviewModal && paqueteSeleccionado && (
-          <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
               {/* Header del modal */}
               <div className="relative bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white p-4 sm:p-6">
