@@ -344,25 +344,13 @@ export const EmployeePanel = () => {
     { id: "dashboard", label: "Mi Dashboard", icon: <TrendingUp className="w-5 h-5" /> },
     { id: "packages", label: "Paquetes", icon: <Package className="w-5 h-5" /> },
     { id: "customers", label: "Clientes", icon: <Users className="w-5 h-5" /> },
-    { id: "reservations", label: "Reservas", icon: <Calendar className="w-5 h-5" /> },
-    { id: "support", label: "Soporte", icon: <MessageCircle className="w-5 h-5" /> },
+    
+
   ]
 
   const myStats = [
-    {
-      title: "Paquetes Gestionados",
-      value: infoPaquetes?.paquetes?.length?.toString() || "0",
-      change: "+5%",
-      icon: <Package className="w-6 h-6" />,
-      color: "bg-blue-500",
-    },
-    {
-      title: "Clientes Atendidos",
-      value: infoUser?.user?.length?.toString() || "0",
-      change: "+12%",
-      icon: <UserCheck className="w-6 h-6" />,
-      color: "bg-green-500",
-    },
+    
+    
     {
       title: "Ventas del Mes",
       value: infoDashBoard?.ventasDelMes
@@ -371,14 +359,9 @@ export const EmployeePanel = () => {
       change: "+18%",
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-purple-500",
-    },
-    {
-      title: "Tareas Pendientes",
-      value: "8",
-      change: "-2",
-      icon: <Clock className="w-6 h-6" />,
-      color: "bg-orange-500",
-    },
+    }
+    
+    
   ]
 
   const renderContent = () => {
@@ -405,39 +388,7 @@ export const EmployeePanel = () => {
             </div>
 
             {/* Tareas Pendientes */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Mis Tareas Pendientes</h3>
-              <div className="space-y-3">
-                {[
-                  { task: "Confirmar reserva de Juan Pérez", priority: "Alta", time: "Vence en 2 horas" },
-                  { task: "Actualizar paquete Cartagena", priority: "Media", time: "Vence mañana" },
-                  { task: "Responder consulta de María", priority: "Baja", time: "Vence en 3 días" },
-                  { task: "Revisar disponibilidad hotel Santa Marta", priority: "Media", time: "Vence en 4 horas" },
-                  { task: "Procesar solicitud de cambio de fecha", priority: "Alta", time: "Vence hoy" },
-                ].map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-900">{item.task}</p>
-                      <p className="text-sm text-gray-500">{item.time}</p>
-                    </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        item.priority === "Alta"
-                          ? "bg-red-100 text-red-800"
-                          : item.priority === "Media"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-green-100 text-green-800"
-                      }`}
-                    >
-                      {item.priority}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            
 
             {/* Actividad Reciente */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">
@@ -619,16 +570,7 @@ export const EmployeePanel = () => {
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button
-                                  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                                  title="Editar paquete"
-                                  onClick={() => {
-                                    setEditPaquete(paquete)
-                                    setEditModalOpen(true)
-                                  }}
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </button>
+                                
                               </div>
                             </td>
                           </tr>

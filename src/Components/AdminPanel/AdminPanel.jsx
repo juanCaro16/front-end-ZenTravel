@@ -608,14 +608,14 @@ export const AdminPanel = () => {
     {
       title: "Total Usuarios",
       value: infoDashBoard?.totalUsuarios?.toString() || "0",
-      change: "+12%",
+      change: "",
       icon: <Users className="w-6 h-6" />,
       color: "bg-blue-500",
     },
     {
       title: "Paquetes Activos",
       value: infoDashBoard?.paquetesActivos?.toString() || "0",
-      change: "+5%",
+      change: "",
       icon: <Package className="w-6 h-6" />,
       color: "bg-green-500",
     },
@@ -624,17 +624,10 @@ export const AdminPanel = () => {
       value: infoDashBoard?.ventasDelMes
         ? `$${Number(infoDashBoard.ventasDelMes).toLocaleString("es-CO", { minimumFractionDigits: 2 })}`
         : "$0.00",
-      change: "+18%",
+      change: "",
       icon: <DollarSign className="w-6 h-6" />,
       color: "bg-purple-500",
-    },
-    {
-      title: "Reservas Pendientes",
-      value: infoDashBoard?.reservasPendientes?.toString() || "0",
-      change: "-3%",
-      icon: <Calendar className="w-6 h-6" />,
-      color: "bg-orange-500",
-    },
+    }
   ]
 
   const renderContent = () => {
@@ -650,7 +643,7 @@ export const AdminPanel = () => {
                       <p className="text-sm font-medium text-gray-600">{stat.title}</p>
                       <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                       <p className={`text-sm mt-1 ${stat.change.startsWith("+") ? "text-green-600" : "text-red-600"}`}>
-                        {stat.change} vs mes anterior
+                        {stat.change} 
                       </p>
                     </div>
                     <div className={`${stat.color} p-3 rounded-lg text-white`}>{stat.icon}</div>
@@ -707,25 +700,7 @@ export const AdminPanel = () => {
               </select>
             </div>
 
-            {usuariosFiltrados.length > 0 && (
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  <strong>Debug Info:</strong> Se encontraron {usuariosFiltrados.length} usuarios.
-                </p>
-                <details className="mt-2">
-                  <summary className="cursor-pointer text-sm text-blue-700 hover:text-blue-900">
-                    Ver detalles de usuarios (para debug)
-                  </summary>
-                  <div className="mt-2 text-xs bg-white p-2 rounded border">
-                    {usuariosFiltrados.map((u, i) => (
-                      <div key={i} className="mb-1">
-                        ID: {u.id_usuario}, Nombre: {u.nombre}, Rol: "{u.rol}" ({typeof u.rol})
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              </div>
-            )}
+            
 
             <div className="overflow-x-auto">
               <table className="w-full">

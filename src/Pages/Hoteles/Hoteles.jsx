@@ -182,17 +182,17 @@ export const Hoteles = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+      
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-slate-600 text-sm sm:text-base">Cargando hoteles...</p>
         </div>
-      </div>
+      
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-16 sm:pt-20 pb-8">
+    
       <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
         {/* Header */}
         <div className="text-center">
@@ -867,6 +867,6 @@ export const Hoteles = () => {
           </div>
         )}
       </div>
-    </div>
+    
   )
 }

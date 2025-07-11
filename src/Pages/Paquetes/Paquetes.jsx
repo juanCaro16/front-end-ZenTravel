@@ -458,17 +458,16 @@ export const Paquetes = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+      
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-slate-600 text-sm sm:text-base">Cargando paquetes...</p>
         </div>
-      </div>
+     
     )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-16 sm:pt-20 pb-8">
-      <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
+    <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
         {/* Mensaje de hotel reservado */}
         {hotelReservado && (
           <div className="max-w-4xl w-full">
@@ -929,7 +928,7 @@ export const Paquetes = () => {
 
         {/* Modal de Preview del Paquete */}
         {showPreviewModal && paqueteSeleccionado && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 backdrop-blur-2xl bg-opacity-50  flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
               {/* Header del modal */}
               <div className="relative bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white p-4 sm:p-6">
@@ -1093,6 +1092,6 @@ export const Paquetes = () => {
           </div>
         )}
       </div>
-    </div>
+    
   )
 }

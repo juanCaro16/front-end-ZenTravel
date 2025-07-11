@@ -170,27 +170,10 @@ export const MisViajes = () => {
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100 text-xs sm:text-sm font-medium">Del Sistema</p>
-              <p className="text-2xl sm:text-3xl font-bold mt-1">{reservas.length}</p>
-            </div>
-            <Plane className="w-6 h-6 sm:w-8 sm:h-8 text-green-200" />
-          </div>
-        </div>
+       
 
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-purple-100 text-xs sm:text-sm font-medium">Locales</p>
-              <p className="text-2xl sm:text-3xl font-bold mt-1">{reservasLocales.length}</p>
-            </div>
-            <Hotel className="w-6 h-6 sm:w-8 sm:h-8 text-purple-200" />
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
+        
+           <div className="bg-gradient-to-br from-pink-500 to-pink-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-pink-100 text-xs sm:text-sm font-medium">Favoritos</p>
@@ -270,7 +253,7 @@ export const MisViajes = () => {
                       Reserva confirmada: {reserva.nombreHotel || "Hotel"}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      {formatearFecha(reserva.fecha_inicio)} • {formatearPrecio(reserva.precioTotal || 0)}
+                      {formatearFecha(reserva.fecha_inicio)} • {formatearPrecio(reserva.precio || 0)}
                     </p>
                   </div>
                 </div>
@@ -379,7 +362,7 @@ export const MisViajes = () => {
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                   <span className="font-bold text-emerald-600 text-sm sm:text-base">
-                    {formatearPrecio(reserva.precioTotal || 0)}
+                    {formatearPrecio(reserva.precio || reserva.precioTotal || 0)}
                   </span>
                   <button className="flex items-center space-x-1 sm:space-x-2 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-xs sm:text-sm">
                     <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
