@@ -40,12 +40,12 @@ const NewUserModal = ({ open, onClose, onCreate }) => {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 bg-emerald-100 bg-opacity-80 flex items-center justify-center z-50 transition-all">
+    <div className="fixed inset-0 bg-transparent bg-opacity-50  backdrop-blur-sm z-50 flex items-center justify-center transition-all">
       <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md relative animate-fade-in">
         <button onClick={onClose} className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">
           &times;
         </button>
-        <h2 className="text-xl font-bold mb-4 text-emerald-700">Crear Nuevo Empleado</h2>
+        <h2 className="text-xl font-bold mb-4 text-emerald-700">Crear Nuevo Usuario</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             name="nombre"
@@ -473,7 +473,7 @@ export const AdminPanel = () => {
     })
     if (confirm.isConfirmed) {
       try {
-        await api.delete(`packages/IDPackage/${id_paquete}`)
+        await api.delete(`admin/deletePackage/${id_paquete}`)
         Swal.fire({
           title: "Eliminado",
           text: "El paquete ha sido eliminado exitosamente",
@@ -602,9 +602,7 @@ export const AdminPanel = () => {
     { id: "dashboard", label: "Dashboard", icon: <BarChart3 className="w-5 h-5" /> },
     { id: "users", label: "Usuarios", icon: <Users className="w-5 h-5" /> },
     { id: "packages", label: "Paquetes", icon: <Package className="w-5 h-5" /> },
-    { id: "reports", label: "Reportes", icon: <FileText className="w-5 h-5" /> },
-    { id: "settings", label: "Configuración", icon: <Settings className="w-5 h-5" /> },
-  ]
+    ]
 
   const stats = [
     {

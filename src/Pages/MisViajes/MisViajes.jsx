@@ -45,11 +45,30 @@ export const MisViajes = () => {
 
   const cargarReservas = async () => {
     try {
-      const response = await api.get("reservations/user")
-      setReservas(response.data.reservas || [])
+      const response = await api.get("reservas/Historial")
+      let fetchedReservas = []
+
+      if (response.data && response.data.historial) {
+        if (Array.isArray(response.data.historial)) {
+          fetchedReservas = response.data.historial
+        } else if (typeof response.data.historial === "object" && response.data.historial !== null) {
+          // Si es un objeto individual (como se ve en el error), lo envolvemos en un array
+          fetchedReservas = [response.data.historial]
+          console.warn(
+            "API devolvió un objeto individual para historial, envolviéndolo en un array:",
+            response.data.historial,
+          )
+        } else {
+          console.warn("API devolvió un tipo inesperado para historial:", response.data.historial)
+        }
+      } else {
+        console.warn("La estructura de la respuesta de la API no es la esperada:", response.data)
+      }
+
+      setReservas(fetchedReservas)
     } catch (error) {
       console.error("Error al cargar reservas:", error)
-      setReservas([])
+      setReservas([]) // Asegurarse de que siempre sea un array vacío en caso de error
     }
   }
 
@@ -107,7 +126,11 @@ export const MisViajes = () => {
   const formatearFecha = (fecha) => {
     if (!fecha) return "Fecha no disponible"
     try {
-      return new Date(fecha).toLocaleDateString("es-CO", {
+      const date = new Date(fecha)
+      if (isNaN(date.getTime())) {
+        return "Fecha inválida"
+      }
+      return date.toLocaleDateString("es-CO", {
         year: "numeric",
         month: "long",
         day: "numeric",
@@ -118,8 +141,10 @@ export const MisViajes = () => {
   }
 
   const formatearPrecio = (precio) => {
-    if (!precio) return "Precio no disponible"
-    return `$${Number(precio).toLocaleString("es-CO")} COP`
+    if (typeof precio !== "number" && typeof precio !== "string") return "Precio no disponible"
+    const numPrecio = Number(precio)
+    if (isNaN(numPrecio)) return "Precio no disponible"
+    return `$${numPrecio.toLocaleString("es-CO")} COP`
   }
 
   const totalReservas = reservas.length + reservasLocales.length
@@ -233,21 +258,29 @@ export const MisViajes = () => {
             </div>
           ) : (
             <>
+              {/* Mostrar las últimas 3 reservas del sistema */}
               {reservas.slice(0, 3).map((reserva, index) => (
-                <div key={index} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                <div
+                  key={`reserva-actividad-${index}`}
+                  className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg"
+                >
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900 text-sm sm:text-base">
-                      Reserva confirmada: {reserva.nombrePaquete || "Paquete"}
+                      Reserva confirmada: {reserva.nombreHotel || "Hotel"}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500">
-                      {formatearFecha(reserva.fechaReserva)} • {formatearPrecio(reserva.precioTotal)}
+                      {formatearFecha(reserva.fecha_inicio)} • {formatearPrecio(reserva.precioTotal || 0)}
                     </p>
                   </div>
                 </div>
               ))}
+              {/* Mostrar los últimos 2 paquetes favoritos */}
               {paquetesFavoritos.slice(0, 2).map((paquete, index) => (
-                <div key={index} className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg">
+                <div
+                  key={`favorito-actividad-${index}`}
+                  className="flex items-center space-x-3 sm:space-x-4 p-3 sm:p-4 bg-gray-50 rounded-lg"
+                >
                   <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900 text-sm sm:text-base">
@@ -303,17 +336,17 @@ export const MisViajes = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {reservas.map((reserva, index) => (
               <div
-                key={index}
+                key={`reserva-sistema-${index}`}
                 className="border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-3 sm:mb-4">
                   <div className="flex-1">
                     <h4 className="font-bold text-gray-900 text-sm sm:text-base mb-1">
-                      {reserva.nombrePaquete || "Paquete de Viaje"}
+                      {reserva.nombreHotel || "Reserva de Hotel"}
                     </h4>
                     <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600 mb-2">
                       <MapPin className="w-3 h-3 sm:w-4 sm:h-4" />
-                      <span>{reserva.destino || "Destino no especificado"}</span>
+                      <span>{reserva.destino || reserva.nombreHotel || "Destino no especificado"}</span>
                     </div>
                   </div>
                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
@@ -323,20 +356,30 @@ export const MisViajes = () => {
                 <div className="space-y-2 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center space-x-2">
                     <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Fecha: {formatearFecha(reserva.fechaReserva)}</span>
+                    <span>Fecha Inicio: {formatearFecha(reserva.fecha_inicio)}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>Fecha Fin: {formatearFecha(reserva.fecha_fin)}</span>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Users className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Personas: {reserva.cantidadPersonas || 1}</span>
+                    <span>Cédula: {reserva.cedula || "N/A"}</span>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
-                    <span>Duración: {reserva.duracionDias || "N/A"} días</span>
+                    <Hotel className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span>ID Habitación: {reserva.id_habitacion || "N/A"}</span>
                   </div>
+                  {reserva.observacion && (
+                    <div className="flex items-center space-x-2">
+                      <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <span>Observación: {reserva.observacion}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
                   <span className="font-bold text-emerald-600 text-sm sm:text-base">
-                    {formatearPrecio(reserva.precioTotal)}
+                    {formatearPrecio(reserva.precioTotal || 0)}
                   </span>
                   <button className="flex items-center space-x-1 sm:space-x-2 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors text-xs sm:text-sm">
                     <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -364,7 +407,7 @@ export const MisViajes = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {reservasLocales.map((reserva, index) => (
               <div
-                key={index}
+                key={`reserva-local-${index}`}
                 className="border border-gray-200 rounded-lg sm:rounded-xl p-4 sm:p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-3 sm:mb-4">
@@ -447,7 +490,7 @@ export const MisViajes = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
             {paquetesFavoritos.map((paquete, index) => (
               <div
-                key={index}
+                key={`favorito-${index}`}
                 className="border border-gray-200 rounded-lg sm:rounded-xl overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="relative">
@@ -492,7 +535,7 @@ export const MisViajes = () => {
                       <span>{paquete.duracionDias} días</span>
                     </div>
                     <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
-                      <Package className="w-3 h-3 sm:w-4 sm:h-4" />
+                      <Package className="w-3 h-3 sm:w-4" />
                       <span className="capitalize">{paquete.categoria || "Aventura"}</span>
                     </div>
                   </div>

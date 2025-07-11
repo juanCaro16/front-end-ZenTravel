@@ -91,10 +91,10 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                   isActive ? (
                     <span className="flex items-center gap-1">
                       <FaHeadSideVirus size={15} />
-                      Asistente IA
+                      Planea tu viaje con IA
                     </span>
                   ) : (
-                    "Asistente IA"
+                    "Planea tu viaje con IA"
                   )
                 }
               />
@@ -216,7 +216,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
-              content="Asistente IA"
+              content="Planea tu viaje con IA"
               route="/ZenIA"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />

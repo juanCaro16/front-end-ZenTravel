@@ -120,7 +120,7 @@ export const Register = () => {
         confirmButtonText: "Continuar",
       })
 
-      navigate("/login")
+      navigate("/")
     } catch (err) {
       console.error("❌ Error en registro:", err)
 

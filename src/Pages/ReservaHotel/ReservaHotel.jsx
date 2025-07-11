@@ -181,9 +181,9 @@ export const ReservarHotel = () => {
     setProcesando(true)
 
     try {
+      // Construir el objeto con todos los datos de la reserva para uso interno y localStorage
       const reservaCompleta = {
-        cedula: reservaData.cedula, // Usar la cédula del formulario
-        id_paquete: hotel.id_hotel, // Using hotel ID as package ID for now
+        cedula: reservaData.cedula,
         fechaEntrada: reservaData.fechaEntrada,
         fechaSalida: reservaData.fechaSalida,
         numeroHuespedes: reservaData.numeroHuespedes,
@@ -194,40 +194,29 @@ export const ReservarHotel = () => {
         precioTotal: calcularPrecioTotal(),
       }
 
-      console.log("Enviando reserva:", reservaCompleta)
+      console.log("Datos completos de la reserva (frontend):", reservaCompleta)
 
-      // Make actual API call to backend
-      const response = await api.post("/Reservations", {
+      // Construir el payload específico para el backend
+      const backendPayload = {
         cedula: reservaCompleta.cedula,
-        id_paquete: reservaCompleta.id_paquete,
-      })
+        fecha_inicio: reservaCompleta.fechaEntrada, // Mapeado a fecha_inicio
+        fecha_fin: reservaCompleta.fechaSalida, // Mapeado a fecha_fin
+        id_habitacion: hotel.id_hotel, // Usando id_hotel como id_habitacion. Asegúrate que tu backend lo maneje así o ajusta si tienes IDs de habitación específicos.
+        observacion: reservaCompleta.observaciones, // Mapeado a observacion
+      }
+
+      console.log("Enviando payload al backend:", backendPayload)
+
+      // Realizar la llamada a la API
+      const response = await api.post("reservas/Reservations", backendPayload)
 
       console.log("Respuesta del servidor:", response.data)
 
-      // Also save additional hotel reservation details to localStorage for UI purposes
-      const reservaDetallada = {
-        id_reserva: `HTL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-        id_hotel: hotel.id_hotel,
-        nombreHotel: hotel.nombre,
-        ubicacionHotel: hotel.ubicacion,
-        estrellasHotel: hotel.estrellas,
-        imagenHotel: hotel.imagenes,
-        fechaReserva: new Date().toISOString(),
-        fechaEntrada: reservaCompleta.fechaEntrada,
-        fechaSalida: reservaCompleta.fechaSalida,
-        numeroHuespedes: reservaCompleta.numeroHuespedes,
-        tipoHabitacion: reservaCompleta.tipoHabitacion,
-        metodoPago: reservaCompleta.metodoPago,
-        observaciones: reservaCompleta.observaciones,
-        noches: reservaCompleta.noches,
-        precioTotal: reservaCompleta.precioTotal,
-        estado: "confirmado",
-        tipo: "hotel",
-        cedula: reservaCompleta.cedula,
-      }
+      // Generar un ID de reserva para el localStorage
+      const idReservaGenerado = `HTL-${Date.now()}-${Math.floor(Math.random() * 1000)}`
 
-      // Save to localStorage for UI display
-      guardarReservaEnLocalStorage(reservaCompleta, reservaDetallada.id_reserva)
+      // Guardar en localStorage para la visualización en la UI
+      guardarReservaEnLocalStorage(reservaCompleta, idReservaGenerado)
 
       await Swal.fire({
         title: "¡Reserva Exitosa!",

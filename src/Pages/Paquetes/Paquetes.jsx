@@ -165,8 +165,16 @@ export const Paquetes = () => {
     const paqueteIndex = paquetes.findIndex((p) => p.id_paquete === paquetesFiltrados[index].id_paquete)
     const paqueteId = paquetes[paqueteIndex].id_paquete
 
+    // Validar y convertir el valor según el tipo de campo
+    let valorProcesado = value
+    if (name === "duracionDias" || name === "precioTotal") {
+      valorProcesado = value === "" ? "" : Number(value)
+      // Asegurar que no sea negativo
+      if (valorProcesado < 0) valorProcesado = 0
+    }
+
     // Actualizar el valor
-    nuevosPaquetes[paqueteIndex][name] = value
+    nuevosPaquetes[paqueteIndex][name] = valorProcesado
 
     // Si se está cambiando la duración, recalcular el precio automáticamente
     if (name === "duracionDias") {
@@ -210,8 +218,58 @@ export const Paquetes = () => {
   const handleGuardar = async (paquete) => {
     try {
       const id = paquete.id_paquete
-      await api.put(`packages/IDPackage/${id}`, paquete)
-      Swal.fire("Éxito", "Paquete actualizado exitosamente", "success")
+
+      // Preparar los datos con el formato exacto que espera el backend
+      // Basado en el procedimiento almacenado ActualizarPaqueteFlexible
+      const datosActualizados = {
+        // Campos básicos del paquete
+        nombrePaquete: String(paquete.nombrePaquete || "").trim(),
+        descripcion: String(paquete.descripcion || "").trim(),
+        duracionDias: Number.parseInt(paquete.duracionDias) || 1,
+        precioTotal: Number.parseFloat(paquete.precioTotal) || 0,
+
+        // Campos adicionales que pueden ser requeridos
+        nombre_destino: String(paquete.nombre_destino || "").trim(),
+        id_hotel: paquete.id_hotel ? Number.parseInt(paquete.id_hotel) : null,
+        imagenUrl: paquete.imagenUrl || null,
+
+        // Campos que pueden ser necesarios para el procedimiento almacenado
+        // (ajustar según la estructura real de tu base de datos)
+        estado: paquete.estado || "activo",
+        fechaCreacion: paquete.fechaCreacion || null,
+        fechaActualizacion: new Date().toISOString(),
+
+        // Campos adicionales que podrían estar en el procedimiento
+        categoria: paquete.categoria || null,
+        serviciosIncluidos: paquete.serviciosIncluidos || null,
+        restricciones: paquete.restricciones || null,
+        politicasCancelacion: paquete.politicasCancelacion || null,
+        descuento: paquete.descuento || 0,
+        disponibilidad: paquete.disponibilidad !== undefined ? paquete.disponibilidad : true,
+        calificacion: paquete.calificacion || null,
+      }
+
+      console.log("📤 Enviando datos actualizados:", datosActualizados)
+      console.log("🔍 ID del paquete:", id)
+
+      // Hacer la petición con manejo de errores específico
+      const response = await api.put(`packages/IDPackage/${id}`, datosActualizados, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        timeout: 10000, // 10 segundos de timeout
+      })
+
+      console.log("✅ Respuesta del servidor:", response.data)
+
+      Swal.fire({
+        title: "¡Éxito!",
+        text: "Paquete actualizado exitosamente",
+        icon: "success",
+        timer: 2000,
+        showConfirmButton: false,
+      })
+
       setEditandoId(null)
 
       // Limpiar los precios originales
@@ -220,9 +278,43 @@ export const Paquetes = () => {
         delete newPreciosOriginales[id]
         return newPreciosOriginales
       })
+
+      // Recargar los paquetes para obtener los datos actualizados del servidor
+      await obtenerPaquetes()
     } catch (error) {
-      console.error("❌ Error al actualizar:", error)
-      Swal.fire("Error", "No se pudo actualizar el paquete", "error")
+      console.error("❌ Error completo al actualizar:", error)
+      console.error("❌ Respuesta del error:", error.response?.data)
+      console.error("❌ Status del error:", error.response?.status)
+      console.error("❌ Config de la petición:", error.config)
+
+      let errorMessage = "No se pudo actualizar el paquete"
+
+      if (error.code === "ECONNABORTED") {
+        errorMessage = "La petición tardó demasiado tiempo. Intenta nuevamente."
+      } else if (error.response?.status === 500) {
+        if (error.response?.data?.message?.includes("Malformed")) {
+          errorMessage = "Error en el formato de datos. Verifica que todos los campos sean válidos."
+        } else {
+          errorMessage = "Error interno del servidor. Contacta al administrador."
+        }
+      } else if (error.response?.status === 400) {
+        errorMessage = "Datos inválidos. Verifica que todos los campos estén correctos."
+      } else if (error.response?.status === 404) {
+        errorMessage = "El paquete no fue encontrado"
+      } else if (error.response?.status === 403) {
+        errorMessage = "No tienes permisos para actualizar este paquete"
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+
+      Swal.fire({
+        title: "Error",
+        text: errorMessage,
+        icon: "error",
+        confirmButtonText: "Entendido",
+      })
     }
   }
 
@@ -336,7 +428,7 @@ export const Paquetes = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br  to-blue-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-slate-600 text-sm sm:text-base">Cargando paquetes...</p>
@@ -371,17 +463,9 @@ export const Paquetes = () => {
           <p className="text-slate-600 text-sm sm:text-base">Encuentra el paquete perfecto para tu próximo viaje</p>
         </div>
 
-
         {/* Controles superiores */}
         <div className="flex flex-wrap gap-3 sm:gap-4 items-center justify-center">
           <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
-
-  if (paquetes.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="flex flex-col items-center pt-16 gap-8">
-          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
-
             <button
               onClick={() => navigate("/crearPaquete")}
               className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
@@ -390,7 +474,6 @@ export const Paquetes = () => {
               <span className="hidden sm:inline">Agregar</span> Paquete
             </button>
           </RoleBasedComponent>
-
 
           <button
             onClick={() => setMostrarFiltros(!mostrarFiltros)}
@@ -507,36 +590,6 @@ export const Paquetes = () => {
                 : "Intenta ajustar los filtros de búsqueda."}
             </p>
             {filtros.hotel || filtros.destino || filtros.precioMin || filtros.precioMax ? (
-
-  return (
-
-    <div className="flex flex-col items-center pt-16 gap-8">
-      <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
-        <button
-          onClick={() => navigate("/crearPaquete")}
-          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-        >
-          + Agregar Paquete
-        </button>
-      </RoleBasedComponent>
-
-      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-7xl">
-        {paquetes.map((paquete, index) => {
-          const enEdicion = editandoId === paquete.id_paquete
-          const esFavorito = favoritos.some((fav) => fav.id_paquete === paquete.id_paquete)
-
-          return (
-            <div
-              key={paquete.id_paquete || index}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 p-5 transform hover:-translate-y-1 border border-slate-100 cursor-pointer relative"
-              onClick={() => {
-                console.log("Card clicked, paquete:", paquete) // Para debug
-                setPaqueteSeleccionado(paquete)
-                setShowPreviewModal(true)
-              }}
-            >
-              {/* Botón de favorito */}
-
               <button
                 onClick={limpiarFiltros}
                 className="px-4 sm:px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm sm:text-base"
@@ -625,7 +678,7 @@ export const Paquetes = () => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                             strokeWidth={2}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                           />
                         </svg>
                         <p className="text-xs sm:text-sm">Sin imagen</p>
@@ -751,31 +804,6 @@ export const Paquetes = () => {
                     </div>
                   )}
 
-
-                </div>
-              </RoleBasedComponent>
-            </div>
-          )
-        })}
-      </div>
-
-      {/* Modal de Preview del Paquete */}
-      {showPreviewModal && paqueteSeleccionado && (
-        <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Header del modal */}
-            <div className="relative bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white p-6">
-              <button
-                onClick={() => {
-                  setShowPreviewModal(false)
-                  setPaqueteSeleccionado(null)
-                }}
-                className="absolute top-4 right-4 p-2 hover:bg-white hover:bg-opacity-20 rounded-full transition-all duration-200"
-              >
-                <X className="w-6 h-6" />
-              </button>
-
-
                   {/* Botones de acción */}
                   <div className="flex gap-1 sm:gap-2">
                     <button
@@ -855,7 +883,6 @@ export const Paquetes = () => {
                         </div>
                       )}
                     </div>
-
                   </RoleBasedComponent>
                 </div>
               )
@@ -865,7 +892,7 @@ export const Paquetes = () => {
 
         {/* Modal de Preview del Paquete */}
         {showPreviewModal && paqueteSeleccionado && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-transparent bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
               {/* Header del modal */}
               <div className="relative bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 text-white p-4 sm:p-6">
@@ -882,7 +909,6 @@ export const Paquetes = () => {
                 <div className="flex items-center space-x-3 sm:space-x-4">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center">
                     <Star className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-
                   </div>
                   <div>
                     <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold">{paqueteSeleccionado.nombrePaquete}</h2>
@@ -1033,64 +1059,3 @@ export const Paquetes = () => {
     </div>
   )
 }
-
-export const PaquetesCard = ({ paquete, onComprar, onFavorito, esFavorito }) => (
-  <div className="min-w-[300px] max-w-xs bg-white rounded-2xl shadow p-4 border border-emerald-100 flex-shrink-0 relative">
-    <button
-      onClick={() => onFavorito(paquete)}
-      className={`absolute top-2 right-2 p-2 rounded-full transition-all duration-200 hover:scale-110 z-10 ${esFavorito
-          ? "bg-red-500 hover:bg-red-600 text-white shadow-lg"
-          : "bg-white/80 hover:bg-white text-gray-600 hover:text-red-500 shadow-md backdrop-blur-sm"
-        }`}
-      title={esFavorito ? "Remover de favoritos" : "Agregar a favoritos"}
-    >
-      <Heart className={`w-4 h-4 ${esFavorito ? "fill-current" : ""}`} />
-    </button>
-    <h4 className="text-xl font-semibold mb-1">{paquete.nombrePaquete || paquete.paquete || "Paquete"}</h4>
-    <p className="text-gray-600 text-sm mb-2">{paquete.descripcion || ""}</p>
-    <ul className="text-sm space-y-1 mb-2">
-      {paquete.destino && (
-        <li>
-          <strong>Destino:</strong> {paquete.destino}
-        </li>
-      )}
-      {paquete.hotel && (
-        <li>
-          <strong>Hotel:</strong> {paquete.hotel}
-        </li>
-      )}
-      {paquete.duracion && (
-        <li>
-          <strong>Duración:</strong> {paquete.duracion}
-        </li>
-      )}
-      {paquete.fechaSalida && (
-        <li>
-          <strong>Salida:</strong> {paquete.fechaSalida}
-        </li>
-      )}
-      {paquete.precio && (
-        <li>
-          <strong>Precio:</strong> {paquete.precio}
-        </li>
-      )}
-      {paquete.calificacion && (
-        <li>
-          <strong>Calificación:</strong> {paquete.calificacion}
-        </li>
-      )}
-      {paquete.estado && (
-        <li>
-          <strong>Estado:</strong> {paquete.estado}
-        </li>
-      )}
-    </ul>
-    <button
-      onClick={() => onComprar(paquete.nombrePaquete || paquete.paquete)}
-      className="w-full mt-2 px-5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl transition-all duration-200 hover:scale-105"
-    >
-      Comprar
-    </button>
-  </div>
-)
-
