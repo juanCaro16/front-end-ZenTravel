@@ -27,6 +27,8 @@ import { Hoteles } from "./Pages/Hoteles/Hoteles"
 import { MisViajes } from "./Pages/MisViajes/MisViajes"
 import { CrearHoteles } from "./Pages/CrearHoteles/CrearHoteles"
 import { ReservarHotel } from "./Pages/ReservaHotel/ReservaHotel"
+import { SolicitarCambioRol } from "./Pages/SolicitarCambioRol/SolicitarCambioRol"
+
 
 export const App = () => {
   const { isAuthenticated, userRole, login, logout } = useAuth()
@@ -151,6 +153,8 @@ export const App = () => {
         <Route path="/servicios" element={<Servicios />} />
         <Route path="/contacto" element={<Contacto />} />
         <Route path="/soporte" element={<Soporte />} />
+        <Route path="/solicitar-cambio-rol" element={<SolicitarCambioRol />} />
+        
 
         {/* Rutas protegidas */}
         <Route
