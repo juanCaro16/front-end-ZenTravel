@@ -433,6 +433,22 @@ export const Paquetes = () => {
         <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p className="text-slate-600 text-sm sm:text-base">Cargando paquetes...</p>
 
+
+  if (paquetes.length === 0) {
+    return (
+      <div className="min-h-screen ">
+        <div className="flex flex-col items-center pt-16 gap-8">
+          <RoleBasedComponent allowedRoles={["admin", "Empleado"]}>
+            <button
+              onClick={() => navigate("/crearPaquete")}
+              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              + Agregar Paquete
+            </button>
+          </RoleBasedComponent>
+          <p className="text-center mt-8 text-slate-600">No hay paquetes disponibles.</p>
+        </div>
+
       </div>
     )
 
