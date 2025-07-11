@@ -1,9 +1,11 @@
+"use client"
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Menu, X, Phone, Globe, Luggage, HelpCircle, TestTube } from "lucide-react"
-import { IoHome } from "react-icons/io5";
-import { FaSuitcaseRolling,FaHeadSideVirus } from "react-icons/fa6";
-import { FaBuilding } from "react-icons/fa";
+import { Menu, X, Phone, Globe, HelpCircle } from "lucide-react"
+import { IoHome } from "react-icons/io5"
+import { FaSuitcaseRolling, FaHeadSideVirus } from "react-icons/fa6"
+import { FaBuilding } from "react-icons/fa"
 import img from "../../Images/logofull_sin_fondo-Photoroom.png"
 import { ItemNavLink } from "../../Components/ItemNavLink/ItemNavLink"
 import { ProfileButton } from "../../Components/ProfileButton/ProfileButton"
@@ -21,82 +23,87 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
     navigate("/")
   }
 
-  
-
   return (
-    <header className="w-[100%] bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50  ">
-      <div className=" mx-auto sm:px-6 lg:px-8">
-        <div className="w-full flex items-center h-16 ">
+    <header className="w-full bg-white/95 backdrop-blur-md shadow-lg border-b border-gray-100 sticky top-0 z-50">
+      <div className="mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-full flex items-center justify-between h-16">
           {/* Logo y navegación principal */}
-          <div className="flex items-center w-[60%] gap-5">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate("/index")}>
-              <img className="w-12 h-12 object-contain" src={img || "/placeholder.svg"} alt="ZenTravel Logo" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+          <div className="flex items-center flex-1">
+            <div className="flex items-center space-x-2 sm:space-x-3 cursor-pointer" onClick={() => navigate("/index")}>
+              <img
+                className="w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 object-contain"
+                src={img || "/placeholder.svg"}
+                alt="ZenTravel Logo"
+              />
+              <span className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
                 ZenTravel
               </span>
             </div>
 
-            <nav className="hidden lg:flex items-center space-x-1">
+            {/* Navegación desktop */}
+            <nav className="hidden lg:flex items-center space-x-1 ml-8">
               <ItemNavLink
                 route="/index"
-                myStyles="px-2 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
                 content={({ isActive }) =>
                   isActive ? (
                     <span className="flex items-center gap-1">
                       <IoHome size={15} />
-                      inicio
+                      Inicio
                     </span>
-                  ) : "inicio"
+                  ) : (
+                    "Inicio"
+                  )
                 }
-          
               />
               <ItemNavLink
                 route="/paquetes"
-                myStyles="px-2 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
-                content = {({ isActive }) =>
+                myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
+                content={({ isActive }) =>
                   isActive ? (
-                    <span className="flex items-center gap-1 ">
+                    <span className="flex items-center gap-1">
                       <FaSuitcaseRolling size={15} />
                       Paquetes
                     </span>
-                  ) : "Paquetes"
+                  ) : (
+                    "Paquetes"
+                  )
                 }
-               
               />
               <ItemNavLink
                 route="/Hoteles"
-                myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
                 content={({ isActive }) =>
                   isActive ? (
-                    <span className="flex items-center gap-1 ">
+                    <span className="flex items-center gap-1">
                       <FaBuilding size={15} />
                       Hoteles
                     </span>
-                  ) : "Hoteles"
+                  ) : (
+                    "Hoteles"
+                  )
                 }
               />
               <ItemNavLink
-                
                 route="/ZenIA"
-                myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
                 content={({ isActive }) =>
                   isActive ? (
-                    <span className="flex items-center gap-1 ">
+                    <span className="flex items-center gap-1">
                       <FaHeadSideVirus size={15} />
-                      Asistente IA
+                      Planea tu viaje con IA
                     </span>
-                  ) : "Asistente IA"
+                  ) : (
+                    "Planea tu viaje con IA"
+                  )
                 }
               />
-
-              {/* Enlace para probar permisos - solo visible cuando está autenticado */}
-              
 
               <RoleBasedComponent allowedRoles={["admin"]}>
                 <ItemNavLink
                   content="Admin Panel"
                   route="/admin"
-                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                  myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
                 />
               </RoleBasedComponent>
 
@@ -104,15 +111,14 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
                 <ItemNavLink
                   content="Panel Empleado"
                   route="/employee"
-                  myStyles="px-4 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium"
+                  myStyles="px-3 py-2 rounded-lg text-gray-700 hover:text-emerald-600 hover:bg-emerald-50 transition-all duration-200 font-medium text-sm xl:text-base"
                 />
               </RoleBasedComponent>
-
             </nav>
           </div>
 
           {/* Controles adicionales */}
-          <div className="flex items-center ml-auto">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {/* Info adicional - Desktop */}
             <div className="hidden xl:flex items-center w-full  space-x-4 text-sm text-gray-600">
               <div className="flex items-center space-x-2">
@@ -144,26 +150,35 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               <div className="w-px h-4 bg-gray-300"></div>
 
               <ItemNavLink
-              content="Mis viajes"
-              route="/mis-viajes"
-              myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
-            />
+                content="Mis viajes"
+                route="/mis-viajes"
+                myStyles="block px-3 py-2 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+              />
+            </div>
+
+            {/* Mis viajes - Tablet */}
+            <div className="hidden md:block xl:hidden">
+              <ItemNavLink
+                content="Mis viajes"
+                route="/mis-viajes"
+                myStyles="px-3 py-2 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium text-sm"
+              />
             </div>
 
             {/* Autenticación */}
             {isAuthenticated ? (
               <ProfileButton />
             ) : (
-              <div className="hidden md:flex items-center ">
+              <div className="hidden sm:flex items-center space-x-2">
                 <button
                   onClick={() => navigate("/")}
-                  className="px-4 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200"
+                  className="px-3 py-2 text-gray-700 hover:text-emerald-600 font-medium transition-colors duration-200 text-sm lg:text-base"
                 >
                   Iniciar Sesión
                 </button>
                 <button
                   onClick={() => navigate("/register")}
-                  className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transform hover:scale-105 transition-all duration-200 font-medium shadow-lg"
+                  className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transform hover:scale-105 transition-all duration-200 font-medium shadow-lg text-sm lg:text-base"
                 >
                   Registrarse
                 </button>
@@ -184,7 +199,7 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
       {/* Menú móvil desplegable */}
       {menuOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
-          <div className="px-4 py-6 space-y-4">
+          <div className="px-4 py-6 space-y-4 max-h-screen overflow-y-auto">
             <ItemNavLink
               content="Inicio"
               route="/index"
@@ -196,13 +211,18 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
-              content="Hotel"
+              content="Hoteles"
               route="/hoteles"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
-              content="Asistente IA"
+              content="Planea tu viaje con IA"
               route="/ZenIA"
+              myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+            />
+            <ItemNavLink
+              content="Mis viajes"
+              route="/mis-viajes"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
             <ItemNavLink
@@ -210,15 +230,6 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               route="/soporte"
               myStyles="block px-4 py-3 rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
             />
-
-            {/* Enlace de testing en móvil */}
-            {isAuthenticated && (
-              <ItemNavLink
-                content="🧪 Test Permisos"
-                route="/test-permissions"
-                myStyles="block px-4 py-3 rounded-lg text-orange-600 hover:bg-orange-50 hover:text-orange-700 transition-all duration-200 font-medium border border-orange-200"
-              />
-            )}
 
             <RoleBasedComponent allowedRoles={["admin"]}>
               <ItemNavLink
@@ -248,14 +259,20 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               {!isAuthenticated ? (
                 <div className="space-y-3">
                   <button
-                    onClick={() => navigate("/")}
-                    className="w-screen px-4 py-3 text-left rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
+                    onClick={() => {
+                      navigate("/")
+                      setMenuOpen(false)
+                    }}
+                    className="w-full px-4 py-3 text-left rounded-lg text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 transition-all duration-200 font-medium"
                   >
                     Iniciar Sesión
                   </button>
                   <button
-                    onClick={() => navigate("/register")}
-                    className="w-screen px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 font-medium"
+                    onClick={() => {
+                      navigate("/register")
+                      setMenuOpen(false)
+                    }}
+                    className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-lg hover:from-emerald-600 hover:to-teal-600 transition-all duration-200 font-medium"
                   >
                     Registrarse
                   </button>
@@ -263,11 +280,24 @@ export const AppHeader = ({ isAuthenticated, onLogout }) => {
               ) : (
                 <button
                   onClick={handleLogout}
-                  className="w-screen px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-3 text-left rounded-lg text-red-600 hover:bg-red-50 transition-all duration-200 font-medium"
                 >
                   Cerrar sesión
                 </button>
               )}
+            </div>
+
+            {/* Info adicional en móvil */}
+            <div className="pt-4 border-t border-gray-200 space-y-3">
+              <div className="flex items-center justify-center space-x-2 text-sm text-gray-600">
+                <Globe className="w-4 h-4" />
+                <img src="https://flagcdn.com/w20/co.png" alt="Colombia" className="w-5 h-3 rounded-sm" />
+                <span className="font-medium">ES - COP</span>
+              </div>
+              <div className="flex items-center justify-center space-x-2 text-emerald-600 font-semibold text-sm">
+                <Phone className="w-4 h-4" />
+                <span>601 743 6620</span>
+              </div>
             </div>
           </div>
         </div>

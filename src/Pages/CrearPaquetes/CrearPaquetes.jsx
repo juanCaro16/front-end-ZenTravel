@@ -543,7 +543,6 @@ const buscarHabitacion = async (nombreHotel) => {
     "Transporte local",
     "Guía turístico",
     "Entradas a sitios",
-    "Seguro de viaje",
     "Actividades programadas",
   ]
 
