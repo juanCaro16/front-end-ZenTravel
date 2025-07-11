@@ -349,11 +349,11 @@ const buscarHabitacion = async (nombreHotel) => {
                   <select
                     name="nombreTransporte"
                     value={formData.nombreTransporte}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       setFormData({ ...formData, nombreTransporte: e.target.value })
-                    }
+                      // Ya no se borra la lista al seleccionar
+                    }}
                     className="w-full p-3 border border-gray-300 rounded-xl bg-white text-sm text-gray-700 resize-none whitespace-normal break-words"
-                    size={opcionesTransporte.length > 3 ? 4 : opcionesTransporte.length}
                   >
                     <option value="">Selecciona un transporte</option>
                     {opcionesTransporte.map((item) => (
