@@ -182,26 +182,16 @@ export const Hoteles = () => {
 
   if (loading) {
     return (
-<<<<<<< HEAD
 
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
         <p className="text-slate-600 text-sm sm:text-base">Cargando hoteles...</p>
       </div>
 
-=======
-      
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-slate-600 text-sm sm:text-base">Cargando hoteles...</p>
-        </div>
-      
->>>>>>> 7c931f878ce6bc6fe6c06c948ae0e4c8c4029b85
     )
   }
 
   return (
-<<<<<<< HEAD
 
     <div className="flex flex-col items-center gap-6 sm:gap-8 px-4 mt-10">
       {/* Header */}
@@ -209,27 +199,6 @@ export const Hoteles = () => {
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-2">Hoteles Disponibles</h1>
         <p className="text-slate-600 text-sm sm:text-base">Encuentra el hotel perfecto para tu estadía</p>
       </div>
-=======
-    
-      <div className="flex flex-col items-center gap-6 sm:gap-8 px-4">
-        {/* Header */}
-        <div className="text-center">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-800 mb-2">Hoteles Disponibles</h1>
-          <p className="text-slate-600 text-sm sm:text-base">Encuentra el hotel perfecto para tu estadía</p>
-        </div>
-
-        {/* Controles superiores */}
-        <div className="flex flex-wrap gap-3 sm:gap-4 items-center justify-center">
-          <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
-            <button
-              onClick={() => navigate("/crearHoteles")}
-              className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden sm:inline">Agregar</span> Hotel
-            </button>
-          </RoleBasedComponent>
->>>>>>> 7c931f878ce6bc6fe6c06c948ae0e4c8c4029b85
 
       {/* Controles superiores */}
       <div className="flex flex-wrap gap-3 sm:gap-4 items-center justify-center">
@@ -895,15 +864,9 @@ export const Hoteles = () => {
               </div>
             </div>
           </div>
-<<<<<<< HEAD
         </div>
       )}
     </div>
 
-=======
-        )}
-      </div>
-    
->>>>>>> 7c931f878ce6bc6fe6c06c948ae0e4c8c4029b85
   )
 }
