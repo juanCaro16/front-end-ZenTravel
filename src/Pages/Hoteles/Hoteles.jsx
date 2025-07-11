@@ -204,7 +204,7 @@ export const Hoteles = () => {
         <div className="flex flex-wrap gap-3 sm:gap-4 items-center justify-center">
           <RoleBasedComponent allowedRoles={["admin", "empleado"]}>
             <button
-              onClick={() => navigate("/crearHotel")}
+              onClick={() => navigate("/crearHoteles")}
               className="px-4 sm:px-6 py-2 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center gap-2 text-sm sm:text-base"
             >
               <Plus className="w-4 h-4" />
